@@ -1,0 +1,4 @@
+name: docu_fill
+packages:
+  - apps/*
+  - packages/*
