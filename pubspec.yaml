@@ -3,3 +3,5 @@ environment:
   sdk: ">=3.7.2 <4.0.0"
 dev_dependencies:
   melos: ^6.3.2
+dependencies:
+  easy_localization: ^3.0.7+1

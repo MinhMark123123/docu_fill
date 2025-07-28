@@ -8,6 +8,11 @@ A new Flutter project.
 ```shell
 flutter pub run build_runner build --delete-conflicting-outputs
 ```
+### gen assets
+```shell
+fluttergen -c pubspec.yaml
+```
+
 This project is a starting point for a Flutter application.
 
 A few resources to get you started if this is your first Flutter project:
