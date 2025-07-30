@@ -1,4 +1,4 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
 abstract class UiActionEvent<T> {
   final Function(T? completeData)? onCompleted;
@@ -30,8 +30,20 @@ class ShowSnackbarEvent extends UiActionEvent<void> {
 class ShowDialogEvent<T> extends UiActionEvent<T> {
   final String? title;
   final String? content;
-  final List<VoidCallback>? actions;
+  final List<DialogAction>? actions;
 
   // Add other dialog properties as needed (e.g., action buttons)
   ShowDialogEvent({this.title, this.content, super.onCompleted, this.actions});
+}
+
+class DialogAction {
+  final String title;
+  final Function(BuildContext context) onPressed;
+  final bool isDestructive;
+
+  DialogAction({
+    required this.title,
+    required this.onPressed,
+    this.isDestructive = false,
+  });
 }

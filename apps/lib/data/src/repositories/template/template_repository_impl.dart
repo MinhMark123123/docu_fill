@@ -50,4 +50,10 @@ class TemplateRepositoryImpl implements TemplateRepository {
         .watchTemplateByName(name)
         .map((model) => model?.toDomain());
   }
+
+  @override
+  Future<TemplateConfig?> getTemplateById(int id) async {
+    final model = await localDataSource.getTemplateById(id);
+    return model?.toDomain();
+  }
 }

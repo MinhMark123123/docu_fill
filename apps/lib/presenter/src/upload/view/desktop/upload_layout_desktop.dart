@@ -1,6 +1,7 @@
 import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/gen/assets.gen.dart';
 import 'package:docu_fill/presenter/page.dart';
+import 'package:docu_fill/presenter/src/widgets/desktop_top_title.dart';
 import 'package:docu_fill/ui/ui.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -97,28 +98,10 @@ class UploadLayoutDesktop extends StatelessWidget {
   }
 
   Widget header(BuildContext context) {
-    return AspectRatio(
+    return DesktopTopTitle(
       aspectRatio: 960 / 105,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: Dimens.size16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              AppLang.actionsUploadTemplate.tr(),
-              style: context.textTheme.displayLarge,
-            ),
-            Dimens.spacing.vertical(Dimens.size12),
-            Text(
-              AppLang.messagesUploadTemplate.tr(),
-              style: context.textTheme.bodySmall?.copyWith(
-                color: context.appColors?.bodyTextColor,
-              ),
-            ),
-          ],
-        ),
-      ),
+      title: AppLang.actionsUploadTemplate.tr(),
+      subtitle: AppLang.messagesUploadTemplate.tr(),
     );
   }
 

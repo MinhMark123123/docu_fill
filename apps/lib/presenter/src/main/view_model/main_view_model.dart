@@ -16,6 +16,7 @@ class MainViewModel extends BaseViewModel {
 
   void selectMenu(BuildContext context, MainDesktopMenu menu) {
     if (menu == _currentMenu.data) return;
+
     _currentMenu.postValue(menu);
     if (GoRouter.of(context).state.path != menu.pathRoute) {
       navigatePage(menu.pathRoute);

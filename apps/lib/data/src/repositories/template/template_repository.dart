@@ -4,6 +4,7 @@ import 'package:docu_fill/data/src/template_config.dart';
 
 abstract class TemplateRepository {
   Future<List<TemplateConfig>> getAllTemplates();
+  Future<TemplateConfig?> getTemplateById(int id);
   Future<TemplateConfig?> getTemplateByName(String name);
   Future<void> saveTemplate(TemplateConfig template);
   Future<void> deleteTemplateByName(String name);

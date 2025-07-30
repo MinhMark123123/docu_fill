@@ -26,7 +26,7 @@ packages:
     source: hosted
     version: "7.7.1"
   archive:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: archive
       sha256: cb6a278ef2dbb298455e1a713bda08524a175630ec643a242c399c932a0a1f7d
@@ -233,14 +233,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
-  docx_template:
+  docx_to_text:
     dependency: "direct main"
     description:
-      name: docx_template
-      sha256: "0dbdaa47c1ef6cf34565820c647771721886170d8fbc5dd6ca6c0af6adc17503"
+      name: docx_to_text
+      sha256: d94e199bf9f36321cbd7701f82ce4874d7b94fd362a007fd4923ba9d57794664
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.0"
+    version: "1.0.1"
   easy_localization:
     dependency: "direct main"
     description:
@@ -806,6 +806,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.0"
+  simple_loading_dialog:
+    dependency: "direct main"
+    description:
+      name: simple_loading_dialog
+      sha256: d0b3a9d488c017fdab9e7fb64749a5a78fe1b0b2e6baa39c54003b445c9ad53a
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -955,6 +963,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  two_dimensional_scrollables:
+    dependency: "direct main"
+    description:
+      name: two_dimensional_scrollables
+      sha256: "0f77ecb96596f2f82eec2b0a8e60d9305c58315557da9fa3b610c7dbf5ded621"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.7"
   typed_data:
     dependency: transitive
     description:
@@ -1068,7 +1084,7 @@ packages:
     source: hosted
     version: "1.1.0"
   xml:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: xml
       sha256: b015a8ad1c488f66851d762d3090a21c600e479dc75e68328c52774040cf9226

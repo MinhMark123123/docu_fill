@@ -14,6 +14,7 @@ class TemplateConfigModel {
     replace: true,
   ) // Ensure templateName is unique and replaces on conflict
   late String templateName;
+  late String pathTemplate;
 
   late String version;
 
@@ -24,6 +25,7 @@ class TemplateConfigModel {
   TemplateConfigModel({
     this.id = Isar.autoIncrement,
     this.templateName = '',
+    this.pathTemplate = '',
     this.version = '',
     this.fields = const [],
   });
@@ -33,6 +35,7 @@ class TemplateConfigModel {
     return TemplateConfigModel(
       // id will be handled by Isar or set if updating an existing one
       templateName: domainConfig.templateName,
+      pathTemplate: domainConfig.pathTemplate,
       version: domainConfig.version,
       fields:
           domainConfig.fields
@@ -45,8 +48,9 @@ class TemplateConfigModel {
   TemplateConfig toDomain() {
     return TemplateConfig(
       templateName: templateName,
+      pathTemplate: pathTemplate,
       version: version,
       fields: fields.map((modelField) => modelField.toDomain()).toList(),
-    );
+    )..id = id;
   }
 }

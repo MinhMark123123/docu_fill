@@ -7,7 +7,7 @@ part 'template_field.g.dart'; // Ensure this matches your file name
 class TemplateField {
   final String key;
   final String label;
-  final FileType type;
+  final FieldType type;
   final bool required;
 
   // Use @JsonKey to map Dart field name 'defaultValue' to JSON key 'default'
@@ -31,7 +31,7 @@ class TemplateField {
   Map<String, dynamic> toJson() => _$TemplateFieldToJson(this);
 }
 
-enum FileType {
+enum FieldType {
   @JsonValue("text")
   text("text"),
   @JsonValue("datetime")
@@ -41,12 +41,23 @@ enum FileType {
 
   final String value;
 
-  const FileType(this.value);
+  const FieldType(this.value);
 
-  static FileType fromValue(String? value) {
-    return FileType.values.firstWhere(
+  static FieldType fromValue(String? value) {
+    return FieldType.values.firstWhere(
       (e) => e.value == value,
-      orElse: () => FileType.text,
+      orElse: () => FieldType.text,
     );
+  }
+
+  String label() {
+    switch (this) {
+      case FieldType.text:
+        return "Text";
+      case FieldType.datetime:
+        return "Date Time";
+      case FieldType.selection:
+        return "Selection";
+    }
   }
 }

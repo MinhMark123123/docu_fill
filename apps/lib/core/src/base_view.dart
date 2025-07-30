@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
+import 'loading_dialog_manager.dart';
+
 abstract class BaseView<T extends BaseViewModel>
     extends DependencyViewModelWidget<T> {
   const BaseView({super.key});
@@ -16,10 +18,13 @@ abstract class BaseView<T extends BaseViewModel>
     final subNavigate = _handlePageNavigator(wrapperContext.context, viewModel);
     final subSnackbar = _handleSnackbar(wrapperContext.context, viewModel);
     final subDialog = _handleDialog(wrapperContext.context, viewModel);
+    final subLoading = _handleLoading(wrapperContext.context, viewModel);
     wrapperContext.lifeCycleManager.onDispose(() {
       subNavigate.cancel();
       subSnackbar.cancel();
       subDialog.cancel();
+      subLoading.cancel();
+      LoadingDialogManager().closeLoadingDialog();
     });
   }
 
@@ -53,23 +58,38 @@ abstract class BaseView<T extends BaseViewModel>
       if (!context.mounted || event.title == null) return;
       showDialog(
         context: context,
-        builder:
-            (dialogContext) => AlertDialog(
-              title: Text(event.title!),
-              content: Text(event.content ?? ""),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(dialogContext).pop();
-                    event.onCompleted?.call(null);
-                  },
-                ),
-              ],
-            ),
+        barrierDismissible: event.actions == null,
+        builder: (dialogContext) {
+          return alertDialogBuilder(event, dialogContext);
+        },
       );
     });
     return sub;
+  }
+
+  AlertDialog alertDialogBuilder(
+    ShowDialogEvent<dynamic> event,
+    BuildContext dialogContext,
+  ) {
+    return AlertDialog(
+      title: Text(event.title!),
+      content: Text(event.content ?? ""),
+      actions:
+          event.actions
+              ?.map(
+                (e) =>
+                    e.isDestructive
+                        ? TextButton(
+                          child: Text(e.title),
+                          onPressed: () => e.onPressed.call(dialogContext),
+                        )
+                        : ElevatedButton(
+                          onPressed: () => e.onPressed.call(dialogContext),
+                          child: Text(e.title),
+                        ),
+              )
+              .toList(),
+    );
   }
 
   StreamSubscription<ShowSnackbarEvent> _handleSnackbar(
@@ -85,6 +105,18 @@ abstract class BaseView<T extends BaseViewModel>
         ),
       );
       controller.closed.then((_) => event.onCompleted?.call(null));
+    });
+    return sub;
+  }
+
+  StreamSubscription<bool> _handleLoading(BuildContext context, T viewModel) {
+    final sub = viewModel.showLoading.asStream().listen((isLoading) {
+      print("cache event loading $isLoading ${context.mounted}");
+      if (context.mounted && isLoading) {
+        LoadingDialogManager().showLoadingDialog(context);
+      } else if (!isLoading) {
+        LoadingDialogManager().closeLoadingDialog();
+      }
     });
     return sub;
   }

@@ -10,6 +10,8 @@ part 'base_view_model.g.dart';
 @BindableViewModel()
 class BaseViewModel extends ViewModel {
   @Bind()
+  late final _showLoading = false.mtd(this);
+  @Bind()
   late final _navigatePageEvent = NavigatePageEvent().mtd(this);
   @Bind()
   late final _showSnackbarEvent = ShowSnackbarEvent().mtd(this);
@@ -45,10 +47,10 @@ class BaseViewModel extends ViewModel {
     return completer.future;
   }
 
-  Future<T?> showDialog<T>({
+  Future<T?> showAppAlertDialog<T>({
     String? title,
     String? content,
-    List<VoidCallback>? actions,
+    required List<DialogAction> actions,
   }) async {
     Completer<T?> completer = Completer<T?>();
     _showDialogEvent.postValue(
@@ -60,5 +62,14 @@ class BaseViewModel extends ViewModel {
       ),
     );
     return completer.future;
+  }
+
+  Future<dynamic> loadingGuard(Future<dynamic> future) async {
+    _showLoading.postValue(true);
+    try {
+      return await future;
+    } finally {
+      _showLoading.postValue(false);
+    }
   }
 }

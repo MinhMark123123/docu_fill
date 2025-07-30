@@ -45,7 +45,7 @@ class TemplateFieldModel {
     return TemplateField(
       key: key,
       label: label,
-      type: FileType.fromValue(type),
+      type: FieldType.fromValue(type),
       required: required,
       defaultValue: defaultValue,
       options: options,

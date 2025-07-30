@@ -25,12 +25,17 @@ const TemplateConfigModelSchema = CollectionSchema(
 
       target: r'TemplateFieldModel',
     ),
-    r'templateName': PropertySchema(
+    r'pathTemplate': PropertySchema(
       id: 1,
+      name: r'pathTemplate',
+      type: IsarType.string,
+    ),
+    r'templateName': PropertySchema(
+      id: 2,
       name: r'templateName',
       type: IsarType.string,
     ),
-    r'version': PropertySchema(id: 2, name: r'version', type: IsarType.string),
+    r'version': PropertySchema(id: 3, name: r'version', type: IsarType.string),
   },
 
   estimateSize: _templateConfigModelEstimateSize,
@@ -80,6 +85,7 @@ int _templateConfigModelEstimateSize(
       );
     }
   }
+  bytesCount += 3 + object.pathTemplate.length * 3;
   bytesCount += 3 + object.templateName.length * 3;
   bytesCount += 3 + object.version.length * 3;
   return bytesCount;
@@ -97,8 +103,9 @@ void _templateConfigModelSerialize(
     TemplateFieldModelSchema.serialize,
     object.fields,
   );
-  writer.writeString(offsets[1], object.templateName);
-  writer.writeString(offsets[2], object.version);
+  writer.writeString(offsets[1], object.pathTemplate);
+  writer.writeString(offsets[2], object.templateName);
+  writer.writeString(offsets[3], object.version);
 }
 
 TemplateConfigModel _templateConfigModelDeserialize(
@@ -117,8 +124,9 @@ TemplateConfigModel _templateConfigModelDeserialize(
         ) ??
         const [],
     id: id,
-    templateName: reader.readStringOrNull(offsets[1]) ?? '',
-    version: reader.readStringOrNull(offsets[2]) ?? '',
+    pathTemplate: reader.readStringOrNull(offsets[1]) ?? '',
+    templateName: reader.readStringOrNull(offsets[2]) ?? '',
+    version: reader.readStringOrNull(offsets[3]) ?? '',
   );
   return object;
 }
@@ -142,6 +150,8 @@ P _templateConfigModelDeserializeProp<P>(
     case 1:
       return (reader.readStringOrNull(offset) ?? '') as P;
     case 2:
+      return (reader.readStringOrNull(offset) ?? '') as P;
+    case 3:
       return (reader.readStringOrNull(offset) ?? '') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -480,6 +490,147 @@ extension TemplateConfigModelQueryFilter
   }
 
   QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  pathTemplateEqualTo(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'pathTemplate',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  pathTemplateGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'pathTemplate',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  pathTemplateLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'pathTemplate',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  pathTemplateBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'pathTemplate',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  pathTemplateStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'pathTemplate',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  pathTemplateEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'pathTemplate',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  pathTemplateContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'pathTemplate',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  pathTemplateMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'pathTemplate',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  pathTemplateIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'pathTemplate', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  pathTemplateIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'pathTemplate', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
   templateNameEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -788,6 +939,20 @@ extension TemplateConfigModelQueryLinks
 extension TemplateConfigModelQuerySortBy
     on QueryBuilder<TemplateConfigModel, TemplateConfigModel, QSortBy> {
   QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  sortByPathTemplate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pathTemplate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  sortByPathTemplateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pathTemplate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
   sortByTemplateName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'templateName', Sort.asc);
@@ -833,6 +998,20 @@ extension TemplateConfigModelQuerySortThenBy
   }
 
   QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  thenByPathTemplate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pathTemplate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  thenByPathTemplateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'pathTemplate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
   thenByTemplateName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'templateName', Sort.asc);
@@ -864,6 +1043,13 @@ extension TemplateConfigModelQuerySortThenBy
 extension TemplateConfigModelQueryWhereDistinct
     on QueryBuilder<TemplateConfigModel, TemplateConfigModel, QDistinct> {
   QueryBuilder<TemplateConfigModel, TemplateConfigModel, QDistinct>
+  distinctByPathTemplate({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'pathTemplate', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QDistinct>
   distinctByTemplateName({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'templateName', caseSensitive: caseSensitive);
@@ -890,6 +1076,13 @@ extension TemplateConfigModelQueryProperty
   fieldsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'fields');
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, String, QQueryOperations>
+  pathTemplateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'pathTemplate');
     });
   }
 

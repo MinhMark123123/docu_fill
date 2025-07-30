@@ -206,7 +206,16 @@ class Dimens {
   static double get size99 => 99.w;
 
   static double get size100 => 100.w;
+
+  static double get size120 => 120.w;
+
+  static double get size150 => 150.w;
+
+  static double get size200 => 200.w;
+  static double get size400 => 400.w;
+
   static double get size928 => 928.w;
+
   static double get size232 => 232.w;
 
   // Add more dimensions as needed

@@ -57,6 +57,7 @@ abstract class AppLang {
   static const String actionsOpenDocument = "actions.open_document";
   static const String actionsReturnToTemplates = "actions.return_to_templates";
   static const String actionsDownloadDocument = "actions.download_document";
+  static const String actionsSelectDateTime = "actions.select_date_time";
 
   // --- Labels ---
   static const String labelsTemplates = "labels.templates";
@@ -68,8 +69,11 @@ abstract class AppLang {
   static const String labelsConfigureTemplateFields =
       "labels.configure_template_fields";
   static const String labelsDetectedFields = "labels.detected_fields";
+  static const String labelsFieldKey = "labels.field_key";
   static const String labelsFieldName = "labels.field_name";
   static const String labelsInputType = "labels.input_type";
+  static const String labelsOptions = "labels.options";
+  static const String labelsRequired = "labels.required";
   static const String labelsActions = "labels.actions";
   static const String labelsUploadDocxFile = "labels.upload_docx_file";
   static const String labelsSupportedFileTypes = "labels.supported_file_types";
@@ -79,6 +83,10 @@ abstract class AppLang {
   static const String labelsImportConfiguration = "labels.import_configuration";
   static const String labelsExportConfiguration = "labels.export_configuration";
   static const String labelsExportProgress = "labels.export_progress";
+  static const String labelsInputFieldName = "labels.input_field_name";
+  static const String labelsInputOptions = "labels.input_options";
+  static const String labelsEnterTemplateName = "labels.enter_template_name";
+  static const String labelsTemplateName = "labels.template_name";
 
   // --- Messages ---
   static const String messagesReviewAndConfigureFields =
@@ -89,6 +97,18 @@ abstract class AppLang {
   static const String messagesDocumentExportedReadyForDownload =
       "messages.document_exported_ready_for_download";
   static const String messagesUploadTemplate = "messages.upload_template";
+  static const String documentSuccessFullyCreate =
+      "messages.document_successfully_create";
+  static const String messagesConfirmCreateDocument =
+      "messages.confirm_create_document";
+  static const String messagesEnterTemplateNameHint =
+      "messages.enter_template_name_hint";
+  static const String messagesInputTextHint = "messages.input_text_hint";
+  static const String messagesFieldIsRequired = "messages.field_is_required";
+  static const String messagesPickFolderToExport =
+      "messages.pick_folder_to_export";
+  static const String messagesNameTheDocumentExported =
+      "messages.name_the_document_exported";
 
   // If you had more top-level keys or nested structures, you'd continue like this:
   // static const String someOtherTopLevelKey = "some_other_top_level_key";

@@ -221,7 +221,7 @@ class AppTheme {
           vertical: Dimens.size14,
         ),
         textStyle: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
-        shape: RoundedRectangleBorder(borderRadius: Dimens.radii.small()),
+        shape: RoundedRectangleBorder(borderRadius: Dimens.radii.borderSmall()),
       ),
     );
   }
@@ -240,7 +240,7 @@ class AppTheme {
           vertical: Dimens.size6,
         ),
         textStyle: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
-        shape: RoundedRectangleBorder(borderRadius: Dimens.radii.small()),
+        shape: RoundedRectangleBorder(borderRadius: Dimens.radii.borderSmall()),
       ),
     );
   }
@@ -273,7 +273,7 @@ class AppTheme {
         vertical: Dimens.size4,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: Dimens.radii.large(), // M3 often uses
+        borderRadius: Dimens.radii.borderLarge(), // M3 often uses
         // larger
         // radii
       ),
@@ -286,16 +286,16 @@ class AppTheme {
   ) {
     return InputDecorationTheme(
       border: OutlineInputBorder(
-        borderRadius: Dimens.radii.medium(),
+        borderRadius: Dimens.radii.borderMedium(),
         borderSide: BorderSide(color: borderColor),
       ),
       enabledBorder: OutlineInputBorder(
         // Explicitly define for enabled state
-        borderRadius: Dimens.radii.medium(),
+        borderRadius: Dimens.radii.borderMedium(),
         borderSide: BorderSide(color: borderColor),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: Dimens.radii.medium(),
+        borderRadius: Dimens.radii.borderMedium(),
         borderSide: BorderSide(color: focusedBorderColor, width: Dimens.size2),
       ),
     );

@@ -18,18 +18,23 @@ dependencies:
   google_fonts: ^6.2.1
   go_router: ^16.0.0
   flutter_screenutil: ^5.9.3
-  #architec
-  maac_mvvm_with_get_it: ^0.2.1+1
-  maac_mvvm_annotation: ^0.0.2
+  two_dimensional_scrollables: ^0.3.7
   adaptive_layout: ^0.1.7
   cached_network_image: ^3.4.1
   flutter_svg: ^2.2.0
+  simple_loading_dialog: ^1.0.0
+  #tools
   path: ^1.9.1
+  path_provider: ^2.1.0
+  docx_to_text: ^1.0.1
+  file_picker: ^10.2.0
+  xml: ^6.5.0
+  archive: ^3.3.6
+  #architec
+  maac_mvvm_with_get_it: ^0.2.1+1
+  maac_mvvm_annotation: ^0.0.2
   easy_localization: ^3.0.7+1
   json_annotation: ^4.7.0
-  path_provider: ^2.1.0
-  docx_template: ^0.4.0
-  file_picker: ^10.2.0
   isar:
     version: *isar_version
     hosted: https://pub.isar-community.dev/

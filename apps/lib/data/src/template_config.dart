@@ -10,14 +10,16 @@ part 'template_config.g.dart'; // Ensure this matches your file name
   createFactory: true, // Generate fromJson factory
 )
 class TemplateConfig {
+  late int id;
   @JsonKey(name: 'template_name')
   final String templateName;
-
+  final String pathTemplate;
   final String version;
   final List<TemplateField> fields;
 
   TemplateConfig({
     required this.templateName,
+    required this.pathTemplate,
     required this.version,
     required this.fields,
   });
@@ -28,4 +30,7 @@ class TemplateConfig {
 
   // Converts this EmployeeTemplate instance to a map.
   Map<String, dynamic> toJson() => _$TemplateConfigToJson(this);
+
+  factory TemplateConfig.none() => TemplateConfig(templateName: '',
+      pathTemplate: '', version: '', fields: []);
 }

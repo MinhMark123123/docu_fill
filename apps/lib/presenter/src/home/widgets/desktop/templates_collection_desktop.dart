@@ -13,56 +13,75 @@ class TemplatesCollectionDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       spacing: Dimens.size12,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: Dimens.size16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppLang.labelsTemplates.tr(),
-                style: context.textTheme.titleLarge,
-              ),
-              FilledButton(
-                onPressed: () => getViewModel<HomeViewModel>().onAddPressed(),
-                child: Text(
-                  AppLang.actionsAdd.tr(),
-                  style: context.textTheme.bodySmall,
-                ),
-              ),
-            ],
-          ),
-        ),
+      children: [header(context), templateBox(context)],
+    );
+  }
 
-        Expanded(
-          child: Theme(
-            data: context.theme.copyWith(
-              cardTheme: context.theme.cardTheme.copyWith(
-                color: Colors.white,
-                elevation: Dimens.size4,
-              ),
-            ),
-            child: Card(
-              child: ListView.separated(
-                padding: EdgeInsets.symmetric(
-                  horizontal: Dimens.size16,
-                  vertical: Dimens.size16,
-                ),
-                itemBuilder: (context, index) {
-                  return ItemDocumentCollection(
-                    id: index.toString(),
-                    title: "Proposal Template",
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return Dimens.spacing.vertical(Dimens.size16);
-                },
-                itemCount: 10,
-              ),
-            ),
+  Expanded templateBox(BuildContext context) {
+    return Expanded(
+      child: Theme(
+        data: context.theme.copyWith(
+          cardTheme: context.theme.cardTheme.copyWith(
+            color: Colors.white,
+            elevation: Dimens.size4,
           ),
         ),
-      ],
+        child: Card(child: templateList()),
+      ),
+    );
+  }
+
+  Widget templateList() {
+    final viewModel = getViewModel<HomeViewModel>();
+    return StreamDataConsumer(
+      streamData: viewModel.zipTemplatesAndSelected,
+      builder: (context, value) {
+        final selected = value.$2;
+        final templates = value.$1;
+        return ListView.separated(
+          padding: EdgeInsets.symmetric(
+            horizontal: Dimens.size20,
+            vertical: Dimens.size16,
+          ),
+          itemBuilder: (context, index) {
+            final isSelected = selected == templates[index].id;
+            return ItemDocumentCollection(
+              isSelected: isSelected,
+              id: index.toString(),
+              title: templates[index].templateName,
+              onItemPressed: () {
+                viewModel.onTemplateSelected(templates[index]);
+              },
+            );
+          },
+          separatorBuilder: (context, index) {
+            return Dimens.spacing.vertical(Dimens.size16);
+          },
+          itemCount: templates.length,
+        );
+      },
+    );
+  }
+
+  Padding header(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: Dimens.size16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            AppLang.labelsTemplates.tr(),
+            style: context.textTheme.titleLarge,
+          ),
+          FilledButton(
+            onPressed: () => getViewModel<HomeViewModel>().onAddPressed(),
+            child: Text(
+              AppLang.actionsAdd.tr(),
+              style: context.textTheme.bodySmall,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

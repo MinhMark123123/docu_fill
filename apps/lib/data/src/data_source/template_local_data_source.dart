@@ -3,6 +3,7 @@ import 'package:isar/isar.dart';
 
 abstract class TemplateLocalDataSource {
   Future<List<TemplateConfigModel>> getAllTemplates();
+  Future<TemplateConfigModel?> getTemplateById(int id);
   Future<TemplateConfigModel?> getTemplateByName(String name);
   Future<Id> saveTemplate(TemplateConfigModel template); // Returns ID
   Future<bool> deleteTemplate(Id templateId);
@@ -62,5 +63,10 @@ class TemplateLocalDataSourceImpl implements TemplateLocalDataSource {
         .templateNameEqualTo(name)
         .watch(fireImmediately: true)
         .map((results) => results.isNotEmpty ? results.first : null);
+  }
+
+  @override
+  Future<TemplateConfigModel?> getTemplateById(int id) async {
+    return await _isar.templateConfigModels.filter().idEqualTo(id).findFirst();
   }
 }

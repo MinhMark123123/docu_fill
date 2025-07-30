@@ -50,7 +50,8 @@
     "browse_files": "Browse Files",
     "open_document": "Open Document",
     "return_to_templates": "Return to Templates",
-    "download_document": "Download Document"
+    "download_document": "Download Document",
+    "select_date_time": "Select Date & Time"
   },
   "labels": {
     "templates": "Templates",
@@ -61,8 +62,11 @@
     "all_templates": "All Templates",
     "configure_template_fields": "Configure Template Fields",
     "detected_fields": "Detected Fields",
+    "field_key": "Field Key",
     "field_name": "Field Name",
     "input_type": "Input Type",
+    "options": "Options",
+    "required": "Required",
     "actions": "Actions",
     "upload_docx_file": "Upload .docx File",
     "supported_file_types": "Supported file types: .docx",
@@ -70,13 +74,24 @@
     "import_export_configuration": "Import/Export Configuration",
     "import_configuration": "Import Configuration",
     "export_configuration": "Export Configuration",
-    "export_progress": "Export Progress"
+    "export_progress": "Export Progress",
+    "input_field_name": "Input Field Name",
+    "input_options": "Input Options (comma-separated)",
+    "enter_template_name": "Enter Template Name",
+    "template_name": "Template Name"
   },
   "messages": {
     "review_and_configure_fields": "Review and configure the fields detected in your template. Ensure all fields are correctly identified and assigned the appropriate input type for accurate data collection.",
     "drag_and_drop_docx": "Drag and drop your .docx file here, or",
     "document_exported_successfully": "Document Exported Successfully",
     "document_exported_ready_for_download": "Your document has been successfully exported and is ready for download.",
-    "upload_template": "Select a .docx file to upload as a template. The system will automatically detect and configure fields within the document."
+    "upload_template": "Select a .docx file to upload as a template. The system will automatically detect and configure fields within the document.",
+    "document_successfully_create": "Your document has been successfully created.",
+    "confirm_create_document": "Are you sure you want to create a new document with the provided name {name}?",
+    "enter_template_name_hint": "Template name required to confirm.",
+    "input_text_hint": "Enter text here",
+    "field_is_required": "Field {fields} is required",
+    "pick_folder_to_export": "Pick a folder to export the document",
+    "name_the_document_exported": "Name the document you want to export"
   }
 }

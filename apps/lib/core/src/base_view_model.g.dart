@@ -8,6 +8,10 @@ part of 'base_view_model.dart';
 
 extension $BaseViewModel on BaseViewModel {
   /// This getter is used to access the stream of data
+  /// associated with the private field _showLoading.
+  StreamData<bool> get showLoading => _showLoading.streamData;
+
+  /// This getter is used to access the stream of data
   /// associated with the private field _navigatePageEvent.
   StreamData<NavigatePageEvent<dynamic>> get navigatePageEvent =>
       _navigatePageEvent.streamData;
