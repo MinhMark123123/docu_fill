@@ -8,7 +8,6 @@ import 'package:docu_fill/data/data.dart';
 import 'package:docu_fill/presenter/src/configure/model/table_row_data.dart';
 import 'package:docu_fill/route/routers.dart';
 import 'package:docu_fill/utils/utils.dart';
-import 'package:docx_to_text/docx_to_text.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
@@ -23,14 +22,14 @@ class ConfigureViewModel extends BaseViewModel {
   ConfigureViewModel({required TemplateRepository templateRepository})
     : _templateRepository = templateRepository;
 
-  String? _pathFilePicked;
-
   @Bind()
   late final _fieldsData = <TableRowData>[].mtd(this);
   @Bind()
   late final _enableConfirm = false.mtd(this);
   @Bind()
   late final _enableNameTemplate = false.mtd(this);
+
+  String? _pathFilePicked;
   final TextEditingController _nameController = TextEditingController();
 
   TextEditingController get nameController => _nameController;
@@ -52,7 +51,7 @@ class ConfigureViewModel extends BaseViewModel {
   Future<void> loadDoc() async {
     if (_pathFilePicked == null) return;
     final f = File(_pathFilePicked!);
-    final text = docxToText(await f.readAsBytes());
+    final text = DocxUtils.docxToText(await f.readAsBytes());
     final regex = RegExp(AppConst.placeHolderRegex);
     final matches = regex.allMatches(text);
     final fields = matches.map((match) {
@@ -66,8 +65,10 @@ class ConfigureViewModel extends BaseViewModel {
     String key, {
     String? fieldName,
     FieldType? inputType,
-    String? options,
+    List<String>? options,
     bool? isRequired,
+    String? defaultValue,
+    String? additionalInfo,
   }) async {
     final index = _fieldsData.data.indexWhere(
       (element) => element.fieldKey == key,
@@ -76,6 +77,18 @@ class ConfigureViewModel extends BaseViewModel {
     if (fieldName != null) {
       _fieldsData.data[index] = _fieldsData.data[index].copyWith(
         fieldName: fieldName,
+      );
+      shouldUpdateUI = false;
+    }
+    if (defaultValue != null) {
+      _fieldsData.data[index] = _fieldsData.data[index].copyWith(
+        fieldName: defaultValue,
+      );
+      shouldUpdateUI = false;
+    }
+    if (additionalInfo != null) {
+      _fieldsData.data[index] = _fieldsData.data[index].copyWith(
+        fieldName: additionalInfo,
       );
       shouldUpdateUI = false;
     }
@@ -91,17 +104,36 @@ class ConfigureViewModel extends BaseViewModel {
         inputType: inputType,
         options: options,
         isRequired: isRequired,
+        defaultValue: defaultValue,
+        additionalInfo: additionalInfo,
       );
       bool hasInputType = inputType != null;
-      bool shouldResetOptions =
-          inputType != FieldType.selection && newData.options != null;
-      if (hasInputType && shouldResetOptions) {
-        newData = newData.removeOptions();
-      }
+      newData = removeUselessInput(
+        newData: newData,
+        hasInputType: hasInputType,
+      );
       _fieldsData.data[index] = newData;
       _fieldsData.postValue(List.from(_fieldsData.data));
     }
     await checkEnableConfirm();
+  }
+
+  TableRowData removeUselessInput({
+    required TableRowData newData,
+    required bool hasInputType,
+  }) {
+    final raw = newData.copyWith();
+    final inputType = raw.inputType;
+    if (!inputType.isSelection) {
+      raw.options = null;
+    }
+    if (inputType.isSelection) {
+      raw.defaultValue = "";
+    }
+    if (!inputType.isDateTime) {
+      raw.additionalInfo = null;
+    }
+    return raw;
   }
 
   Future<void> checkEnableConfirm() async {
@@ -151,7 +183,7 @@ class ConfigureViewModel extends BaseViewModel {
     return TemplateConfig(
       templateName: name,
       pathTemplate: path,
-      version: "1.0",
+      version: DateTime.now().toString(),
       fields: fields,
     );
   }

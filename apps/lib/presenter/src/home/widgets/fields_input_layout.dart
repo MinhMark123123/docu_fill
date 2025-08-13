@@ -9,17 +9,17 @@ import 'desktop/field_input_desktop.dart';
 import 'mobile/field_input_mobile.dart';
 
 class FieldsInputLayout extends BaseView<FieldsInputViewModel> {
-  final int? id;
+  final List<int>? ids;
 
-  const FieldsInputLayout({super.key, this.id});
+  const FieldsInputLayout({super.key, this.ids});
 
   @override
   void awake(WrapperContext wrapperContext, FieldsInputViewModel viewModel) {
     super.awake(wrapperContext, viewModel);
-    if (id != null) {
-      viewModel.setup(id!);
+    if (ids != null) {
+      viewModel.setup(ids!);
     } else {
-      final sub = getViewModel<HomeViewModel>().idTemplateSelected
+      final sub = getViewModel<HomeViewModel>().selectedTemplateIds
           .asStream()
           .listen((data) => viewModel.setup(data));
       wrapperContext.lifeCycleManager.onDispose(() => sub.cancel());

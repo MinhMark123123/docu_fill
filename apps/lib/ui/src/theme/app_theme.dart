@@ -37,7 +37,7 @@ class AppTheme {
         textThemeLight,
       ),
       appBarTheme: _buildAppBarTheme(Colors.blue[700]!, Colors.white),
-      cardTheme: _buildCardTheme(),
+      cardTheme: _buildCardTheme(cardColor: Colors.white),
       inputDecorationTheme: _buildInputDecorationTheme(
         Colors.grey[400]!,
         Colors.blue[700]!,

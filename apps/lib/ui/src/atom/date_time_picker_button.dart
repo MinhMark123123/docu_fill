@@ -63,6 +63,7 @@ class _DateTimePickerButtonState extends State<DateTimePickerButton> {
     // 1. Pick Date
     final DateTime? pickedDate = await showDatePicker(
       context: context,
+      initialEntryMode: DatePickerEntryMode.input,
       initialDate: initialDateForPicker,
       firstDate: firstDatePickerDate,
       // Or your specific earliest selectable date

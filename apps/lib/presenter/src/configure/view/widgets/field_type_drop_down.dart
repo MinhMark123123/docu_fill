@@ -1,5 +1,6 @@
 import 'package:docu_fill/data/data.dart';
 import 'package:docu_fill/ui/src/methodology/tokens/dimens.dart';
+import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
 
 class EnumDropdownButton extends StatefulWidget {
@@ -46,6 +47,10 @@ class _EnumDropdownButtonState extends State<EnumDropdownButton> {
       child: LayoutBuilder(
         builder: (context, constraint) {
           return DropdownButton<FieldType>(
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
             value: _selectedValue,
             // Hint to display when no value is selected (optional, if you want the button text to change)
             // hint: _selectedValue == null ? Text(widget.buttonText) : null,

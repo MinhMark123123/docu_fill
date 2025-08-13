@@ -16,6 +16,8 @@ class TemplateField {
 
   final List<String>? options;
 
+  final String? additionalInfo;
+
   TemplateField({
     required this.key,
     required this.label,
@@ -23,6 +25,7 @@ class TemplateField {
     required this.required,
     this.defaultValue,
     this.options,
+    this.additionalInfo,
   });
 
   factory TemplateField.fromJson(Map<String, dynamic> json) =>
@@ -37,7 +40,9 @@ enum FieldType {
   @JsonValue("datetime")
   datetime("datetime"),
   @JsonValue("selection")
-  selection("selection");
+  selection("selection"),
+  @JsonValue("image")
+  image("image");
 
   final String value;
 
@@ -58,6 +63,12 @@ enum FieldType {
         return "Date Time";
       case FieldType.selection:
         return "Selection";
+      case FieldType.image:
+        return "Image";
     }
   }
+
+  bool get isSelection => this == FieldType.selection;
+  bool get isDateTime => this == FieldType.datetime;
+  bool get isImage => this == FieldType.image;
 }

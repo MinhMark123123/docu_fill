@@ -58,6 +58,8 @@ abstract class AppLang {
   static const String actionsReturnToTemplates = "actions.return_to_templates";
   static const String actionsDownloadDocument = "actions.download_document";
   static const String actionsSelectDateTime = "actions.select_date_time";
+  static const String actionsShowMenu = "actions.show_menu";
+  static const String actionsPickImage = "actions.pick_image";
 
   // --- Labels ---
   static const String labelsTemplates = "labels.templates";
@@ -87,6 +89,11 @@ abstract class AppLang {
   static const String labelsInputOptions = "labels.input_options";
   static const String labelsEnterTemplateName = "labels.enter_template_name";
   static const String labelsTemplateName = "labels.template_name";
+  static const String labelsDefaultValue = "labels.default_value";
+  static const String labelsEnableMultipleChoice =
+      "labels.enable_multiple_choice";
+  static const String labelsSingle = "labels.single";
+  static const String labelsMultiple = "labels.multiple";
 
   // --- Messages ---
   static const String messagesReviewAndConfigureFields =
@@ -109,6 +116,9 @@ abstract class AppLang {
       "messages.pick_folder_to_export";
   static const String messagesNameTheDocumentExported =
       "messages.name_the_document_exported";
+  static const String messagesDateFormatInvalid =
+      "messages.date_format_invalid";
+  static const String messagesEnterDateFormat = "messages.enter_date_format";
 
   // If you had more top-level keys or nested structures, you'd continue like this:
   // static const String someOtherTopLevelKey = "some_other_top_level_key";

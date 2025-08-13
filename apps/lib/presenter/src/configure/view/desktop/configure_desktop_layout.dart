@@ -10,6 +10,9 @@ import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 class ConfigureDesktopLayout extends StatelessWidget {
   const ConfigureDesktopLayout({super.key});
 
+  ConfigureViewModel get configureViewModel =>
+      getViewModel<ConfigureViewModel>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +23,7 @@ class ConfigureDesktopLayout extends StatelessWidget {
           spacing: Dimens.size16,
           children: [
             DesktopTopTitle(
-              aspectRatio: 960 / 126,
+              aspectRatio: 960 / 100,
               title: AppLang.labelsConfigureTemplateFields.tr(),
               subtitle: AppLang.messagesReviewAndConfigureFields.tr(),
             ),
@@ -54,18 +57,14 @@ class ConfigureDesktopLayout extends StatelessWidget {
           SizedBox(
             width: Dimens.size400,
             child: StreamDataConsumer(
-              streamData: getViewModel<ConfigureViewModel>().enableNameTemplate,
+              streamData: configureViewModel.enableNameTemplate,
               builder: (context, data) {
                 return Visibility(
                   visible: data,
                   replacement: SizedBox.shrink(),
                   child: TextField(
-                    controller:
-                        getViewModel<ConfigureViewModel>().nameController,
-                    onChanged:
-                        (_) =>
-                            getViewModel<ConfigureViewModel>()
-                                .checkEnableConfirm(),
+                    controller: configureViewModel.nameController,
+                    onChanged: (_) => configureViewModel.checkEnableConfirm(),
                     decoration: InputDecoration(
                       hintText: AppLang.messagesEnterTemplateNameHint.tr(),
                       labelText: AppLang.labelsTemplateName.tr(),
@@ -77,13 +76,13 @@ class ConfigureDesktopLayout extends StatelessWidget {
             ),
           ),
           StreamDataConsumer(
-            streamData: getViewModel<ConfigureViewModel>().enableConfirm,
+            streamData: configureViewModel.enableConfirm,
             builder: (context, data) {
               return ElevatedButton(
                 onPressed:
                     data
                         ? () {
-                          getViewModel<ConfigureViewModel>().confirm(context);
+                          configureViewModel.confirm(context);
                         }
                         : null,
                 child: Text(AppLang.actionsConfirm.tr()),
@@ -100,7 +99,7 @@ class ConfigureDesktopLayout extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.only(left: Dimens.size16, right: Dimens.size32),
         child: StreamDataConsumer(
-          streamData: getViewModel<ConfigureViewModel>().fieldsData,
+          streamData: configureViewModel.fieldsData,
           builder: (context, data) {
             return CustomScrollableTable(data: data);
           },

@@ -29,8 +29,8 @@ class TemplateRepositoryImpl implements TemplateRepository {
   }
 
   @override
-  Future<void> deleteTemplateByName(String name) async {
-    await localDataSource.deleteTemplateByName(name);
+  Future<void> deleteTemplate(int id) async {
+    await localDataSource.deleteTemplate(id);
   }
 
   @override
