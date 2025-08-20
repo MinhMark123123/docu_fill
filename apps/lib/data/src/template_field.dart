@@ -69,6 +69,24 @@ enum FieldType {
   }
 
   bool get isSelection => this == FieldType.selection;
+
   bool get isDateTime => this == FieldType.datetime;
+
   bool get isImage => this == FieldType.image;
+}
+
+enum ImageUnit {
+  cm("cm"),
+  inch("inch");
+
+  final String value;
+
+  const ImageUnit(this.value);
+
+  static ImageUnit fromValue(String? value) {
+    return ImageUnit.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => ImageUnit.cm,
+    );
+  }
 }

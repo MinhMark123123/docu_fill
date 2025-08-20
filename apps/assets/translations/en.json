@@ -84,7 +84,12 @@
     "default_value": "Default Value",
     "enable_multiple_choice": "Enable Multiple Choice",
     "single": "Single",
-    "multiple": "Multiple"
+    "multiple": "Multiple",
+    "width": "width",
+    "height": "height",
+    "unit": "unit",
+    "cm": "cm",
+    "inches": "inches"
   },
   "messages": {
     "review_and_configure_fields": "Review and configure the fields detected in your template. Ensure all fields are correctly identified and assigned the appropriate input type for accurate data collection.",

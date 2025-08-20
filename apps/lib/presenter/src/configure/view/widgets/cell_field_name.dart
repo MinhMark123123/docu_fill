@@ -18,7 +18,7 @@ class CellFieldName extends StatelessWidget {
         border: const OutlineInputBorder(),
       ),
       onChanged: (value) {
-        getViewModel<ConfigureViewModel>().setValue(
+        getViewModel<ConfigureViewModel>().updateFieldName(
           data.fieldKey,
           fieldName: value,
         );

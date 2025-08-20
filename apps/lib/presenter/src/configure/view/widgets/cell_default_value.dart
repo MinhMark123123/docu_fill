@@ -23,7 +23,7 @@ class CellDefaultValue extends StatelessWidget {
         border: const OutlineInputBorder(),
       ),
       onChanged: (value) {
-        getViewModel<ConfigureViewModel>().setValue(
+        getViewModel<ConfigureViewModel>().updateDefaultValue(
           data.fieldKey,
           defaultValue: value,
         );

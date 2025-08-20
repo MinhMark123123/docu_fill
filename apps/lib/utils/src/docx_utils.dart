@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
@@ -73,7 +74,7 @@ class DocxUtils {
   static Future<Uint8List> composeModifiedDocxWithPlaceholders({
     required Uint8List originalBytes,
     required Map<String, String> replacements,
-    Map<String, String>? imageReplacements,
+    Map<String, (String, Size)>? imageReplacements,
   }) async {
     final originalArchive = ZipDecoder().decodeBytes(originalBytes);
     final newArchive = Archive();
@@ -162,124 +163,10 @@ class DocxUtils {
     return list.join('\n');
   }
 
-  Future<Uint8List> insertImagesIntoDocx({
-    required Uint8List docxBytes,
-    required Map<String, String> replacements, // placeholder -> image path
-  }) async {
-    final archive = ZipDecoder().decodeBytes(docxBytes);
-
-    // Step 1: Load and modify document.xml
-    final documentFile = archive.files.firstWhere(
-      (f) => f.name == 'word/document.xml',
-    );
-    final documentXml = xml.XmlDocument.parse(
-      utf8.decode(documentFile.content),
-    );
-
-    final allTextNodes = documentXml.findAllElements('w:t').toList();
-
-    int imageIndex = 1;
-    final relEntries = <xml.XmlElement>[];
-
-    for (final entry in replacements.entries) {
-      final placeholder = entry.key;
-      final imagePath = entry.value;
-      final targetNode = allTextNodes.firstWhere(
-        (node) => node.innerText.contains(placeholder),
-        orElse: () => throw Exception('Placeholder "$placeholder" not found'),
-      );
-
-      final imageRelId = 'rId_image_$imageIndex';
-      final imageFileName = 'image$imageIndex${p.extension(imagePath)}';
-      final imageMediaPath = 'word/media/$imageFileName';
-
-      // Load image bytes
-      final imageBytes = await File(imagePath).readAsBytes();
-
-      // Step 2: Insert <w:drawing> to replace the placeholder
-      final drawingXml = '''
-<w:r xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-     xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
-     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-     xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
-  <w:drawing>
-    <wp:inline>
-      <wp:extent cx="990000" cy="792000"/>
-      <wp:docPr id="$imageIndex" name="Picture $imageIndex"/>
-      <a:graphic>
-        <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
-          <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
-            <pic:blipFill>
-              <a:blip r:embed="$imageRelId"/>
-              <a:stretch><a:fillRect/></a:stretch>
-            </pic:blipFill>
-            <pic:spPr>
-              <a:xfrm><a:off x="0" y="0"/><a:ext cx="990000" cy="792000"/></a:xfrm>
-              <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
-            </pic:spPr>
-          </pic:pic>
-        </a:graphicData>
-      </a:graphic>
-    </wp:inline>
-  </w:drawing>
-</w:r>
-''';
-
-      final newDrawing = xml.XmlDocument.parse(drawingXml).rootElement;
-      targetNode.parent?.replace(newDrawing);
-
-      // Step 3: Add image to media
-      archive.addFile(
-        ArchiveFile(imageMediaPath, imageBytes.length, imageBytes),
-      );
-
-      // Step 4: Create <Relationship> entry for the image
-      relEntries.add(
-        xml.XmlElement(xml.XmlName('Relationship'), [
-          xml.XmlAttribute(xml.XmlName('Id'), imageRelId),
-          xml.XmlAttribute(
-            xml.XmlName('Type'),
-            'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
-          ),
-          xml.XmlAttribute(xml.XmlName('Target'), 'media/$imageFileName'),
-        ]),
-      );
-
-      imageIndex++;
-    }
-
-    // Step 5: Update word/_rels/document.xml.rels
-    final relsFile = archive.files.firstWhere(
-      (f) => f.name == 'word/_rels/document.xml.rels',
-    );
-    final relsXml = xml.XmlDocument.parse(utf8.decode(relsFile.content));
-    relsXml.rootElement.children.addAll(relEntries);
-
-    // Replace files in archive
-    archive.files.removeWhere((f) => f.name == 'word/document.xml');
-    archive.files.removeWhere((f) => f.name == 'word/_rels/document.xml.rels');
-
-    archive.addFile(
-      ArchiveFile(
-        'word/document.xml',
-        0,
-        utf8.encode(documentXml.toXmlString()),
-      ),
-    );
-    archive.addFile(
-      ArchiveFile(
-        'word/_rels/document.xml.rels',
-        0,
-        utf8.encode(relsXml.toXmlString()),
-      ),
-    );
-
-    return Uint8List.fromList(ZipEncoder().encode(archive)!);
-  }
-
   static Future<Uint8List> insertImagesIntoDocxArchived({
     required Uint8List docxBytes,
-    required Map<String, String> replacements, // placeholder -> image path
+    required Map<String, (String, Size)> replacements, // placeholder -> image
+    // path
     required Archive archive,
   }) async {
     // Step 1: Load and modify document.xml
@@ -297,7 +184,9 @@ class DocxUtils {
 
     for (final entry in replacements.entries) {
       final placeholder = entry.key;
-      final imagePath = entry.value;
+      final imagePath = entry.value.$1;
+      final widthInInches = entry.value.$2.width;
+      final heightInInches = entry.value.$2.height;
       final targetNode = allTextNodes.firstWhere(
         (node) => node.innerText.contains(placeholder),
         orElse: () => throw Exception('Placeholder "$placeholder" not found'),
@@ -306,7 +195,9 @@ class DocxUtils {
       final imageRelId = 'rId_image_$imageIndex';
       final imageFileName = 'image$imageIndex${p.extension(imagePath)}';
       final imageMediaPath = 'word/media/$imageFileName';
-
+      // Convert inches → EMUs
+      final cx = (widthInInches * 914400).round();
+      final cy = (heightInInches * 914400).round();
       // Load image bytes
       final imageBytes = await File(imagePath).readAsBytes();
 
@@ -318,7 +209,7 @@ class DocxUtils {
      xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
   <w:drawing>
     <wp:inline>
-      <wp:extent cx="990000" cy="792000"/>
+      <wp:extent cx="$cx" cy="$cy"/>
       <wp:docPr id="$imageIndex" name="Picture $imageIndex"/>
       <a:graphic>
         <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
@@ -328,7 +219,7 @@ class DocxUtils {
               <a:stretch><a:fillRect/></a:stretch>
             </pic:blipFill>
             <pic:spPr>
-              <a:xfrm><a:off x="0" y="0"/><a:ext cx="990000" cy="792000"/></a:xfrm>
+              <a:xfrm><a:off x="0" y="0"/><a:ext cx="$cx" cy="$cy"/></a:xfrm>
               <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
             </pic:spPr>
           </pic:pic>

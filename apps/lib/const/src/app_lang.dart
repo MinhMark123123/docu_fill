@@ -94,6 +94,10 @@ abstract class AppLang {
       "labels.enable_multiple_choice";
   static const String labelsSingle = "labels.single";
   static const String labelsMultiple = "labels.multiple";
+  static const String labelsWidth = "labels.width";
+  static const String labelsHeight = "labels.height";
+  static const String labelsUnit = "labels.unit";
+  static const String labelsCm = "labels.cm";
 
   // --- Messages ---
   static const String messagesReviewAndConfigureFields =

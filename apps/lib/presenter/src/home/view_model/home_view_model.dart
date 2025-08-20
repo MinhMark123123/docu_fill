@@ -37,7 +37,6 @@ class HomeViewModel extends BaseViewModel {
   @override
   void onInitState() {
     super.onInitState();
-    loadTemplates();
     _composed.addSource(templates.asStream(), (data) {
       _composed.postValue((_composed.data.$1, data));
     });
@@ -46,7 +45,12 @@ class HomeViewModel extends BaseViewModel {
     });
   }
 
-  // Getter for multiple selected templates (if applicable)
+  @override
+  void onResume() {
+    super.onResume();
+    loadTemplates(); //
+  } // Getter for multiple selected templates (if applicable)
+
   List<TemplateConfig> get selectedTemplates {
     return _templates.data
         .where((t) => _selectedTemplateIds.data.contains(t.id))
@@ -108,7 +112,10 @@ class HomeViewModel extends BaseViewModel {
 
   void _onMultipleTemplatesSelected(TemplateConfig data) {
     bool hasSelected = hasSelectedTemplates(data);
-    if (hasSelected) {
+    if (hasSelected && _selectedTemplateIds.data.length > 1) {
+      final newList = List<int>.from(_selectedTemplateIds.data);
+      newList.remove(data.id);
+      _selectedTemplateIds.postValue(newList);
       return;
     }
     _selectedTemplateIds.postValue([..._selectedTemplateIds.data, data.id]);

@@ -5,6 +5,7 @@ import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/core/src/events.dart';
 import 'package:docu_fill/data/data.dart';
+import 'package:docu_fill/data/src/dimensions.dart';
 import 'package:docu_fill/presenter/src/configure/model/table_row_data.dart';
 import 'package:docu_fill/route/routers.dart';
 import 'package:docu_fill/utils/utils.dart';
@@ -61,67 +62,66 @@ class ConfigureViewModel extends BaseViewModel {
     _fieldsData.postValue(fields.toList());
   }
 
-  Future<void> setValue(
-    String key, {
-    String? fieldName,
-    FieldType? inputType,
-    List<String>? options,
-    bool? isRequired,
-    String? defaultValue,
-    String? additionalInfo,
-  }) async {
-    final index = _fieldsData.data.indexWhere(
-      (element) => element.fieldKey == key,
-    );
-    var shouldUpdateUI = true;
-    if (fieldName != null) {
-      _fieldsData.data[index] = _fieldsData.data[index].copyWith(
-        fieldName: fieldName,
-      );
-      shouldUpdateUI = false;
-    }
-    if (defaultValue != null) {
-      _fieldsData.data[index] = _fieldsData.data[index].copyWith(
-        fieldName: defaultValue,
-      );
-      shouldUpdateUI = false;
-    }
-    if (additionalInfo != null) {
-      _fieldsData.data[index] = _fieldsData.data[index].copyWith(
-        fieldName: additionalInfo,
-      );
-      shouldUpdateUI = false;
-    }
-    if (options != null) {
-      _fieldsData.data[index] = _fieldsData.data[index].copyWith(
-        options: options,
-      );
-      shouldUpdateUI = false;
-    }
-    if (shouldUpdateUI) {
-      var newData = _fieldsData.data[index].copyWith(
-        fieldName: fieldName,
-        inputType: inputType,
-        options: options,
-        isRequired: isRequired,
-        defaultValue: defaultValue,
-        additionalInfo: additionalInfo,
-      );
-      bool hasInputType = inputType != null;
-      newData = removeUselessInput(
-        newData: newData,
-        hasInputType: hasInputType,
-      );
-      _fieldsData.data[index] = newData;
-      _fieldsData.postValue(List.from(_fieldsData.data));
-    }
+  TableRowData fieldOfKey(String key) {
+    return _fieldsData.data.firstWhere((element) => element.fieldKey == key);
+  }
+
+  Future<void> updateFieldData(String key, TableRowData? data) async {
+    if (data == null) return;
+    final index = fieldsData.data.indexWhere((e) => e.fieldKey == key);
+    if (index == AppConst.commonUnknow) return;
+    final newData = removeUselessInput(newData: data);
+    _fieldsData.data[index] = newData;
+  }
+
+  Future<void> updateFieldName(String key, {required String fieldName}) async {
+    updateFieldData(key, fieldOfKey(key).copyWith(fieldName: fieldName));
     await checkEnableConfirm();
   }
 
-  TableRowData removeUselessInput({
-    required TableRowData newData,
-    required bool hasInputType,
-  }) {
+  Future<void> updateDefaultValue(
+    String key, {
+    required String defaultValue,
+  }) async {
+    updateFieldData(key, fieldOfKey(key).copyWith(defaultValue: defaultValue));
+    await checkEnableConfirm();
+  }
+
+  Future<void> updateAdditionalInfo(
+    String key, {
+    required String additionalInfo,
+  }) async {
+    updateFieldData(
+      key,
+      fieldOfKey(key).copyWith(additionalInfo: additionalInfo),
+    );
+    await checkEnableConfirm();
+  }
+
+  Future<void> updateOptions(
+    String key, {
+    required List<String> options,
+  }) async {
+    updateFieldData(key, fieldOfKey(key).copyWith(options: options));
+    await checkEnableConfirm();
+  }
+
+  Future<void> updateIsRequired(String key, {bool? isRequired}) async {
+    updateFieldData(key, fieldOfKey(key).copyWith(isRequired: isRequired));
+    await checkEnableConfirm();
+  }
+
+  Future<void> updateInputType(String key, {FieldType? inputType}) async {
+    updateFieldData(key, fieldOfKey(key).copyWith(inputType: inputType));
+    notifyDataChanged();
+    await checkEnableConfirm();
+  }
+
+  Future<void> notifyDataChanged() async {
+    _fieldsData.postValue(List.from(_fieldsData.data));
+  }
+
+  TableRowData removeUselessInput({required TableRowData newData}) {
     final raw = newData.copyWith();
     final inputType = raw.inputType;
     if (!inputType.isSelection) {
@@ -186,6 +186,94 @@ class ConfigureViewModel extends BaseViewModel {
       version: DateTime.now().toString(),
       fields: fields,
     );
+  }
+
+  Future<void> updateWidthImage(
+    String fieldKey, {
+    required String widthImage,
+  }) async {
+    final currentRaw = fieldOfKey(fieldKey).additionalInfo;
+    final currentDimension = Dimensions.from(currentRaw);
+    if (widthImage.isEmpty) {
+      if (currentDimension == null) return;
+      final dimension = Dimensions.empty().copyWith(
+        height: currentDimension.height,
+        unit: currentDimension.unit,
+      );
+      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
+    } else {
+      if (currentDimension == null) {
+        final dimension = Dimensions.empty().copyWith(
+          width: double.tryParse(widthImage),
+          unit: ImageUnit.cm.value,
+        );
+        await updateAdditionalInfo(
+          fieldKey,
+          additionalInfo: dimension.format(),
+        );
+        return;
+      }
+      final dimension = currentDimension.copyWith(
+        width: double.tryParse(widthImage),
+      );
+      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
+    }
+  }
+
+  Future<void> updateHeightImage(
+    String fieldKey, {
+    required String heightImage,
+  }) async {
+    final currentRaw = fieldOfKey(fieldKey).additionalInfo;
+    final currentDimension = Dimensions.from(currentRaw);
+    if (heightImage.isEmpty) {
+      if (currentDimension == null) return;
+      final dimension = Dimensions.empty().copyWith(
+        width: currentDimension.width,
+        unit: currentDimension.unit,
+      );
+      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
+    } else {
+      if (currentDimension == null) {
+        final dimension = Dimensions.empty().copyWith(
+          height: double.tryParse(heightImage),
+          unit: ImageUnit.cm.value,
+        );
+        await updateAdditionalInfo(
+          fieldKey,
+          additionalInfo: dimension.format(),
+        );
+        return;
+      }
+      final dimension = currentDimension.copyWith(
+        height: double.tryParse(heightImage),
+      );
+      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
+    }
+  }
+
+  Future<void> updateUnitImage(String fieldKey, {ImageUnit? unitImage}) async {
+    final currentRaw = fieldOfKey(fieldKey).additionalInfo;
+    final currentDimension = Dimensions.from(currentRaw);
+    if (unitImage == null) {
+      if (currentDimension == null) return;
+      final dimension = Dimensions.empty().copyWith(
+        width: currentDimension.width,
+        height: currentDimension.height,
+      );
+      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
+    } else {
+      if (currentDimension == null) {
+        final dimension = Dimensions.empty().copyWith(unit: unitImage.value);
+        await updateAdditionalInfo(
+          fieldKey,
+          additionalInfo: dimension.format(),
+        );
+        return;
+      }
+      final dimension = currentDimension.copyWith(unit: unitImage.value);
+      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
+    }
   }
 
   Future<void> saveConfigure(BuildContext context) async {

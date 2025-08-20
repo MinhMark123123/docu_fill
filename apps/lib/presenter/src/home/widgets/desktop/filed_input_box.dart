@@ -45,7 +45,7 @@ class FiledInputBox extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          templateId == AppConst.noSelectedId
+          templateId == AppConst.commonUnknow
               ? AppLang.labelsTemplates.tr()
               : getViewModel<FieldsInputViewModel>().getTemplateName(
                 templateId,

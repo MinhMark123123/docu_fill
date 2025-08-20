@@ -71,14 +71,14 @@ class FieldsInputViewModel extends BaseViewModel {
       _composedTemplateUI.postValue(rawData);
       return;
     }
-    rawData[AppConst.noSelectedId] = [];
+    rawData[AppConst.commonUnknow] = [];
     for (var template in _templates.data) {
       final fields = template.fields;
       rawData[template.id] = fields;
       for (var field in fields) {
-        if (!rawData[AppConst.noSelectedId]!.contains(field)) {
-          rawData[AppConst.noSelectedId]!.add(field);
-          rawData[AppConst.noSelectedId]!.remove(field);
+        if (!rawData[AppConst.commonUnknow]!.contains(field)) {
+          rawData[AppConst.commonUnknow]!.add(field);
+          rawData[AppConst.commonUnknow]!.remove(field);
         }
       }
     }
@@ -103,12 +103,12 @@ class FieldsInputViewModel extends BaseViewModel {
 
   Future<void> checkValidate() async {
     final requiredKeys = List<String>.empty(growable: true);
+
     for (var template in _templates.data) {
-      final childRequired =
-          template.fields
-              .where((element) => element.required)
-              .map((e) => e.key)
-              .toList();
+      final rawFields = template.fields
+          .where((element) => element.required)
+          .map((e) => e.key);
+      final childRequired = rawFields.toList();
       requiredKeys.addAll(childRequired);
     }
     final missingKeys = requiredKeys.where((key) => _fieldKeys[key] == null);
