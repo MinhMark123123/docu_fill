@@ -20,4 +20,14 @@ class DateTimeUtils {
       return false;
     }
   }
+
+  static String? format(String valueInput, {required String format}) {
+    try {
+      final dateTimeFormat = DateFormat(format);
+      final dateTime = DateTime.parse(valueInput);
+      return dateTimeFormat.format(dateTime);
+    } catch (e) {
+      return null;
+    }
+  }
 }

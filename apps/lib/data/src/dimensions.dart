@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:docu_fill/const/const.dart';
+import 'package:docu_fill/data/src/template_field.dart';
 
 class Dimensions {
   final double? width;
@@ -38,5 +41,13 @@ class Dimensions {
       height: height ?? this.height,
       unit: unit ?? this.unit,
     );
+  }
+
+  Size? toInches() {
+    if (width == null || height == null || unit == null) return null;
+    if (unit == ImageUnit.cm.value) {
+      return Size(width! / 2.54, height! / 2.54);
+    }
+    return Size(width!, height!);
   }
 }

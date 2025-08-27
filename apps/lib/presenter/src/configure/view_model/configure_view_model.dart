@@ -5,7 +5,6 @@ import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/core/src/events.dart';
 import 'package:docu_fill/data/data.dart';
-import 'package:docu_fill/data/src/dimensions.dart';
 import 'package:docu_fill/presenter/src/configure/model/table_row_data.dart';
 import 'package:docu_fill/route/routers.dart';
 import 'package:docu_fill/utils/utils.dart';
@@ -54,10 +53,9 @@ class ConfigureViewModel extends BaseViewModel {
     final f = File(_pathFilePicked!);
     final text = DocxUtils.docxToText(await f.readAsBytes());
     final regex = RegExp(AppConst.placeHolderRegex);
-    final matches = regex.allMatches(text);
-    final fields = matches.map((match) {
-      final key = match.group(1);
-      return TableRowData(fieldKey: '''{{$key}}''');
+    final matches = regex.allMatches(text).map((e) => e.group(1)).toSet();
+    final fields = matches.map((key) {
+      return TableRowData(fieldKey: AppConst.composeKey(key: key!));
     });
     _fieldsData.postValue(fields.toList());
   }
@@ -91,7 +89,7 @@ class ConfigureViewModel extends BaseViewModel {
     String key, {
     required String additionalInfo,
   }) async {
-    updateFieldData(
+    await updateFieldData(
       key,
       fieldOfKey(key).copyWith(additionalInfo: additionalInfo),
     );
@@ -109,6 +107,7 @@ class ConfigureViewModel extends BaseViewModel {
   Future<void> updateIsRequired(String key, {bool? isRequired}) async {
     updateFieldData(key, fieldOfKey(key).copyWith(isRequired: isRequired));
     await checkEnableConfirm();
+    notifyDataChanged();
   }
 
   Future<void> updateInputType(String key, {FieldType? inputType}) async {
@@ -129,9 +128,6 @@ class ConfigureViewModel extends BaseViewModel {
     }
     if (inputType.isSelection) {
       raw.defaultValue = "";
-    }
-    if (!inputType.isDateTime) {
-      raw.additionalInfo = null;
     }
     return raw;
   }
@@ -193,30 +189,21 @@ class ConfigureViewModel extends BaseViewModel {
     required String widthImage,
   }) async {
     final currentRaw = fieldOfKey(fieldKey).additionalInfo;
-    final currentDimension = Dimensions.from(currentRaw);
-    if (widthImage.isEmpty) {
-      if (currentDimension == null) return;
-      final dimension = Dimensions.empty().copyWith(
-        height: currentDimension.height,
-        unit: currentDimension.unit,
+    final splitter = currentRaw?.split(";");
+    final widthString = double.tryParse(widthImage);
+    if (widthString == null) return;
+    if (splitter == null || splitter.isEmpty) {
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo:
+            "$widthString;;"
+            "${ImageUnit.cm.value}",
       );
-      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
     } else {
-      if (currentDimension == null) {
-        final dimension = Dimensions.empty().copyWith(
-          width: double.tryParse(widthImage),
-          unit: ImageUnit.cm.value,
-        );
-        await updateAdditionalInfo(
-          fieldKey,
-          additionalInfo: dimension.format(),
-        );
-        return;
-      }
-      final dimension = currentDimension.copyWith(
-        width: double.tryParse(widthImage),
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo: [widthString, splitter[1], splitter[2]].join(";"),
       );
-      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
     }
   }
 
@@ -225,54 +212,35 @@ class ConfigureViewModel extends BaseViewModel {
     required String heightImage,
   }) async {
     final currentRaw = fieldOfKey(fieldKey).additionalInfo;
-    final currentDimension = Dimensions.from(currentRaw);
-    if (heightImage.isEmpty) {
-      if (currentDimension == null) return;
-      final dimension = Dimensions.empty().copyWith(
-        width: currentDimension.width,
-        unit: currentDimension.unit,
+    final splitter = currentRaw?.split(";");
+    final heightString = double.tryParse(heightImage);
+    if (heightString == null) return;
+    if (splitter == null || splitter.isEmpty) {
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo: ";$heightString;${ImageUnit.cm.value}",
       );
-      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
     } else {
-      if (currentDimension == null) {
-        final dimension = Dimensions.empty().copyWith(
-          height: double.tryParse(heightImage),
-          unit: ImageUnit.cm.value,
-        );
-        await updateAdditionalInfo(
-          fieldKey,
-          additionalInfo: dimension.format(),
-        );
-        return;
-      }
-      final dimension = currentDimension.copyWith(
-        height: double.tryParse(heightImage),
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo: [splitter[0], heightString, splitter[2]].join(";"),
       );
-      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
     }
   }
 
   Future<void> updateUnitImage(String fieldKey, {ImageUnit? unitImage}) async {
     final currentRaw = fieldOfKey(fieldKey).additionalInfo;
-    final currentDimension = Dimensions.from(currentRaw);
-    if (unitImage == null) {
-      if (currentDimension == null) return;
-      final dimension = Dimensions.empty().copyWith(
-        width: currentDimension.width,
-        height: currentDimension.height,
+    final splitter = currentRaw?.split(";");
+    if (splitter == null || splitter.isEmpty) {
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo: ";;${unitImage?.value}",
       );
-      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
     } else {
-      if (currentDimension == null) {
-        final dimension = Dimensions.empty().copyWith(unit: unitImage.value);
-        await updateAdditionalInfo(
-          fieldKey,
-          additionalInfo: dimension.format(),
-        );
-        return;
-      }
-      final dimension = currentDimension.copyWith(unit: unitImage.value);
-      await updateAdditionalInfo(fieldKey, additionalInfo: dimension.format());
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo: [splitter[0], splitter[1], unitImage?.value].join(";"),
+      );
     }
   }
 

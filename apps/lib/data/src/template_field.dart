@@ -42,7 +42,9 @@ enum FieldType {
   @JsonValue("selection")
   selection("selection"),
   @JsonValue("image")
-  image("image");
+  image("image"),
+  @JsonValue("singleLine")
+  singleLine("singleLine");
 
   final String value;
 
@@ -65,6 +67,8 @@ enum FieldType {
         return "Selection";
       case FieldType.image:
         return "Image";
+      case FieldType.singleLine:
+        return "Single Line";
     }
   }
 

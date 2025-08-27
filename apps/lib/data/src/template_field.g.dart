@@ -34,4 +34,5 @@ const _$FieldTypeEnumMap = {
   FieldType.datetime: 'datetime',
   FieldType.selection: 'selection',
   FieldType.image: 'image',
+  FieldType.singleLine: 'singleLine',
 };

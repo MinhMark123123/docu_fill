@@ -41,6 +41,7 @@ class TemplatesCollectionDesktop extends StatelessWidget {
       builder: (context, value) {
         final selectedIds = value.$1;
         final templates = value.$2;
+        if (selectedIds.isEmpty) return SizedBox.shrink();
         return ListView.separated(
           padding: EdgeInsets.symmetric(vertical: Dimens.size16),
           itemBuilder: (context, index) {

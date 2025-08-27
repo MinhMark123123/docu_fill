@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:archive/archive.dart';
+import 'package:collection/collection.dart'; // Add this import
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -74,50 +75,66 @@ class DocxUtils {
   static Future<Uint8List> composeModifiedDocxWithPlaceholders({
     required Uint8List originalBytes,
     required Map<String, String> replacements,
+    required Map<String, String?> singleLines,
     Map<String, (String, Size)>? imageReplacements,
   }) async {
     final originalArchive = ZipDecoder().decodeBytes(originalBytes);
-    final newArchive = Archive();
+    var newArchive = Archive();
 
     for (final file in originalArchive) {
       if (file.isFile && isValidDocNamePart(file)) {
         final xmlContent = utf8.decode(file.content);
         final document = xml.XmlDocument.parse(xmlContent);
-
         final textNodes = document.findAllElements('w:t');
         for (final node in textNodes) {
           var text = node.innerText;
-
+          for (final entry in singleLines.entries) {
+            final value = entry.value;
+            if (text.contains(entry.key)) {
+              if (value == null || value.isEmpty) {
+                // remove the whole line (the paragraph <w:p> element)
+                xml.XmlElement? paragraph =
+                    node.ancestors
+                        .whereType<xml.XmlElement>()
+                        .toList()
+                        .where((e) => e.name.local == 'p')
+                        .firstOrNull;
+                paragraph?.parent?.children.remove(paragraph);
+              } else {
+                text = text.replaceAll(entry.key, entry.value!);
+              }
+            }
+          }
           for (final entry in replacements.entries) {
             text = text.replaceAll(entry.key, entry.value);
           }
 
+          // ✅ apply the updated text
           node.innerText = text;
         }
 
-        final updatedXml = utf8.encode(document.toXmlString());
-        newArchive.addFile(
-          ArchiveFile(file.name, updatedXml.length, updatedXml),
-        );
+        final updatedXml = utf8.encode(document.toXmlString(pretty: false));
+        // ✅ use replaceFileInArchive helper
+        replaceFileInArchive(newArchive, file.name, updatedXml);
       } else {
-        // Copy all other files as-is
+        // Copy unchanged files
         newArchive.addFile(ArchiveFile(file.name, file.size, file.content));
       }
     }
     if (imageReplacements != null && imageReplacements.isNotEmpty) {
-      await insertImagesIntoDocxArchived(
-        docxBytes: originalBytes,
+      // ⭐️ Re-assign newArchive with the result from the image insertion function
+      newArchive = await insertImagesIntoDocxArchived(
         replacements: imageReplacements,
-        archive: newArchive,
+        inputArchive: newArchive, // Pass the text-modified archive
       );
     }
     return Uint8List.fromList(ZipEncoder().encode(newArchive)!);
   }
 
   static String docxToText(Uint8List bytes, {bool handleNumbering = false}) {
-    final _zipDecoder = ZipDecoder();
+    final zipDecoder = ZipDecoder();
 
-    final archive = _zipDecoder.decodeBytes(bytes);
+    final archive = zipDecoder.decodeBytes(bytes);
     final List<String> list = [];
 
     void extractTextFromXml(String xmlContent, {bool handleNumbering = false}) {
@@ -163,83 +180,92 @@ class DocxUtils {
     return list.join('\n');
   }
 
-  static Future<Uint8List> insertImagesIntoDocxArchived({
-    required Uint8List docxBytes,
-    required Map<String, (String, Size)> replacements, // placeholder -> image
-    // path
-    required Archive archive,
+  /// ❗️ REVISED FUNCTION
+  /// Takes an archive, adds images, and returns a NEW, modified archive.
+  static Future<Archive> insertImagesIntoDocxArchived({
+    required Map<String, (String, Size)>
+    replacements, // placeholder -> (imagePath, imageSize)
+    required Archive inputArchive, // The archive to read from
   }) async {
-    // Step 1: Load and modify document.xml
-    final documentFile = archive.files.firstWhere(
-      (f) => f.name == 'word/document.xml',
+    // Find the essential XML files within the input archive.
+    final documentFileEntry = inputArchive.findFile('word/document.xml');
+    final relsFileEntry = inputArchive.findFile('word/_rels/document.xml.rels');
+    final contentTypesFileEntry = inputArchive.findFile('[Content_Types].xml');
+
+    if (documentFileEntry == null ||
+        relsFileEntry == null ||
+        contentTypesFileEntry == null) {
+      throw Exception('A required DOCX part is missing from the archive.');
+    }
+
+    // Parse the XML content.
+    final documentXmlDoc = xml.XmlDocument.parse(
+      utf8.decode(documentFileEntry.content),
     );
-    final documentXml = xml.XmlDocument.parse(
-      utf8.decode(documentFile.content),
+    final relsXmlDoc = xml.XmlDocument.parse(
+      utf8.decode(relsFileEntry.content),
+    );
+    final contentTypesDoc = xml.XmlDocument.parse(
+      utf8.decode(contentTypesFileEntry.content),
     );
 
-    final allTextNodes = documentXml.findAllElements('w:t').toList();
+    final relationshipsElement = relsXmlDoc.rootElement;
+    final typesElement = contentTypesDoc.rootElement;
 
-    int imageIndex = 1;
-    final relEntries = <xml.XmlElement>[];
+    // --- Prepare for adding new content ---
+    final existingExtensions =
+        typesElement
+            .findElements('Default')
+            .map((e) => e.getAttribute('Extension')?.toLowerCase())
+            .whereNotNull()
+            .toSet();
 
+    int maxExistingRId = 0;
+    relationshipsElement.findElements('Relationship').forEach((rel) {
+      final id = rel.getAttribute('Id');
+      if (id != null && id.startsWith('rId')) {
+        final numVal = int.tryParse(id.substring(3));
+        if (numVal != null && numVal > maxExistingRId) {
+          maxExistingRId = numVal;
+        }
+      }
+    });
+
+    int imageCounter = maxExistingRId + 1;
+    final allTextNodes = documentXmlDoc.findAllElements('w:t').toList();
+    final List<ArchiveFile> newMediaFiles = [];
+
+    // Loop through placeholders and prepare image data and XML modifications
     for (final entry in replacements.entries) {
+      // (The logic inside this loop remains the same as the previous answer)
       final placeholder = entry.key;
       final imagePath = entry.value.$1;
-      final widthInInches = entry.value.$2.width;
-      final heightInInches = entry.value.$2.height;
-      final targetNode = allTextNodes.firstWhere(
+      final imageSize = entry.value.$2;
+
+      final targetTextNode = allTextNodes.firstWhereOrNull(
         (node) => node.innerText.contains(placeholder),
-        orElse: () => throw Exception('Placeholder "$placeholder" not found'),
       );
 
-      final imageRelId = 'rId_image_$imageIndex';
-      final imageFileName = 'image$imageIndex${p.extension(imagePath)}';
-      final imageMediaPath = 'word/media/$imageFileName';
-      // Convert inches → EMUs
-      final cx = (widthInInches * 914400).round();
-      final cy = (heightInInches * 914400).round();
-      // Load image bytes
+      if (targetTextNode == null) continue;
+
+      final targetRunNode =
+          targetTextNode.ancestors.firstWhereOrNull(
+                (n) => n is xml.XmlElement && n.name.local == 'r',
+              )
+              as xml.XmlElement?;
+
+      if (targetRunNode == null) continue;
+
+      final imageRelId = 'rId$imageCounter';
+      final imageFileExtension = p.extension(imagePath).toLowerCase();
+      final imageFileName = 'image$imageCounter$imageFileExtension';
       final imageBytes = await File(imagePath).readAsBytes();
 
-      // Step 2: Insert <w:drawing> to replace the placeholder
-      final drawingXml = '''
-<w:r xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-     xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
-     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-     xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
-  <w:drawing>
-    <wp:inline>
-      <wp:extent cx="$cx" cy="$cy"/>
-      <wp:docPr id="$imageIndex" name="Picture $imageIndex"/>
-      <a:graphic>
-        <a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">
-          <pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
-            <pic:blipFill>
-              <a:blip r:embed="$imageRelId"/>
-              <a:stretch><a:fillRect/></a:stretch>
-            </pic:blipFill>
-            <pic:spPr>
-              <a:xfrm><a:off x="0" y="0"/><a:ext cx="$cx" cy="$cy"/></a:xfrm>
-              <a:prstGeom prst="rect"><a:avLst/></a:prstGeom>
-            </pic:spPr>
-          </pic:pic>
-        </a:graphicData>
-      </a:graphic>
-    </wp:inline>
-  </w:drawing>
-</w:r>
-''';
-
-      final newDrawing = xml.XmlDocument.parse(drawingXml).rootElement;
-      targetNode.parent?.replace(newDrawing);
-
-      // Step 3: Add image to media
-      archive.addFile(
-        ArchiveFile(imageMediaPath, imageBytes.length, imageBytes),
+      newMediaFiles.add(
+        ArchiveFile('word/media/$imageFileName', imageBytes.length, imageBytes),
       );
 
-      // Step 4: Create <Relationship> entry for the image
-      relEntries.add(
+      relationshipsElement.children.add(
         xml.XmlElement(xml.XmlName('Relationship'), [
           xml.XmlAttribute(xml.XmlName('Id'), imageRelId),
           xml.XmlAttribute(
@@ -250,36 +276,87 @@ class DocxUtils {
         ]),
       );
 
-      imageIndex++;
+      final extension = imageFileExtension.substring(1);
+      if (!existingExtensions.contains(extension)) {
+        final String contentType;
+        switch (extension) {
+          case 'jpeg':
+          case 'jpg':
+            contentType = 'image/jpeg';
+            break;
+          case 'png':
+            contentType = 'image/png';
+            break;
+          default:
+            continue;
+        }
+        typesElement.children.add(
+          xml.XmlElement(xml.XmlName('Default'), [
+            xml.XmlAttribute(xml.XmlName('Extension'), extension),
+            xml.XmlAttribute(xml.XmlName('ContentType'), contentType),
+          ]),
+        );
+        existingExtensions.add(extension);
+      }
+
+      final cx = (imageSize.width * 914400).round();
+      final cy = (imageSize.height * 914400).round();
+
+      final drawingXmlString =
+          '''<w:r xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="$cx" cy="$cy"/><wp:docPr id="$imageCounter" name="Picture $imageCounter"/><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="0" name="$imageFileName"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="$imageRelId"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="$cx" cy="$cy"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>''';
+      final drawingElement =
+          xml.XmlDocument.parse(drawingXmlString).rootElement.copy();
+
+      targetRunNode.parent?.children.insert(
+        targetRunNode.parent!.children.indexOf(targetRunNode),
+        drawingElement,
+      );
+      targetRunNode.parent?.children.remove(targetRunNode);
+
+      imageCounter++;
     }
 
-    // Step 5: Update word/_rels/document.xml.rels
-    final relsFile = archive.files.firstWhere(
-      (f) => f.name == 'word/_rels/document.xml.rels',
-    );
-    final relsXml = xml.XmlDocument.parse(utf8.decode(relsFile.content));
-    relsXml.rootElement.children.addAll(relEntries);
+    // --- Rebuild the archive ---
+    final outputArchive = Archive();
 
-    // Replace files in archive
-    archive.files.removeWhere((f) => f.name == 'word/document.xml');
-    archive.files.removeWhere((f) => f.name == 'word/_rels/document.xml.rels');
+    // 1. Add all original files EXCEPT the ones we've modified
+    for (final file in inputArchive.files) {
+      if (file.name != 'word/document.xml' &&
+          file.name != 'word/_rels/document.xml.rels' &&
+          file.name != '[Content_Types].xml') {
+        outputArchive.addFile(file);
+      }
+    }
 
-    archive.addFile(
+    // 2. Add the newly generated media files
+    for (final mediaFile in newMediaFiles) {
+      outputArchive.addFile(mediaFile);
+    }
+
+    // 3. Add the updated XML files
+    outputArchive.addFile(
       ArchiveFile(
         'word/document.xml',
-        0,
-        utf8.encode(documentXml.toXmlString()),
+        utf8.encode(documentXmlDoc.toXmlString()).length,
+        utf8.encode(documentXmlDoc.toXmlString()),
       ),
     );
-    archive.addFile(
+    outputArchive.addFile(
       ArchiveFile(
         'word/_rels/document.xml.rels',
-        0,
-        utf8.encode(relsXml.toXmlString()),
+        utf8.encode(relsXmlDoc.toXmlString()).length,
+        utf8.encode(relsXmlDoc.toXmlString()),
+      ),
+    );
+    outputArchive.addFile(
+      ArchiveFile(
+        '[Content_Types].xml',
+        utf8.encode(contentTypesDoc.toXmlString()).length,
+        utf8.encode(contentTypesDoc.toXmlString()),
       ),
     );
 
-    return Uint8List.fromList(ZipEncoder().encode(archive)!);
+    return outputArchive;
   }
 
   /// Helper to replace file in archive

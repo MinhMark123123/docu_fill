@@ -1,6 +1,7 @@
 import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/data/src/template_field.dart';
 import 'package:docu_fill/presenter/src/home/view_model/fields_input_view_model.dart';
+import 'package:docu_fill/presenter/src/home/widgets/image_picker_widget.dart';
 import 'package:docu_fill/ui/src/atom/date_time_picker_button.dart';
 import 'package:docu_fill/ui/src/atom/outline_dropdown_button.dart';
 import 'package:docu_fill/ui/src/methodology/tokens/dimens.dart';
@@ -16,6 +17,7 @@ class FiledInputBox extends StatelessWidget {
     return StreamDataConsumer(
       streamData: getViewModel<FieldsInputViewModel>().composedTemplateUI,
       builder: (context, data) {
+        if (data.isEmpty) return SizedBox.shrink();
         return SingleChildScrollView(
           padding: EdgeInsets.all(Dimens.size16),
           child: Column(
@@ -72,6 +74,8 @@ class FiledInputBox extends StatelessWidget {
         return selectionItem(context, e);
       case FieldType.image:
         return imagePickItem(context, e);
+      case FieldType.singleLine:
+        return textInputItem(context, e);
     }
   }
 
@@ -80,12 +84,14 @@ class FiledInputBox extends StatelessWidget {
       context: context,
       isRequired: e.required,
       title: e.label,
-      child: FilledButton(
-        onPressed: () {},
-        child: Text(
-          AppLang.actionsPickImage.tr(),
-          style: context.textTheme.bodySmall,
-        ),
+      child: ImagePickerWidget(
+        imageFiled: e,
+        onImageChanged: (image) {
+          getViewModel<FieldsInputViewModel>().setValue(
+            key: e.key,
+            value: image?.path,
+          );
+        },
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:docu_fill/const/src/app_const.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/data/data.dart';
+import 'package:docu_fill/data/src/dimensions.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -47,22 +48,6 @@ class FieldsInputViewModel extends BaseViewModel {
     _nameDocExported.dispose();
   }
 
-  Future<void> loadTemplates() async {
-    if (_idsSelected.isEmpty) {
-      _templates.postValue([]);
-      return;
-    }
-    for (var id in _idsSelected) {
-      final template = await _templateRepository.getTemplateById(id);
-      if (template != null) {
-        _templates.postValue([template]);
-      }
-    }
-    await _composedUI();
-
-    _initFirstValueSelection();
-  }
-
   Future<void> _composedUI() async {
     final rawData = <int, List<TemplateField>>{};
     if (_templates.data.length == 1) {
@@ -83,6 +68,22 @@ class FieldsInputViewModel extends BaseViewModel {
       }
     }
     _composedTemplateUI.postValue(rawData);
+  }
+
+  Future<void> loadTemplates() async {
+    if (_idsSelected.isEmpty) {
+      _templates.postValue([]);
+      return;
+    }
+    final templates = await Future.wait(
+      _idsSelected.map((id) => _templateRepository.getTemplateById(id)),
+    );
+    final nonNullTemplates =
+        templates.where((element) => element != null).toList();
+    _templates.postValue(List<TemplateConfig>.from(nonNullTemplates));
+    await _composedUI();
+
+    _initFirstValueSelection();
   }
 
   void _initFirstValueSelection() {
@@ -123,17 +124,31 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   Future<void> exported(BuildContext context) async {
+    final singleLines = getSingleLines();
     final nonNullAbleMap = prettyData();
-    await loadingGuard(_executedExport(nonNullAbleMap));
+    final imageReplacements = getImageReplacements(nonNullAbleMap);
+    await loadingGuard(
+      _executedExport(
+        nonNullAbleMap: nonNullAbleMap,
+        imageReplacements: imageReplacements,
+        singleLines: singleLines,
+      ),
+    );
     await Future.delayed(Duration(milliseconds: 200));
     doneExported();
   }
 
-  Future<void> _executedExport(Map<String, String> nonNullAbleMap) async {
+  Future<void> _executedExport({
+    required Map<String, String> nonNullAbleMap,
+    required Map<String, (String, Size)> imageReplacements,
+    required Map<String, String?> singleLines,
+  }) async {
     for (var template in _templates.data) {
       await _executeSingleTemplate(
         template: template,
         nonNullAbleMap: nonNullAbleMap,
+        imageReplacements: imageReplacements,
+        singleLines: singleLines,
       );
     }
     await Future.delayed(Duration(seconds: 2));
@@ -142,12 +157,16 @@ class FieldsInputViewModel extends BaseViewModel {
   Future<void> _executeSingleTemplate({
     required TemplateConfig template,
     required Map<String, String> nonNullAbleMap,
+    required Map<String, (String, Size)> imageReplacements,
+    required Map<String, String?> singleLines,
   }) async {
     final fileOrigin = File(template.pathTemplate);
     final originalBytes = await fileOrigin.readAsBytes();
     final rawBytes = await DocxUtils.composeModifiedDocxWithPlaceholders(
       originalBytes: originalBytes,
       replacements: nonNullAbleMap,
+      imageReplacements: imageReplacements,
+      singleLines: singleLines,
     );
     final mimeType = template.pathTemplate.split(".").lastOrNull;
     final fileName = "${_nameDocExported.text}.$mimeType";
@@ -161,21 +180,32 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   Map<String, String> prettyData() {
-    final fields = [];
+    final fields = <TemplateField>[];
     for (var template in _templates.data) {
       fields.addAll(template.fields);
     }
     for (var element in fields) {
+      final valueInput = _fieldKeys[element.key];
+      if (element.type == FieldType.datetime && valueInput != null) {
+        final format = element.additionalInfo;
+        if (format != null && format.isNotEmpty) {
+          _fieldKeys[element.key] = DateTimeUtils.format(
+            valueInput,
+            format: format,
+          );
+        }
+      }
       if (_fieldKeys[element.key] == null) {
         _fieldKeys[element.key] = element.defaultValue ?? "";
       }
     }
     final nullKeys = _fieldKeys.keys.where((key) => _fieldKeys[key] == null);
     for (var key in nullKeys) {
-      _fieldKeys[key] =
-          fields.firstWhere((element) => element.key == key).defaultValue;
+      var filed = fields.firstWhere((element) => element.key == key);
+      _fieldKeys[key] = filed.defaultValue;
     }
-    return _fieldKeys.map((key, value) => MapEntry(key, value!));
+    final result = _fieldKeys.map((key, value) => MapEntry(key, value!));
+    return result;
   }
 
   Future<void> pickFolder() async {
@@ -195,6 +225,44 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   String getTemplateName(int templateId) {
+    if (_templates.data.isEmpty) return AppConst.empty;
     return _templates.data.firstWhere((e) => e.id == templateId).templateName;
+  }
+
+  Map<String, (String, Size)> getImageReplacements(
+    Map<String, String> nonNullAbleMap,
+  ) {
+    List<TemplateField> raw = [];
+    for (var e in _composedTemplateUI.data.values) {
+      raw.addAll(e);
+    }
+    final imageField = raw.where((e) => e.type == FieldType.image);
+    final result = <String, (String, Size)>{};
+    //clear image field
+    for (var e in imageField) {
+      final key = e.key;
+      final dimension = Dimensions.from(e.additionalInfo);
+      final size = dimension?.toInches();
+      if (dimension != null && nonNullAbleMap[key] != null && size != null) {
+        result[key] = (nonNullAbleMap[key]!, size);
+      }
+      nonNullAbleMap.remove(e.key);
+    }
+    return result;
+  }
+
+  Map<String, String?> getSingleLines() {
+    List<TemplateField> raw = [];
+    for (var e in _composedTemplateUI.data.values) {
+      raw.addAll(e);
+    }
+    final singleLinesFields = raw.where((e) => e.type == FieldType.singleLine);
+    final result = <String, String?>{};
+
+    for (var e in singleLinesFields) {
+      result[e.key] = _fieldKeys[e.key];
+      _fieldKeys.remove(e.key);
+    }
+    return result;
   }
 }
