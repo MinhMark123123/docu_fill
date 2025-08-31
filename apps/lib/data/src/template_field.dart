@@ -32,6 +32,26 @@ class TemplateField {
       _$TemplateFieldFromJson(json);
 
   Map<String, dynamic> toJson() => _$TemplateFieldToJson(this);
+
+  TemplateField copyWith({
+    String? key,
+    String? label,
+    FieldType? type,
+    bool? required,
+    String? defaultValue,
+    List<String>? options,
+    String? additionalInfo,
+  }) {
+    return TemplateField(
+      key: key ?? this.key,
+      label: label ?? this.label,
+      type: type ?? this.type,
+      required: required ?? this.required,
+      defaultValue: defaultValue ?? this.defaultValue,
+      options: options ?? this.options,
+      additionalInfo: additionalInfo ?? this.additionalInfo,
+    );
+  }
 }
 
 enum FieldType {

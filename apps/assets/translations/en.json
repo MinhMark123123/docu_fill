@@ -105,6 +105,7 @@
     "pick_folder_to_export": "Pick a folder to export the document",
     "name_the_document_exported": "Name the document you want to export",
     "date_format_invalid": "Date format is incorrect.",
-    "enter_date_format": "Enter date format. Example: dd/MM/yyyy"
+    "enter_date_format": "Enter date format. Example: dd/MM/yyyy",
+    "single_line_text_hint": "This line will be removed automatically if empty."
   }
 }

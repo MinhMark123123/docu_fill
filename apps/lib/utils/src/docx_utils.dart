@@ -100,13 +100,20 @@ class DocxUtils {
                         .where((e) => e.name.local == 'p')
                         .firstOrNull;
                 paragraph?.parent?.children.remove(paragraph);
+                debugPrint(
+                  "singleLines removed this line has key ${entry.key}",
+                );
               } else {
                 text = text.replaceAll(entry.key, entry.value!);
+                debugPrint(
+                  "singleLines removed this line has key ${entry.key}",
+                );
               }
             }
           }
           for (final entry in replacements.entries) {
             text = text.replaceAll(entry.key, entry.value);
+            debugPrint("replace text has key ${entry.key}");
           }
 
           // ✅ apply the updated text
@@ -122,11 +129,13 @@ class DocxUtils {
       }
     }
     if (imageReplacements != null && imageReplacements.isNotEmpty) {
+      debugPrint("replace image start");
       // ⭐️ Re-assign newArchive with the result from the image insertion function
       newArchive = await insertImagesIntoDocxArchived(
         replacements: imageReplacements,
         inputArchive: newArchive, // Pass the text-modified archive
       );
+      debugPrint("replace image end");
     }
     return Uint8List.fromList(ZipEncoder().encode(newArchive)!);
   }

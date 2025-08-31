@@ -88,7 +88,7 @@ class FiledInputBox extends StatelessWidget {
         imageFiled: e,
         onImageChanged: (image) {
           getViewModel<FieldsInputViewModel>().setValue(
-            key: e.key,
+            field: e,
             value: image?.path,
           );
         },
@@ -106,7 +106,7 @@ class FiledInputBox extends StatelessWidget {
         items: e.options ?? [],
         onSelected:
             (value) => getViewModel<FieldsInputViewModel>().setValue(
-              key: e.key,
+              field: e,
               value: value,
             ),
       ),
@@ -121,7 +121,7 @@ class FiledInputBox extends StatelessWidget {
       child: DateTimePickerButton(
         onDateTimeChanged: (time) {
           getViewModel<FieldsInputViewModel>().setValue(
-            key: e.key,
+            field: e,
             value: time?.toString(),
           );
         },
@@ -130,19 +130,21 @@ class FiledInputBox extends StatelessWidget {
   }
 
   Widget textInputItem(BuildContext context, TemplateField e) {
+    print("textInputItem ${e.defaultValue}");
     return itemField(
       context: context,
       isRequired: e.required,
       title: e.label,
-      child: TextField(
+      child: TextFormField(
+        initialValue: e.defaultValue,
         decoration: InputDecoration(
-          hintText: AppLang.messagesInputTextHint.tr(),
+          hintText:
+              e.type == FieldType.text
+                  ? AppLang.messagesInputTextHint.tr()
+                  : AppLang.messagesSingleLineTextHint.tr(),
         ),
         onChanged: (value) {
-          getViewModel<FieldsInputViewModel>().setValue(
-            key: e.key,
-            value: value,
-          );
+          getViewModel<FieldsInputViewModel>().setValue(field: e, value: value);
         },
       ),
     );

@@ -123,6 +123,8 @@ abstract class AppLang {
   static const String messagesDateFormatInvalid =
       "messages.date_format_invalid";
   static const String messagesEnterDateFormat = "messages.enter_date_format";
+  static const String messagesSingleLineTextHint =
+      "messages.single_line_text_hint";
 
   // If you had more top-level keys or nested structures, you'd continue like this:
   // static const String someOtherTopLevelKey = "some_other_top_level_key";

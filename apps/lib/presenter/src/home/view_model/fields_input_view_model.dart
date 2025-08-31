@@ -36,8 +36,9 @@ class FieldsInputViewModel extends BaseViewModel {
 
   List<int> _idsSelected = [];
   final _fieldKeys = <String, String?>{};
+  final _singleField = <String, String?>{};
 
-  void setup(List<int> ids) {
+  void performInit(List<int> ids) {
     _idsSelected = ids;
     loadTemplates();
   }
@@ -52,6 +53,14 @@ class FieldsInputViewModel extends BaseViewModel {
     final rawData = <int, List<TemplateField>>{};
     if (_templates.data.length == 1) {
       final template = _templates.data.first;
+      for (var field in template.fields) {
+        if (field.defaultValue != null && field.defaultValue!.isNotEmpty) {
+          setValue(field: field, value: field.defaultValue);
+        }
+        if (field.type == FieldType.selection) {
+          setValue(field: field, value: field.options?.firstOrNull);
+        }
+      }
       rawData[template.id] = template.fields;
       _composedTemplateUI.postValue(rawData);
       return;
@@ -60,7 +69,14 @@ class FieldsInputViewModel extends BaseViewModel {
     for (var template in _templates.data) {
       final fields = template.fields;
       rawData[template.id] = fields;
+
       for (var field in fields) {
+        if (field.defaultValue != null && field.defaultValue!.isNotEmpty) {
+          setValue(field: field, value: field.defaultValue);
+        }
+        if (field.type == FieldType.selection) {
+          setValue(field: field, value: field.options?.firstOrNull);
+        }
         if (!rawData[AppConst.commonUnknow]!.contains(field)) {
           rawData[AppConst.commonUnknow]!.add(field);
           rawData[AppConst.commonUnknow]!.remove(field);
@@ -78,11 +94,9 @@ class FieldsInputViewModel extends BaseViewModel {
     final templates = await Future.wait(
       _idsSelected.map((id) => _templateRepository.getTemplateById(id)),
     );
-    final nonNullTemplates =
-        templates.where((element) => element != null).toList();
-    _templates.postValue(List<TemplateConfig>.from(nonNullTemplates));
+    final safeList = templates.where((element) => element != null).toList();
+    _templates.postValue(List<TemplateConfig>.from(safeList));
     await _composedUI();
-
     _initFirstValueSelection();
   }
 
@@ -97,8 +111,14 @@ class FieldsInputViewModel extends BaseViewModel {
     }
   }
 
-  void setValue({required String key, required String? value}) {
-    _fieldKeys[key] = value;
+  void setValue({required TemplateField field, required String? value}) {
+    if (field.type == FieldType.singleLine) {
+      _singleField[field.key] = value;
+      debugPrint("set value single line ${field.key}: $value");
+    } else {
+      debugPrint("set value ${field.key}: $value");
+      _fieldKeys[field.key] = value;
+    }
     checkValidate();
   }
 
@@ -124,14 +144,13 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   Future<void> exported(BuildContext context) async {
-    final singleLines = getSingleLines();
     final nonNullAbleMap = prettyData();
     final imageReplacements = getImageReplacements(nonNullAbleMap);
     await loadingGuard(
       _executedExport(
         nonNullAbleMap: nonNullAbleMap,
         imageReplacements: imageReplacements,
-        singleLines: singleLines,
+        singleLines: _singleField,
       ),
     );
     await Future.delayed(Duration(milliseconds: 200));
@@ -218,6 +237,7 @@ class FieldsInputViewModel extends BaseViewModel {
   void doneExported() {
     _templates.postValue([]);
     _fieldKeys.clear();
+    _singleField.clear();
     _nameDocExported.clear();
     _directoryExported.postValue("");
     _enableExported.postValue(false);

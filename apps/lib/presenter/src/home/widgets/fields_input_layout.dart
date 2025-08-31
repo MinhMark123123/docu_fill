@@ -17,11 +17,11 @@ class FieldsInputLayout extends BaseView<FieldsInputViewModel> {
   void awake(WrapperContext wrapperContext, FieldsInputViewModel viewModel) {
     super.awake(wrapperContext, viewModel);
     if (ids != null) {
-      viewModel.setup(ids!);
+      viewModel.performInit(ids!);
     } else {
       final sub = getViewModel<HomeViewModel>().selectedTemplateIds
           .asStream()
-          .listen((data) => viewModel.setup(data));
+          .listen((data) => viewModel.performInit(data));
       wrapperContext.lifeCycleManager.onDispose(() => sub.cancel());
     }
   }
