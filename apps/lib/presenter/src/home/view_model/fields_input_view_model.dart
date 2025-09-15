@@ -97,21 +97,13 @@ class FieldsInputViewModel extends BaseViewModel {
     final safeList = templates.where((element) => element != null).toList();
     _templates.postValue(List<TemplateConfig>.from(safeList));
     await _composedUI();
-    _initFirstValueSelection();
   }
 
-  void _initFirstValueSelection() {
-    for (var template in _templates.data) {
-      final selectionsField = template.fields.where(
-        (e) => e.type == FieldType.selection,
-      );
-      for (var e in selectionsField) {
-        _fieldKeys[e.key] = e.options?.firstOrNull;
-      }
-    }
-  }
-
-  void setValue({required TemplateField field, required String? value}) {
+  void setValue({
+    required TemplateField field,
+    required String? value,
+    bool shouldCheckValidate = true,
+  }) {
     if (field.type == FieldType.singleLine) {
       _singleField[field.key] = value;
       debugPrint("set value single line ${field.key}: $value");
@@ -119,7 +111,9 @@ class FieldsInputViewModel extends BaseViewModel {
       debugPrint("set value ${field.key}: $value");
       _fieldKeys[field.key] = value;
     }
-    checkValidate();
+    if (shouldCheckValidate) {
+      checkValidate();
+    }
   }
 
   Future<void> checkValidate() async {
@@ -208,23 +202,23 @@ class FieldsInputViewModel extends BaseViewModel {
       if (element.type == FieldType.datetime && valueInput != null) {
         final format = element.additionalInfo;
         if (format != null && format.isNotEmpty) {
-          _fieldKeys[element.key] = DateTimeUtils.format(
-            valueInput,
-            format: format,
+          setValue(
+            field: element,
+            value: DateTimeUtils.format(valueInput, format: format),
+            shouldCheckValidate: false,
           );
         }
       }
       if (_fieldKeys[element.key] == null) {
-        _fieldKeys[element.key] = element.defaultValue ?? "";
+        setValue(field: element, value: element.defaultValue ?? "");
+        setValue(
+          field: element,
+          value: element.defaultValue ?? "",
+          shouldCheckValidate: false,
+        );
       }
     }
-    final nullKeys = _fieldKeys.keys.where((key) => _fieldKeys[key] == null);
-    for (var key in nullKeys) {
-      var filed = fields.firstWhere((element) => element.key == key);
-      _fieldKeys[key] = filed.defaultValue;
-    }
-    final result = _fieldKeys.map((key, value) => MapEntry(key, value!));
-    return result;
+    return _fieldKeys.map((key, value) => MapEntry(key, value!));
   }
 
   Future<void> pickFolder() async {
@@ -267,21 +261,6 @@ class FieldsInputViewModel extends BaseViewModel {
         result[key] = (nonNullAbleMap[key]!, size);
       }
       nonNullAbleMap.remove(e.key);
-    }
-    return result;
-  }
-
-  Map<String, String?> getSingleLines() {
-    List<TemplateField> raw = [];
-    for (var e in _composedTemplateUI.data.values) {
-      raw.addAll(e);
-    }
-    final singleLinesFields = raw.where((e) => e.type == FieldType.singleLine);
-    final result = <String, String?>{};
-
-    for (var e in singleLinesFields) {
-      result[e.key] = _fieldKeys[e.key];
-      _fieldKeys.remove(e.key);
     }
     return result;
   }

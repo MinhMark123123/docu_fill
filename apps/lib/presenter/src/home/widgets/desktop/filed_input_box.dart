@@ -136,6 +136,7 @@ class FiledInputBox extends StatelessWidget {
       isRequired: e.required,
       title: e.label,
       child: TextFormField(
+        key: Key(e.key),
         initialValue: e.defaultValue,
         decoration: InputDecoration(
           hintText:

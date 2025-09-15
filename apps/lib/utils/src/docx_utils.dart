@@ -85,43 +85,74 @@ class DocxUtils {
       if (file.isFile && isValidDocNamePart(file)) {
         final xmlContent = utf8.decode(file.content);
         final document = xml.XmlDocument.parse(xmlContent);
-        final textNodes = document.findAllElements('w:t');
-        for (final node in textNodes) {
-          var text = node.innerText;
+        // ⭐️ 1. Get a list of all paragraphs first.
+        // .toList() creates a copy, preventing modification errors during iteration.
+        final paragraphs = document.findAllElements('w:p').toList();
+
+        // ⭐️ Use a traditional for-loop to get the index 'i'
+        for (int i = 0; i < paragraphs.length; i++) {
+          final p = paragraphs[i];
+          final paragraphText =
+              p.findAllElements('w:t').map((t) => t.innerText).join();
+          bool paragraphRemoved = false;
+
           for (final entry in singleLines.entries) {
-            final value = entry.value;
-            if (text.contains(entry.key)) {
+            if (paragraphText.contains(entry.key)) {
+              final value = entry.value;
               if (value == null || value.isEmpty) {
-                // remove the whole line (the paragraph <w:p> element)
-                xml.XmlElement? paragraph =
-                    node.ancestors
-                        .whereType<xml.XmlElement>()
-                        .toList()
-                        .where((e) => e.name.local == 'p')
-                        .firstOrNull;
-                paragraph?.parent?.children.remove(paragraph);
-                debugPrint(
-                  "singleLines removed this line has key ${entry.key}",
-                );
-              } else {
-                text = text.replaceAll(entry.key, entry.value!);
-                debugPrint(
-                  "singleLines removed this line has key ${entry.key}",
-                );
+                // 1. Remove the current paragraph
+                p.parent?.children.remove(p);
+                paragraphRemoved = true;
+
+                // ⭐️ 2. Check if the NEXT paragraph exists and is empty
+                if (i + 1 < paragraphs.length) {
+                  final nextP = paragraphs[i + 1];
+                  final nextPText =
+                      nextP
+                          .findAllElements('w:t')
+                          .map((t) => t.innerText)
+                          .join()
+                          .trim();
+
+                  // If it's an empty spacer line, remove it too
+                  if (nextPText.isEmpty) {
+                    nextP.parent?.children.remove(nextP);
+                  }
+                }
+                break;
               }
             }
           }
-          for (final entry in replacements.entries) {
-            text = text.replaceAll(entry.key, entry.value);
-            debugPrint("replace text has key ${entry.key}");
+
+          if (paragraphRemoved) {
+            // Since we might have modified the list, we can continue to the next iteration.
+            // A more robust solution might involve iterating backwards or rebuilding the list,
+            // but for this case, 'continue' is sufficient.
+            continue;
           }
 
-          // ✅ apply the updated text
-          node.innerText = text;
+          // --- Logic to REPLACE text if the paragraph was NOT removed ---
+          final textNodes = p.findAllElements('w:t');
+          for (final node in textNodes) {
+            var text = node.innerText;
+            // Apply singleLine replacements that have a value
+            for (final entry in singleLines.entries) {
+              if (entry.value != null && entry.value!.isNotEmpty) {
+                text = text.replaceAll(entry.key, entry.value!);
+                debugPrint("replace single line text : ${entry.key}");
+              }
+            }
+            // Apply standard replacements
+            for (final entry in replacements.entries) {
+              text = text.replaceAll(entry.key, entry.value);
+              debugPrint("replace normal text : ${entry.key}");
+            }
+            // Update the node's text
+            node.innerText = text;
+          }
         }
 
         final updatedXml = utf8.encode(document.toXmlString(pretty: false));
-        // ✅ use replaceFileInArchive helper
         replaceFileInArchive(newArchive, file.name, updatedXml);
       } else {
         // Copy unchanged files
