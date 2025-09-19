@@ -12,11 +12,16 @@ extension $HomeViewModel on HomeViewModel {
   StreamData<List<TemplateConfig>> get templates => _templates.streamData;
 
   /// This getter is used to access the stream of data
-  /// associated with the private field _idTemplateSelected.
-  StreamData<int> get idTemplateSelected => _idTemplateSelected.streamData;
+  /// associated with the private field _selectedTemplateIds.
+  StreamData<List<int>> get selectedTemplateIds =>
+      _selectedTemplateIds.streamData;
 
   /// This getter is used to access the stream of data
-  /// associated with the private field _zipTemplatesAndSelected.
-  StreamData<(List<TemplateConfig>, int)> get zipTemplatesAndSelected =>
-      _zipTemplatesAndSelected.streamData;
+  /// associated with the private field _enableMultipleChoice.
+  StreamData<bool> get enableMultipleChoice => _enableMultipleChoice.streamData;
+
+  /// This getter is used to access the stream of data
+  /// associated with the private field _composed.
+  StreamData<(List<int>, List<TemplateConfig>)> get composed =>
+      _composed.streamData;
 }

@@ -1,5 +1,6 @@
 import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/presenter/src/configure/model/table_row_data.dart';
+import 'package:docu_fill/presenter/src/configure/view/widgets/cell_default_value.dart';
 import 'package:docu_fill/ui/src/methodology/tokens/dimens.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ enum TableColumn {
   isRequired,
   fieldName,
   inputType,
+  defaultValue,
   options;
 
   static TableColumn from(TableVicinity vicinity) {
@@ -30,6 +32,8 @@ enum TableColumn {
       case 3:
         return TableColumn.inputType;
       case 4:
+        return TableColumn.defaultValue;
+      case 5:
         return TableColumn.options;
       default:
         return TableColumn.isRequired;
@@ -48,6 +52,8 @@ enum TableColumn {
         return AppLang.labelsOptions.tr();
       case TableColumn.isRequired:
         return AppLang.labelsRequired.tr();
+      case TableColumn.defaultValue:
+        return AppLang.labelsDefaultValue.tr();
     }
   }
 
@@ -72,6 +78,8 @@ enum TableColumn {
         return cellBox(child: CellFieldOptions(data: data));
       case TableColumn.isRequired:
         return cellBox(child: CellFieldRequired(data: data));
+      case TableColumn.defaultValue:
+        return cellBox(child: CellDefaultValue(data: data));
     }
   }
 
@@ -93,11 +101,12 @@ class CustomScrollableTable extends StatelessWidget {
   // Define column widths - you can adjust these as needed
   // Using FixedTableSpanExtent for fixed widths, but you can explore others.
   final List<TableSpanExtent> columnWidths = [
-    FractionalSpanExtent(0.15), // Field Key
-    FractionalSpanExtent(0.1), // Required
-    FractionalSpanExtent(0.25), // Field Name
-    FractionalSpanExtent(0.2), // Input Type
-    FractionalSpanExtent(0.3), // Options
+    FixedSpanExtent(Dimens.size180),
+    FixedSpanExtent(Dimens.size94),
+    FixedSpanExtent(Dimens.size232),
+    FixedSpanExtent(Dimens.size150),
+    FixedSpanExtent(Dimens.size232),
+    RemainingSpanExtent(),
   ];
 
   CustomScrollableTable({super.key, required this.data});
@@ -105,6 +114,9 @@ class CustomScrollableTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TableView.builder(
+      verticalDetails: ScrollableDetails.vertical(
+        physics: ClampingScrollPhysics(),
+      ),
       columnCount: TableColumn.values.length,
       rowCount: data.length + 1,
       // Pin the header row

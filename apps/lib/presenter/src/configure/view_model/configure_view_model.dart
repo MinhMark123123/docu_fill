@@ -8,7 +8,6 @@ import 'package:docu_fill/data/data.dart';
 import 'package:docu_fill/presenter/src/configure/model/table_row_data.dart';
 import 'package:docu_fill/route/routers.dart';
 import 'package:docu_fill/utils/utils.dart';
-import 'package:docx_to_text/docx_to_text.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
@@ -23,14 +22,14 @@ class ConfigureViewModel extends BaseViewModel {
   ConfigureViewModel({required TemplateRepository templateRepository})
     : _templateRepository = templateRepository;
 
-  String? _pathFilePicked;
-
   @Bind()
   late final _fieldsData = <TableRowData>[].mtd(this);
   @Bind()
   late final _enableConfirm = false.mtd(this);
   @Bind()
   late final _enableNameTemplate = false.mtd(this);
+
+  String? _pathFilePicked;
   final TextEditingController _nameController = TextEditingController();
 
   TextEditingController get nameController => _nameController;
@@ -52,56 +51,85 @@ class ConfigureViewModel extends BaseViewModel {
   Future<void> loadDoc() async {
     if (_pathFilePicked == null) return;
     final f = File(_pathFilePicked!);
-    final text = docxToText(await f.readAsBytes());
+    final text = DocxUtils.docxToText(await f.readAsBytes());
     final regex = RegExp(AppConst.placeHolderRegex);
-    final matches = regex.allMatches(text);
-    final fields = matches.map((match) {
-      final key = match.group(1);
-      return TableRowData(fieldKey: '''{{$key}}''');
+    final matches = regex.allMatches(text).map((e) => e.group(1)).toSet();
+    final fields = matches.map((key) {
+      return TableRowData(fieldKey: AppConst.composeKey(key: key!));
     });
     _fieldsData.postValue(fields.toList());
   }
 
-  Future<void> setValue(
-    String key, {
-    String? fieldName,
-    FieldType? inputType,
-    String? options,
-    bool? isRequired,
-  }) async {
-    final index = _fieldsData.data.indexWhere(
-      (element) => element.fieldKey == key,
-    );
-    var shouldUpdateUI = true;
-    if (fieldName != null) {
-      _fieldsData.data[index] = _fieldsData.data[index].copyWith(
-        fieldName: fieldName,
-      );
-      shouldUpdateUI = false;
-    }
-    if (options != null) {
-      _fieldsData.data[index] = _fieldsData.data[index].copyWith(
-        options: options,
-      );
-      shouldUpdateUI = false;
-    }
-    if (shouldUpdateUI) {
-      var newData = _fieldsData.data[index].copyWith(
-        fieldName: fieldName,
-        inputType: inputType,
-        options: options,
-        isRequired: isRequired,
-      );
-      bool hasInputType = inputType != null;
-      bool shouldResetOptions =
-          inputType != FieldType.selection && newData.options != null;
-      if (hasInputType && shouldResetOptions) {
-        newData = newData.removeOptions();
-      }
-      _fieldsData.data[index] = newData;
-      _fieldsData.postValue(List.from(_fieldsData.data));
-    }
+  TableRowData fieldOfKey(String key) {
+    return _fieldsData.data.firstWhere((element) => element.fieldKey == key);
+  }
+
+  Future<void> updateFieldData(String key, TableRowData? data) async {
+    if (data == null) return;
+    final index = fieldsData.data.indexWhere((e) => e.fieldKey == key);
+    if (index == AppConst.commonUnknow) return;
+    final newData = removeUselessInput(newData: data);
+    _fieldsData.data[index] = newData;
+  }
+
+  Future<void> updateFieldName(String key, {required String fieldName}) async {
+    updateFieldData(key, fieldOfKey(key).copyWith(fieldName: fieldName));
     await checkEnableConfirm();
+  }
+
+  Future<void> updateDefaultValue(
+    String key, {
+    required String defaultValue,
+  }) async {
+    updateFieldData(key, fieldOfKey(key).copyWith(defaultValue: defaultValue));
+    await checkEnableConfirm();
+  }
+
+  Future<void> updateAdditionalInfo(
+    String key, {
+    required String additionalInfo,
+  }) async {
+    await updateFieldData(
+      key,
+      fieldOfKey(key).copyWith(additionalInfo: additionalInfo),
+    );
+    await checkEnableConfirm();
+  }
+
+  Future<void> updateOptions(
+    String key, {
+    required List<String> options,
+  }) async {
+    updateFieldData(key, fieldOfKey(key).copyWith(options: options));
+    await checkEnableConfirm();
+  }
+
+  Future<void> updateIsRequired(String key, {bool? isRequired}) async {
+    updateFieldData(key, fieldOfKey(key).copyWith(isRequired: isRequired));
+    await checkEnableConfirm();
+    notifyDataChanged();
+  }
+
+  Future<void> updateInputType(String key, {FieldType? inputType}) async {
+    updateFieldData(key, fieldOfKey(key).copyWith(inputType: inputType));
+    notifyDataChanged();
+    await checkEnableConfirm();
+  }
+
+  Future<void> notifyDataChanged() async {
+    _fieldsData.postValue(List.from(_fieldsData.data));
+  }
+
+  TableRowData removeUselessInput({required TableRowData newData}) {
+    final raw = newData.copyWith();
+    final inputType = raw.inputType;
+    if (!inputType.isSelection) {
+      raw.options = null;
+    }
+    if (inputType.isSelection) {
+      raw.defaultValue = "";
+    }
+    return raw;
   }
 
   Future<void> checkEnableConfirm() async {
@@ -151,9 +179,69 @@ class ConfigureViewModel extends BaseViewModel {
     return TemplateConfig(
       templateName: name,
       pathTemplate: path,
-      version: "1.0",
+      version: DateTime.now().toString(),
       fields: fields,
     );
+  }
+
+  Future<void> updateWidthImage(
+    String fieldKey, {
+    required String widthImage,
+  }) async {
+    final currentRaw = fieldOfKey(fieldKey).additionalInfo;
+    final splitter = currentRaw?.split(";");
+    final widthString = double.tryParse(widthImage);
+    if (widthString == null) return;
+    if (splitter == null || splitter.isEmpty) {
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo:
+            "$widthString;;"
+            "${ImageUnit.cm.value}",
+      );
+    } else {
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo: [widthString, splitter[1], splitter[2]].join(";"),
+      );
+    }
+  }
+
+  Future<void> updateHeightImage(
+    String fieldKey, {
+    required String heightImage,
+  }) async {
+    final currentRaw = fieldOfKey(fieldKey).additionalInfo;
+    final splitter = currentRaw?.split(";");
+    final heightString = double.tryParse(heightImage);
+    if (heightString == null) return;
+    if (splitter == null || splitter.isEmpty) {
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo: ";$heightString;${ImageUnit.cm.value}",
+      );
+    } else {
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo: [splitter[0], heightString, splitter[2]].join(";"),
+      );
+    }
+  }
+
+  Future<void> updateUnitImage(String fieldKey, {ImageUnit? unitImage}) async {
+    final currentRaw = fieldOfKey(fieldKey).additionalInfo;
+    final splitter = currentRaw?.split(";");
+    if (splitter == null || splitter.isEmpty) {
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo: ";;${unitImage?.value}",
+      );
+    } else {
+      await updateAdditionalInfo(
+        fieldKey,
+        additionalInfo: [splitter[0], splitter[1], unitImage?.value].join(";"),
+      );
+    }
   }
 
   Future<void> saveConfigure(BuildContext context) async {

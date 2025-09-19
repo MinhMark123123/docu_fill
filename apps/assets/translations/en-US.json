@@ -51,7 +51,9 @@
     "open_document": "Open Document",
     "return_to_templates": "Return to Templates",
     "download_document": "Download Document",
-    "select_date_time": "Select Date & Time"
+    "select_date_time": "Select Date & Time",
+    "show_menu": "Show Menu",
+    "pick_image": "Pick Image"
   },
   "labels": {
     "templates": "Templates",
@@ -78,7 +80,16 @@
     "input_field_name": "Input Field Name",
     "input_options": "Input Options (comma-separated)",
     "enter_template_name": "Enter Template Name",
-    "template_name": "Template Name"
+    "template_name": "Template Name",
+    "default_value": "Default Value",
+    "enable_multiple_choice": "Enable Multiple Choice",
+    "single": "Single",
+    "multiple": "Multiple",
+    "width": "width",
+    "height": "height",
+    "unit": "unit",
+    "cm": "cm",
+    "inches": "inches"
   },
   "messages": {
     "review_and_configure_fields": "Review and configure the fields detected in your template. Ensure all fields are correctly identified and assigned the appropriate input type for accurate data collection.",
@@ -92,6 +103,9 @@
     "input_text_hint": "Enter text here",
     "field_is_required": "Field {fields} is required",
     "pick_folder_to_export": "Pick a folder to export the document",
-    "name_the_document_exported": "Name the document you want to export"
+    "name_the_document_exported": "Name the document you want to export",
+    "date_format_invalid": "Date format is incorrect.",
+    "enter_date_format": "Enter date format. Example: dd/MM/yyyy",
+    "single_line_text_hint": "This line will be removed automatically if empty."
   }
 }

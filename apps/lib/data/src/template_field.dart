@@ -16,6 +16,8 @@ class TemplateField {
 
   final List<String>? options;
 
+  final String? additionalInfo;
+
   TemplateField({
     required this.key,
     required this.label,
@@ -23,12 +25,33 @@ class TemplateField {
     required this.required,
     this.defaultValue,
     this.options,
+    this.additionalInfo,
   });
 
   factory TemplateField.fromJson(Map<String, dynamic> json) =>
       _$TemplateFieldFromJson(json);
 
   Map<String, dynamic> toJson() => _$TemplateFieldToJson(this);
+
+  TemplateField copyWith({
+    String? key,
+    String? label,
+    FieldType? type,
+    bool? required,
+    String? defaultValue,
+    List<String>? options,
+    String? additionalInfo,
+  }) {
+    return TemplateField(
+      key: key ?? this.key,
+      label: label ?? this.label,
+      type: type ?? this.type,
+      required: required ?? this.required,
+      defaultValue: defaultValue ?? this.defaultValue,
+      options: options ?? this.options,
+      additionalInfo: additionalInfo ?? this.additionalInfo,
+    );
+  }
 }
 
 enum FieldType {
@@ -37,7 +60,11 @@ enum FieldType {
   @JsonValue("datetime")
   datetime("datetime"),
   @JsonValue("selection")
-  selection("selection");
+  selection("selection"),
+  @JsonValue("image")
+  image("image"),
+  @JsonValue("singleLine")
+  singleLine("singleLine");
 
   final String value;
 
@@ -58,6 +85,32 @@ enum FieldType {
         return "Date Time";
       case FieldType.selection:
         return "Selection";
+      case FieldType.image:
+        return "Image";
+      case FieldType.singleLine:
+        return "Single Line";
     }
+  }
+
+  bool get isSelection => this == FieldType.selection;
+
+  bool get isDateTime => this == FieldType.datetime;
+
+  bool get isImage => this == FieldType.image;
+}
+
+enum ImageUnit {
+  cm("cm"),
+  inch("inch");
+
+  final String value;
+
+  const ImageUnit(this.value);
+
+  static ImageUnit fromValue(String? value) {
+    return ImageUnit.values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => ImageUnit.cm,
+    );
   }
 }

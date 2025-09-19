@@ -15,11 +15,10 @@ class MainViewModel extends BaseViewModel {
   late final _currentMenu = MainDesktopMenu.template.mtd(this);
 
   void selectMenu(BuildContext context, MainDesktopMenu menu) {
-    if (menu == _currentMenu.data) return;
-
-    _currentMenu.postValue(menu);
-    if (GoRouter.of(context).state.path != menu.pathRoute) {
+    bool isSamePath = GoRouter.of(context).state.path == menu.pathRoute;
+    if (!isSamePath || menu == _currentMenu.data) {
       navigatePage(menu.pathRoute);
+      _currentMenu.postValue(menu);
     }
   }
 }

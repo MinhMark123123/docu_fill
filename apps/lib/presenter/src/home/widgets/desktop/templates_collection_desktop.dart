@@ -11,9 +11,12 @@ class TemplatesCollectionDesktop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      spacing: Dimens.size12,
-      children: [header(context), templateBox(context)],
+    return Padding(
+      padding: EdgeInsets.only(top: Dimens.size16),
+      child: Column(
+        spacing: Dimens.size12,
+        children: [header(context), templateBox(context), addNew(context)],
+      ),
     );
   }
 
@@ -26,7 +29,7 @@ class TemplatesCollectionDesktop extends StatelessWidget {
             elevation: Dimens.size4,
           ),
         ),
-        child: Card(child: templateList()),
+        child: templateList(),
       ),
     );
   }
@@ -34,23 +37,23 @@ class TemplatesCollectionDesktop extends StatelessWidget {
   Widget templateList() {
     final viewModel = getViewModel<HomeViewModel>();
     return StreamDataConsumer(
-      streamData: viewModel.zipTemplatesAndSelected,
+      streamData: viewModel.composed,
       builder: (context, value) {
-        final selected = value.$2;
-        final templates = value.$1;
+        final selectedIds = value.$1;
+        final templates = value.$2;
         return ListView.separated(
-          padding: EdgeInsets.symmetric(
-            horizontal: Dimens.size20,
-            vertical: Dimens.size16,
-          ),
+          padding: EdgeInsets.symmetric(vertical: Dimens.size16),
           itemBuilder: (context, index) {
-            final isSelected = selected == templates[index].id;
+            final isSelected = selectedIds.contains(templates[index].id);
             return ItemDocumentCollection(
               isSelected: isSelected,
               id: index.toString(),
               title: templates[index].templateName,
               onItemPressed: () {
                 viewModel.onTemplateSelected(templates[index]);
+              },
+              onOptionsMenuPress: (itemMenu) {
+                viewModel.onItemMenuSelected(itemMenu, item: templates[index]);
               },
             );
           },
@@ -67,20 +70,66 @@ class TemplatesCollectionDesktop extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: Dimens.size16),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            AppLang.labelsTemplates.tr(),
-            style: context.textTheme.titleLarge,
-          ),
-          FilledButton(
-            onPressed: () => getViewModel<HomeViewModel>().onAddPressed(),
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: Dimens.size8),
             child: Text(
-              AppLang.actionsAdd.tr(),
-              style: context.textTheme.bodySmall,
+              AppLang.labelsTemplates.tr(),
+              style: context.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
+          multipleChoice(context),
         ],
+      ),
+    );
+  }
+
+  Widget multipleChoice(BuildContext context) {
+    return StreamDataConsumer(
+      streamData: getViewModel<HomeViewModel>().enableMultipleChoice,
+      builder: (context, data) {
+        final title =
+            data == false
+                ? AppLang.labelsSingle.tr()
+                : AppLang.labelsMultiple.tr();
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Switch(
+              value: data,
+              onChanged: (value) {
+                getViewModel<HomeViewModel>().setOnEnableMultipleChoice(value);
+              },
+            ),
+            Text(
+              title,
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.appColors?.bodyTextColor,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget addNew(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: Dimens.size12),
+      width: double.infinity,
+      child: FilledButton(
+        onPressed: () => getViewModel<HomeViewModel>().onAddPressed(),
+        child: Padding(
+          padding: EdgeInsets.all(Dimens.size8),
+          child: Text(
+            AppLang.actionsAdd.tr(),
+            style: context.textTheme.bodySmall,
+          ),
+        ),
       ),
     );
   }

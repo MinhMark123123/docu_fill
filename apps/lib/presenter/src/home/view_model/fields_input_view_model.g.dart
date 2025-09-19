@@ -8,8 +8,8 @@ part of 'fields_input_view_model.dart';
 
 extension $FieldsInputViewModel on FieldsInputViewModel {
   /// This getter is used to access the stream of data
-  /// associated with the private field _template.
-  StreamData<TemplateConfig> get template => _template.streamData;
+  /// associated with the private field _templates.
+  StreamData<List<TemplateConfig>> get templates => _templates.streamData;
 
   /// This getter is used to access the stream of data
   /// associated with the private field _enableEditNameDoc.
@@ -22,4 +22,9 @@ extension $FieldsInputViewModel on FieldsInputViewModel {
   /// This getter is used to access the stream of data
   /// associated with the private field _directoryExported.
   StreamData<String> get directoryExported => _directoryExported.streamData;
+
+  /// This getter is used to access the stream of data
+  /// associated with the private field _composedTemplateUI.
+  StreamData<Map<int, List<TemplateField>>> get composedTemplateUI =>
+      _composedTemplateUI.streamData;
 }

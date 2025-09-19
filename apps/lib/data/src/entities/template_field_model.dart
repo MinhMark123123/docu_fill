@@ -18,6 +18,8 @@ class TemplateFieldModel {
   // directly
   List<String>? options;
 
+  String? additionalInfo;
+
   // Default constructor for Isar
   TemplateFieldModel({
     this.key = '', // Provide defaults or make them required
@@ -26,6 +28,7 @@ class TemplateFieldModel {
     this.required = false,
     this.defaultValue,
     this.options,
+    this.additionalInfo,
   });
 
   // It's good practice to have a way to create this from your domain/JSON model
@@ -37,6 +40,7 @@ class TemplateFieldModel {
       required: domainField.required,
       defaultValue: domainField.defaultValue,
       options: domainField.options,
+      additionalInfo: domainField.additionalInfo,
     );
   }
 
@@ -49,6 +53,7 @@ class TemplateFieldModel {
       required: required,
       defaultValue: defaultValue,
       options: options,
+      additionalInfo: additionalInfo,
     );
   }
 }

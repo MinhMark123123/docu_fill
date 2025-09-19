@@ -2,11 +2,13 @@
 import 'package:docu_fill/data/src/template_field.dart';
 
 class TableRowData {
-  final String fieldKey;
-  final String? fieldName;
-  final FieldType inputType;
-  final String? options;
-  final bool isRequired;
+  String fieldKey;
+  String? fieldName;
+  FieldType inputType;
+  List<String>? options;
+  bool isRequired;
+  String? additionalInfo;
+  String? defaultValue;
 
   TableRowData({
     required this.fieldKey,
@@ -14,14 +16,18 @@ class TableRowData {
     this.fieldName,
     this.options,
     this.isRequired = false,
+    this.additionalInfo,
+    this.defaultValue,
   });
 
   TableRowData copyWith({
     String? fieldKey,
     String? fieldName,
     FieldType? inputType,
-    String? options,
+    List<String>? options,
     bool? isRequired,
+    String? additionalInfo,
+    String? defaultValue,
   }) {
     return TableRowData(
       fieldKey: fieldKey ?? this.fieldKey,
@@ -29,6 +35,8 @@ class TableRowData {
       inputType: inputType ?? this.inputType,
       options: options ?? this.options,
       isRequired: isRequired ?? this.isRequired,
+      additionalInfo: additionalInfo ?? this.additionalInfo,
+      defaultValue: defaultValue ?? this.defaultValue,
     );
   }
 
@@ -38,6 +46,8 @@ class TableRowData {
       fieldName: fieldName,
       inputType: inputType,
       isRequired: isRequired,
+      additionalInfo: additionalInfo,
+      defaultValue: defaultValue,
     );
   }
 
@@ -46,8 +56,10 @@ class TableRowData {
       key: fieldKey,
       label: fieldName ?? "",
       type: inputType,
-      options: options?.split(","),
+      options: options,
       required: isRequired,
+      additionalInfo: additionalInfo,
+      defaultValue: defaultValue,
     );
   }
 }

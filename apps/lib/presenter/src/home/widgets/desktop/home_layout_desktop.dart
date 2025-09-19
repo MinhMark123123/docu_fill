@@ -10,10 +10,7 @@ class HomeLayoutDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: Dimens.size40,
-          vertical: Dimens.size20,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: Dimens.size16),
         child: body(),
       ),
     );
