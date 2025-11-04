@@ -9,16 +9,36 @@ import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
 class ConfigurePage extends BaseView<ConfigureViewModel> {
   final String? path;
+  final bool? isEditMode;
+  final int? idEdit;
 
-  const ConfigurePage({super.key, this.path});
+  const ConfigurePage({super.key, this.path, this.isEditMode, this.idEdit});
 
-  static Map<String, String?> paramsQuery({String? path}) {
-    return {'path': path};
+  static Map<String, String?> paramsQuery({
+    String? path,
+    bool? isEditMode,
+    int? idEdit,
+  }) {
+    return {
+      'path': path,
+      'isEditMode': isEditMode.toString(),
+      'idEdit': idEdit.toString(),
+    };
   }
 
   static String? queryPath({Map<String, String?>? stateQuery}) {
     if (stateQuery == null) return null;
     return stateQuery['path'];
+  }
+
+  static bool? queryIsEditMode({Map<String, String?>? stateQuery}) {
+    if (stateQuery == null) return null;
+    return stateQuery['isEditMode'] == 'true';
+  }
+
+  static int? queryIdEdit({Map<String, String?>? stateQuery}) {
+    if (stateQuery == null) return null;
+    return int.tryParse(stateQuery['idEdit'] ?? '');
   }
 
   @override

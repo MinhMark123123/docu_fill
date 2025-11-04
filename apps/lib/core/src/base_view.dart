@@ -14,6 +14,7 @@ abstract class BaseView<T extends BaseViewModel>
 
   @override
   void awake(WrapperContext wrapperContext, T viewModel) {
+    debugPrint("$runtimeType awake");
     super.awake(wrapperContext, viewModel);
     final subNavigate = _handlePageNavigator(wrapperContext.context, viewModel);
     final subSnackbar = _handleSnackbar(wrapperContext.context, viewModel);

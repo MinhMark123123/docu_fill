@@ -130,7 +130,6 @@ class FiledInputBox extends StatelessWidget {
   }
 
   Widget textInputItem(BuildContext context, TemplateField e) {
-    print("textInputItem ${e.defaultValue}");
     return itemField(
       context: context,
       isRequired: e.required,
@@ -138,6 +137,8 @@ class FiledInputBox extends StatelessWidget {
       child: TextFormField(
         key: Key(e.key),
         initialValue: e.defaultValue,
+        maxLines: 8,
+        minLines: 1,
         decoration: InputDecoration(
           hintText:
               e.type == FieldType.text
