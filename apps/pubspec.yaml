@@ -8,7 +8,7 @@ version: 1.0.0+1
 environment:
   sdk: ^3.7.2
 
-isar_version: &isar_version 3.1.8 # define the version to be used
+isar_version: &isar_version 3.3.0-dev.3 # define the version to be used
 
 dependencies:
   flutter:
@@ -36,12 +36,10 @@ dependencies:
   maac_mvvm_annotation: ^0.0.2
   easy_localization: ^3.0.7+1
   json_annotation: ^4.7.0
-  isar:
+  isar_community:
     version: *isar_version
-    hosted: https://pub.isar-community.dev/
-  isar_flutter_libs: # contains Isar Core
+  isar_community_flutter_libs: # contains Isar Core
     version: *isar_version
-    hosted: https://pub.isar-community.dev/
 
 dev_dependencies:
   flutter_test:
@@ -51,17 +49,19 @@ dev_dependencies:
   maac_mvvm_generator: ^0.0.3
   build_runner: ^2.5.4
   json_serializable: ^6.5.4
-#  isar_generator:
-#    version: *isar_version
-#    hosted: https://pub.isar-community.dev/
-  isar_generator:
-    git:
-      url: https://github.com/mdddj/isar
-      ref: v3
-      path: packages/isar_generator/
+  #  isar_generator:
+  #    version: *isar_version
+  #    hosted: https://pub.isar-community.dev/
+  #  isar_generator:
+  #    git:
+  #      url: https://github.com/mdddj/isar
+  #      ref: v3
+  #      path: packages/isar_generator/
+  isar_community_generator:
+    version: *isar_version
 dependency_overrides:
-  #source_gen: any
-  #analyzer: any
+#source_gen: any
+#analyzer: any
 
 flutter:
   uses-material-design: true

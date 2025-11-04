@@ -533,31 +533,30 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  isar:
+  isar_community:
     dependency: "direct main"
     description:
-      name: isar
-      sha256: e17a9555bc7f22ff26568b8c64d019b4ffa2dc6bd4cb1c8d9b269aefd32e53ad
-      url: "https://pub.isar-community.dev"
+      name: isar_community
+      sha256: "28f59e54636c45ba0bb1b3b7f2656f1c50325f740cea6efcd101900be3fba546"
+      url: "https://pub.dev"
     source: hosted
-    version: "3.1.8"
-  isar_flutter_libs:
+    version: "3.3.0-dev.3"
+  isar_community_flutter_libs:
     dependency: "direct main"
     description:
-      name: isar_flutter_libs
-      sha256: "78710781e658ce4bff59b3f38c5b2735e899e627f4e926e1221934e77b95231a"
-      url: "https://pub.isar-community.dev"
+      name: isar_community_flutter_libs
+      sha256: c2934fe755bb3181cb67602fd5df0d080b3d3eb52799f98623aa4fc5acbea010
+      url: "https://pub.dev"
     source: hosted
-    version: "3.1.8"
-  isar_generator:
+    version: "3.3.0-dev.3"
+  isar_community_generator:
     dependency: "direct dev"
     description:
-      path: "packages/isar_generator"
-      ref: v3
-      resolved-ref: "200300d6127e7ea52a94bc5cf6708fd5cd09e849"
-      url: "https://github.com/mdddj/isar"
-    source: git
-    version: "3.1.9"
+      name: isar_community_generator
+      sha256: "1d760de09ffbc837ad65476f14b6ad17381f0fb485e01bf77d76d825ef734bec"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.0-dev.3"
   js:
     dependency: transitive
     description:

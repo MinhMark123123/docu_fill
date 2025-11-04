@@ -36,7 +36,17 @@ final GoRouter router = GoRouter(
                 final path = ConfigurePage.queryPath(
                   stateQuery: state.uri.queryParameters,
                 );
-                return ConfigurePage(path: path);
+                final isEditMode = ConfigurePage.queryIsEditMode(
+                  stateQuery: state.uri.queryParameters,
+                );
+                final idEdit = ConfigurePage.queryIdEdit(
+                  stateQuery: state.uri.queryParameters,
+                );
+                return ConfigurePage(
+                  path: path,
+                  isEditMode: isEditMode,
+                  idEdit: idEdit,
+                );
               },
             ),
             GoRoute(
