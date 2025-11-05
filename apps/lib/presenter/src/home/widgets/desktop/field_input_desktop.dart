@@ -15,13 +15,8 @@ class FieldInputDesktop extends StatelessWidget {
       streamData: getViewModel<HomeViewModel>().composed,
       builder: (context, data) {
         if (data.$1.isEmpty) return EmptyFieldsWidget();
-        return decorationBox(
-          child: Column(
-            children: [
-              FieldInputConfirmBox(),
-              Expanded(child: FiledInputBox()),
-            ],
-          ),
+        return Column(
+          children: [FieldInputConfirmBox(), Expanded(child: FiledInputBox())],
         );
       },
     );

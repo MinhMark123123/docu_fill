@@ -2,6 +2,7 @@ import 'package:adaptive_layout/adaptive_layout.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/presenter/src/home/view_model/fields_input_view_model.dart';
 import 'package:docu_fill/presenter/src/home/view_model/home_view_model.dart';
+import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
@@ -28,9 +29,12 @@ class FieldsInputLayout extends BaseView<FieldsInputViewModel> {
 
   @override
   Widget build(BuildContext context, FieldsInputViewModel viewModel) {
-    return AdaptiveLayout(
-      smallLayout: const FieldInputMobile(),
-      mediumLayout: const FieldInputDesktop(),
+    return Scaffold(
+      backgroundColor: context.appColors?.containerBackground,
+      body: AdaptiveLayout(
+        smallLayout: const FieldInputMobile(),
+        mediumLayout: const FieldInputDesktop(),
+      ),
     );
   }
 }

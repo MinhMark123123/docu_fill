@@ -1,6 +1,5 @@
 import 'package:docu_fill/presenter/src/home/widgets/fields_input_layout.dart';
 import 'package:docu_fill/presenter/src/home/widgets/templates_collection.dart';
-import 'package:docu_fill/ui/ui.dart';
 import 'package:flutter/material.dart';
 
 class HomeLayoutDesktop extends StatelessWidget {
@@ -8,19 +7,14 @@ class HomeLayoutDesktop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        padding: EdgeInsets.symmetric(horizontal: Dimens.size16),
-        child: body(),
-      ),
-    );
+    return Scaffold(body: body());
   }
 
   Widget body() {
     return Row(
       children: [
-        Expanded(flex: 3, child: FieldsInputLayout()),
         Expanded(flex: 1, child: TemplatesCollection()),
+        Expanded(flex: 4, child: FieldsInputLayout()),
       ],
     );
   }
