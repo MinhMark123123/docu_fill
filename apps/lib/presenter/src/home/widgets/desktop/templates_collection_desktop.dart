@@ -42,7 +42,10 @@ class TemplatesCollectionDesktop extends StatelessWidget {
         final selectedIds = value.$1;
         final templates = value.$2;
         return ListView.separated(
-          padding: EdgeInsets.symmetric(vertical: Dimens.size16),
+          padding: EdgeInsets.symmetric(
+            vertical: Dimens.size16,
+            horizontal: Dimens.size8,
+          ),
           itemBuilder: (context, index) {
             final isSelected = selectedIds.contains(templates[index].id);
             return ItemDocumentCollection(
@@ -119,7 +122,10 @@ class TemplatesCollectionDesktop extends StatelessWidget {
 
   Widget addNew(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: Dimens.size12),
+      padding: EdgeInsets.symmetric(
+        vertical: Dimens.size12,
+        horizontal: Dimens.size8,
+      ),
       width: double.infinity,
       child: FilledButton(
         onPressed: () => getViewModel<HomeViewModel>().onAddPressed(),

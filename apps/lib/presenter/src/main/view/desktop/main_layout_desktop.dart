@@ -1,9 +1,11 @@
 import 'package:docu_fill/const/const.dart';
+import 'package:docu_fill/presenter/page.dart';
 import 'package:docu_fill/presenter/src/main/view/widgets/desktop_header_bar.dart';
-import 'package:docu_fill/presenter/src/main/view_model/main_view_model.dart';
+import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:docu_fill/ui/ui.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
 class MainLayoutDesktop extends StatelessWidget {
@@ -14,7 +16,22 @@ class MainLayoutDesktop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(children: [headerBar(), Expanded(child: child)]),
+      body: Column(
+        children: [
+          if (GoRouter.of(context).state.fullPath != RoutesPath.home)
+            AppBar(
+              leading: IconButton(
+                onPressed: () => context.pop(),
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: context.appColors?.bodyTextColor,
+                ),
+              ),
+              backgroundColor: Colors.transparent,
+            ),
+          Expanded(child: child),
+        ],
+      ),
     );
   }
 

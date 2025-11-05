@@ -1,5 +1,5 @@
 import 'package:docu_fill/data/src/template_field.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 part 'template_field_model.g.dart'; // Will be generated
 

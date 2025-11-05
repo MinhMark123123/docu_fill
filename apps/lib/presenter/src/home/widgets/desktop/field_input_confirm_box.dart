@@ -14,31 +14,28 @@ class FieldInputConfirmBox extends StatelessWidget {
     return StreamDataConsumer(
       streamData: getViewModel<FieldsInputViewModel>().enableEditNameDoc,
       builder: (context, data) {
-        return Visibility(
-          visible: data,
-          child: Padding(
-            padding: EdgeInsets.all(Dimens.size16),
-            child: Column(
-              children: [
-                Row(
-                  spacing: Dimens.size32,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: Dimens.size16,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [folderPicker(), nameDocExported()],
-                      ),
+        return Padding(
+          padding: EdgeInsets.all(Dimens.size16),
+          child: Column(
+            children: [
+              Row(
+                spacing: Dimens.size32,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: Dimens.size16,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [folderPicker(), nameDocExported()],
                     ),
-                    VerticalDivider(),
-                    exportButton(),
-                  ],
-                ),
-                Dimens.spacing.vertical(Dimens.size16),
-                Divider(),
-              ],
-            ),
+                  ),
+                  VerticalDivider(),
+                  exportButton(),
+                ],
+              ),
+              Dimens.spacing.vertical(Dimens.size16),
+              Divider(),
+            ],
           ),
         );
       },

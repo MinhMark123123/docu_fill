@@ -44,6 +44,7 @@ class AppTheme {
       ),
       extensions: <ThemeExtension<dynamic>>[
         AppColors(
+          containerBackground: AppColorsDefine.containerBackground.light,
           buttonBackground: AppColorsDefine.buttonBackground.light,
           bodyTextColor: AppColorsDefine.bodyTextColor.light,
           dashColor: AppColorsDefine.dashColor.light,
@@ -87,6 +88,7 @@ class AppTheme {
       ),
       extensions: <ThemeExtension<dynamic>>[
         AppColors(
+          containerBackground: AppColorsDefine.containerBackground.dark,
           buttonBackground: AppColorsDefine.buttonBackground.dark,
           bodyTextColor: AppColorsDefine.bodyTextColor.dark,
           dashColor: AppColorsDefine.dashColor.dark,

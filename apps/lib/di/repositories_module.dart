@@ -1,5 +1,5 @@
 import 'package:docu_fill/data/data.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 import 'app_get_it.dart';
 
