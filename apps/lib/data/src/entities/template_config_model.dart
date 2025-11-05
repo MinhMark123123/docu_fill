@@ -1,5 +1,5 @@
 import 'package:docu_fill/data/src/template_config.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 import 'template_field_model.dart'; // Import the embedded model
 

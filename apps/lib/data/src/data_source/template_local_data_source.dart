@@ -1,5 +1,5 @@
 import 'package:docu_fill/data/src/entities/template_config_model.dart';
-import 'package:isar/isar.dart';
+import 'package:isar_community/isar.dart';
 
 abstract class TemplateLocalDataSource {
   Future<List<TemplateConfigModel>> getAllTemplates();
