@@ -4,12 +4,12 @@ class RoutesPath {
   // --- Main Sub-routes ---
   static const String home = '/home'; // Relative to /main
   static const String setting = '/setting'; // Relative to /main
-  static const String configure = '/configure'; // Relative to /main/configure
 
   // --- Home Sub-routes ---
   static const String input = 'input'; // Relative to /home/input
 
   // --- Setting Sub-routes ---
+  static const String configure = 'configure'; // Relative to /main/configure
   static const String upload = 'upload'; // Relative to /main/setting
   static const String theme = 'theme'; // Relative to /main/setting
 
