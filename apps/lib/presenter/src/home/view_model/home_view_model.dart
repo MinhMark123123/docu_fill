@@ -51,8 +51,8 @@ class HomeViewModel extends BaseViewModel {
   @override
   void onResume() {
     super.onResume();
-    loadTemplates(); //
-  } // Getter for multiple selected templates (if applicable)
+    loadTemplates();
+  }
 
   List<TemplateConfig> get selectedTemplates {
     return _templates.data
@@ -61,7 +61,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   Future<void> onAddPressed() async {
-    await navigatePage(RoutesPath.home);
+    await navigatePage(RoutesPath.homeUpload);
     await loadTemplates();
   }
 
@@ -81,13 +81,6 @@ class HomeViewModel extends BaseViewModel {
       bool currentSelectionIsValid = currentTemplates.any(
         (t) => t.id == currentSelectedId,
       );
-
-      /*if ((currentSelectedId == -1 || !currentSelectionIsValid) &&
-          currentTemplates.isNotEmpty) {
-        _onSingleTemplateSelected(
-          currentTemplates.first,
-        ); // Or clear selection if preferred
-      } else*/
       if (currentSelectedId != -1 && !currentSelectionIsValid) {
         _selectedTemplateIds.postValue([]); // Clear invalid selection
       }
@@ -109,7 +102,6 @@ class HomeViewModel extends BaseViewModel {
     } else {
       _onSingleTemplateSelected(data);
     }
-    print("====> go ${InputPage.pathCompose(_selectedTemplateIds.data)}");
     context.go(InputPage.pathCompose(_selectedTemplateIds.data));
   }
 

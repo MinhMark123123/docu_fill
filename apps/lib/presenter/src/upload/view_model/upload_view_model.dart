@@ -17,7 +17,7 @@ class UploadViewModel extends BaseViewModel {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.custom,
-      allowedExtensions: ['.docx'],
+      allowedExtensions: ['docx', 'doc'],
     );
     if (result != null) {
       _filePicked.postValue(result.files.single);

@@ -17,6 +17,7 @@ class RoutesPath {
   // You can construct full paths here if you frequently navigate to them directly.
   // This helps avoid manual string concatenation in your navigation calls.
   static const String homeConfigure = '$home/$configure';
+  static const String homeUpload = '$home/$upload';
   static const String settingUpload = '$setting/$upload';
   static const String settingTheme = '$setting/$theme';
 }
