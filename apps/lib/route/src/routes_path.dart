@@ -4,9 +4,10 @@ class RoutesPath {
   // --- Main Sub-routes ---
   static const String home = '/home'; // Relative to /main
   static const String setting = '/setting'; // Relative to /main
+  static const String configure = '/configure'; // Relative to /main/configure
 
   // --- Home Sub-routes ---
-  static const String configure = 'configure'; // Relative to /main/home
+  static const String input = 'input'; // Relative to /home/input
 
   // --- Setting Sub-routes ---
   static const String upload = 'upload'; // Relative to /main/setting
@@ -16,7 +17,6 @@ class RoutesPath {
   // You can construct full paths here if you frequently navigate to them directly.
   // This helps avoid manual string concatenation in your navigation calls.
   static const String homeConfigure = '$home/$configure';
-  static const String homeUpload = '$home/$upload';
   static const String settingUpload = '$setting/$upload';
   static const String settingTheme = '$setting/$theme';
 }

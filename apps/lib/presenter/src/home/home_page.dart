@@ -6,13 +6,15 @@ import 'package:docu_fill/presenter/src/home/widgets/mobile/home_layout_mobile.d
 import 'package:flutter/material.dart';
 
 class HomePage extends BaseView<HomeViewModel> {
-  const HomePage({super.key});
+  final Widget detailChild;
+
+  const HomePage({super.key, required this.detailChild});
 
   @override
   Widget build(BuildContext context, HomeViewModel viewModel) {
     return AdaptiveLayout(
       smallLayout: HomeLayoutMobile(),
-      mediumLayout: HomeLayoutDesktop(),
+      mediumLayout: HomeLayoutDesktop(detailChild: detailChild),
     );
   }
 }

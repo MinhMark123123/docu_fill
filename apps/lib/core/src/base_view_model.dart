@@ -18,6 +18,19 @@ class BaseViewModel extends ViewModel {
   @Bind()
   late final _showDialogEvent = ShowDialogEvent().mtd(this);
 
+  @override
+  void onInitState() {
+    print("====> $runtimeType $hashCode onInitState");
+    super.onInitState();
+  }
+
+  @override
+  void onResume() {
+    print("====> $runtimeType $hashCode onResume");
+    super.onResume();
+    //
+  }
+
   Future<T?> navigatePage<T>(
     String routeName, {
     Map<String, dynamic>? queryParameters,
@@ -71,5 +84,11 @@ class BaseViewModel extends ViewModel {
     } finally {
       _showLoading.postValue(false);
     }
+  }
+
+  @override
+  void onDispose() {
+    print("====> $runtimeType $hashCode onDispose");
+    super.onDispose();
   }
 }

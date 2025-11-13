@@ -5,7 +5,10 @@ import 'package:docu_fill/const/enum/template_item_menu.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/data/src/repositories/template/template_repository.dart';
 import 'package:docu_fill/data/src/template_config.dart';
+import 'package:docu_fill/presenter/src/home/widgets/desktop/input_page.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
@@ -58,7 +61,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   Future<void> onAddPressed() async {
-    await navigatePage(RoutesPath.homeUpload);
+    await navigatePage(RoutesPath.home);
     await loadTemplates();
   }
 
@@ -79,12 +82,13 @@ class HomeViewModel extends BaseViewModel {
         (t) => t.id == currentSelectedId,
       );
 
-      if ((currentSelectedId == -1 || !currentSelectionIsValid) &&
+      /*if ((currentSelectedId == -1 || !currentSelectionIsValid) &&
           currentTemplates.isNotEmpty) {
         _onSingleTemplateSelected(
           currentTemplates.first,
         ); // Or clear selection if preferred
-      } else if (currentSelectedId != -1 && !currentSelectionIsValid) {
+      } else*/
+      if (currentSelectedId != -1 && !currentSelectionIsValid) {
         _selectedTemplateIds.postValue([]); // Clear invalid selection
       }
     } else {
@@ -96,12 +100,17 @@ class HomeViewModel extends BaseViewModel {
     }
   }
 
-  void onTemplateSelected(TemplateConfig data) {
+  void onTemplateSelected({
+    required BuildContext context,
+    required TemplateConfig data,
+  }) {
     if (_enableMultipleChoice.data) {
       _onMultipleTemplatesSelected(data);
     } else {
       _onSingleTemplateSelected(data);
     }
+    print("====> go ${InputPage.pathCompose(_selectedTemplateIds.data)}");
+    context.go(InputPage.pathCompose(_selectedTemplateIds.data));
   }
 
   void _onSingleTemplateSelected(TemplateConfig data) {

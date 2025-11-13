@@ -27,4 +27,8 @@ extension $FieldsInputViewModel on FieldsInputViewModel {
   /// associated with the private field _composedTemplateUI.
   StreamData<Map<int, List<TemplateField>>> get composedTemplateUI =>
       _composedTemplateUI.streamData;
+
+  /// This getter is used to access the stream of data
+  /// associated with the private field _idsSelected.
+  StreamData<List<int>> get idsSelected => _idsSelected.streamData;
 }

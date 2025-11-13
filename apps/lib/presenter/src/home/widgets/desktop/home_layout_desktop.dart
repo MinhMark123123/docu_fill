@@ -1,9 +1,9 @@
-import 'package:docu_fill/presenter/src/home/widgets/fields_input_layout.dart';
 import 'package:docu_fill/presenter/src/home/widgets/templates_collection.dart';
 import 'package:flutter/material.dart';
 
 class HomeLayoutDesktop extends StatelessWidget {
-  const HomeLayoutDesktop({super.key});
+  final Widget detailChild;
+  const HomeLayoutDesktop({super.key, required this.detailChild});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class HomeLayoutDesktop extends StatelessWidget {
     return Row(
       children: [
         Expanded(flex: 1, child: TemplatesCollection()),
-        Expanded(flex: 4, child: FieldsInputLayout()),
+        Expanded(flex: 4, child: detailChild),
       ],
     );
   }

@@ -1,4 +1,4 @@
-import 'package:docu_fill/presenter/src/home/view_model/home_view_model.dart';
+import 'package:docu_fill/presenter/src/home/view_model/fields_input_view_model.dart';
 import 'package:docu_fill/presenter/src/home/widgets/desktop/field_input_confirm_box.dart';
 import 'package:docu_fill/presenter/src/home/widgets/desktop/filed_input_box.dart';
 import 'package:docu_fill/presenter/src/home/widgets/empty_fields_widget.dart';
@@ -12,9 +12,9 @@ class FieldInputDesktop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamDataConsumer(
-      streamData: getViewModel<HomeViewModel>().composed,
+      streamData: getViewModel<FieldsInputViewModel>().idsSelected,
       builder: (context, data) {
-        if (data.$1.isEmpty) return EmptyFieldsWidget();
+        if (data.isEmpty) return EmptyFieldsWidget();
         return Column(
           children: [FieldInputConfirmBox(), Expanded(child: FiledInputBox())],
         );
