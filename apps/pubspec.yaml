@@ -32,7 +32,8 @@ dependencies:
   archive: ^3.3.6
   image_picker: ^1.2.0
   #architec
-  maac_mvvm_with_get_it: ^0.2.1+1
+  maac_mvvm_with_get_it: ^0.2.1+2
+
   maac_mvvm_annotation: ^0.0.2
   easy_localization: ^3.0.7+1
   json_annotation: ^4.7.0

@@ -649,10 +649,10 @@ packages:
     dependency: "direct main"
     description:
       name: maac_mvvm_with_get_it
-      sha256: "23cfbf8fbace54eccc1dff1b87646ead7056b4b2c6e89ed7380f80f695c9ab83"
+      sha256: b8db5eccbbdab7e84be3520690203f0d92039c84c544713444927eb5263e8816
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.1+1"
+    version: "0.2.1+2"
   matcher:
     dependency: transitive
     description:

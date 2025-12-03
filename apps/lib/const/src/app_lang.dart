@@ -112,6 +112,8 @@ abstract class AppLang {
       "messages.document_successfully_create";
   static const String messagesConfirmCreateDocument =
       "messages.confirm_create_document";
+  static const String messagesConfirmEditDocument =
+      "messages.confirm_edit_document";
   static const String messagesEnterTemplateNameHint =
       "messages.enter_template_name_hint";
   static const String messagesInputTextHint = "messages.input_text_hint";
@@ -125,6 +127,8 @@ abstract class AppLang {
   static const String messagesEnterDateFormat = "messages.enter_date_format";
   static const String messagesSingleLineTextHint =
       "messages.single_line_text_hint";
+  static const String messagesSettingExported = "messages.setting_exported";
+  static const String messagesImportSetting = "messages.import_setting";
 
   // If you had more top-level keys or nested structures, you'd continue like this:
   // static const String someOtherTopLevelKey = "some_other_top_level_key";

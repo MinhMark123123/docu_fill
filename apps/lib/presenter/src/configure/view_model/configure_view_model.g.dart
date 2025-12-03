@@ -18,4 +18,8 @@ extension $ConfigureViewModel on ConfigureViewModel {
   /// This getter is used to access the stream of data
   /// associated with the private field _enableNameTemplate.
   StreamData<bool> get enableNameTemplate => _enableNameTemplate.streamData;
+
+  /// This getter is used to access the stream of data
+  /// associated with the private field _mode.
+  StreamData<ConfigureMode> get mode => _mode.streamData;
 }

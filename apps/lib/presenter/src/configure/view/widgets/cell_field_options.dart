@@ -27,6 +27,7 @@ class CellFieldOptions extends StatelessWidget {
         return buildDateTimeFormat();
       case FieldType.selection:
         return AddOnInputText(
+          initValue: data.options,
           onChanged: (values) {
             getViewModel<ConfigureViewModel>().updateOptions(
               data.fieldKey,

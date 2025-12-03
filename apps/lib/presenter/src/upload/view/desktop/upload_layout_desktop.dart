@@ -4,6 +4,7 @@ import 'package:docu_fill/presenter/page.dart';
 import 'package:docu_fill/presenter/src/widgets/desktop_top_title.dart';
 import 'package:docu_fill/ui/ui.dart';
 import 'package:docu_fill/utils/utils.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
@@ -106,14 +107,34 @@ class UploadLayoutDesktop extends StatelessWidget {
   }
 
   Widget bottomLabel(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Text(
-        AppLang.messagesDragAndDropDocx.tr(),
-        style: context.textTheme.bodySmall?.copyWith(
-          color: context.appColors?.bodyTextColor,
+    return Center(
+      child: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(
+              text: AppLang.messagesDragAndDropDocx.tr(),
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.appColors?.bodyTextColor,
+              ),
+            ),
+            TextSpan(
+              text: " ",
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.appColors?.bodyTextColor,
+              ),
+            ),
+            TextSpan(
+              text: AppLang.messagesImportSetting.tr(),
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.colorScheme.primary,
+              ),
+              recognizer:
+                  TapGestureRecognizer()
+                    ..onTap =
+                        () => getViewModel<UploadViewModel>().importSetting(),
+            ),
+          ],
         ),
-        textAlign: TextAlign.center,
       ),
     );
   }

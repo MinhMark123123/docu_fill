@@ -43,6 +43,23 @@ class TemplateConfigModel {
               .toList(),
     );
   }
+  // It's good practice to have a way to create this from your domain/JSON model
+  factory TemplateConfigModel.fromDomainId(
+    int id,
+    TemplateConfig domainConfig,
+  ) {
+    return TemplateConfigModel(
+      id: id,
+      // id will be handled by Isar or set if updating an existing one
+      templateName: domainConfig.templateName,
+      pathTemplate: domainConfig.pathTemplate,
+      version: domainConfig.version,
+      fields:
+          domainConfig.fields
+              .map((field) => TemplateFieldModel.fromDomain(field))
+              .toList(),
+    );
+  }
 
   // And to convert back to your domain/JSON model
   TemplateConfig toDomain() {

@@ -9,19 +9,19 @@ import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
 class ConfigurePage extends BaseView<ConfigureViewModel> {
   final String? path;
-  final bool? isEditMode;
+  final ConfigureMode? mode;
   final int? idEdit;
 
-  const ConfigurePage({super.key, this.path, this.isEditMode, this.idEdit});
+  const ConfigurePage({super.key, this.path, this.mode, this.idEdit});
 
   static Map<String, String?> paramsQuery({
     String? path,
-    bool? isEditMode,
     int? idEdit,
+    required ConfigureMode mode,
   }) {
     return {
       'path': path,
-      'isEditMode': isEditMode.toString(),
+      'mode': mode.valueString,
       'idEdit': idEdit.toString(),
     };
   }
@@ -31,9 +31,9 @@ class ConfigurePage extends BaseView<ConfigureViewModel> {
     return stateQuery['path'];
   }
 
-  static bool? queryIsEditMode({Map<String, String?>? stateQuery}) {
+  static ConfigureMode? queryIsEditMode({Map<String, String?>? stateQuery}) {
     if (stateQuery == null) return null;
-    return stateQuery['isEditMode'] == 'true';
+    return ConfigureMode.fromString(stateQuery['mode']);
   }
 
   static int? queryIdEdit({Map<String, String?>? stateQuery}) {
@@ -44,7 +44,11 @@ class ConfigurePage extends BaseView<ConfigureViewModel> {
   @override
   void awake(WrapperContext wrapperContext, ConfigureViewModel viewModel) {
     super.awake(wrapperContext, viewModel);
-    viewModel.setupPath(path: path);
+    viewModel.setupPath(
+      path: path,
+      mode: mode ?? ConfigureMode.addNew,
+      idEdit: idEdit,
+    );
   }
 
   @override

@@ -1,5 +1,7 @@
 import 'package:docu_fill/ui/src/methodology/tokens/radii.dart';
 import 'package:docu_fill/ui/src/methodology/tokens/spacing.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Dimens {
@@ -210,11 +212,15 @@ class Dimens {
   static double get size120 => 120.w;
 
   static double get size150 => 150.w;
+
   static double get size160 => 160.w;
+
   static double get size170 => 170.w;
+
   static double get size180 => 180.w;
 
   static double get size200 => 200.w;
+
   static double get size400 => 400.w;
 
   static double get size928 => 928.w;
@@ -222,4 +228,28 @@ class Dimens {
   static double get size232 => 232.w;
 
   // Add more dimensions as needed
+}
+
+extension SizeExtension on double {
+  Widget wBox() => SizedBox(width: this);
+
+  Widget hBox() => SizedBox(height: this);
+
+  EdgeInsets tPadding() => EdgeInsets.only(top: this);
+
+  EdgeInsets rPadding() => EdgeInsets.only(right: this);
+
+  EdgeInsets bPadding() => EdgeInsets.only(bottom: this);
+
+  EdgeInsets lPadding() => EdgeInsets.only(left: this);
+
+  EdgeInsets hPadding() => EdgeInsets.symmetric(horizontal: this);
+
+  EdgeInsets vPadding() => EdgeInsets.symmetric(vertical: this);
+
+  EdgeInsets paddingAll() => EdgeInsets.all(this);
+
+  EdgeInsets paddingSymmetric() {
+    return EdgeInsets.symmetric(horizontal: this, vertical: this);
+  }
 }

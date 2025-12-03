@@ -1,4 +1,5 @@
 import 'package:docu_fill/presenter/page.dart';
+import 'package:docu_fill/presenter/src/home/widgets/desktop/input_page.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,10 +14,6 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
 final GoRouter router = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: RoutesPath.home, // Use the constant for initialLocation
-  redirect: (context, state) {
-    if (state.path == "/") return RoutesPath.home;
-    return state.path;
-  },
   routes: <RouteBase>[
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
@@ -27,7 +24,8 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: RoutesPath.home, // Use constant (relative)
           builder: (BuildContext context, GoRouterState state) {
-            return const HomePage();
+            final ids = InputPage.parseIds(state);
+            return HomePage(detailChild: InputPage(key: Key("$ids"), ids: ids));
           },
           routes: <RouteBase>[
             GoRoute(
@@ -36,17 +34,13 @@ final GoRouter router = GoRouter(
                 final path = ConfigurePage.queryPath(
                   stateQuery: state.uri.queryParameters,
                 );
-                final isEditMode = ConfigurePage.queryIsEditMode(
+                final mode = ConfigurePage.queryIsEditMode(
                   stateQuery: state.uri.queryParameters,
                 );
                 final idEdit = ConfigurePage.queryIdEdit(
                   stateQuery: state.uri.queryParameters,
                 );
-                return ConfigurePage(
-                  path: path,
-                  isEditMode: isEditMode,
-                  idEdit: idEdit,
-                );
+                return ConfigurePage(path: path, mode: mode, idEdit: idEdit);
               },
             ),
             GoRoute(
@@ -63,12 +57,6 @@ final GoRouter router = GoRouter(
             return const SettingPage();
           },
           routes: <RouteBase>[
-            /* GoRoute(
-                  path: AppRoutes.upload, // Use constant (relative)
-                  builder: (BuildContext context, GoRouterState state) {
-                    return const UploadPage();
-                  },
-                ),*/
             GoRoute(
               path: RoutesPath.theme, // Use constant (relative)
               builder: (BuildContext context, GoRouterState state) {
