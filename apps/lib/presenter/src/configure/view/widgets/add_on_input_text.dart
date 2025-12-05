@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 
 class AddOnInputText extends StatefulWidget {
   final Function(List<String>)? onChanged;
+  final List<String?>? initValue;
 
-  const AddOnInputText({super.key, this.onChanged});
+  const AddOnInputText({super.key, this.onChanged, this.initValue});
 
   @override
   State<AddOnInputText> createState() => _AddOnInputTextState();
@@ -17,12 +18,37 @@ class _AddOnInputTextState extends State<AddOnInputText> {
   final List<String?> _values = [];
   final ScrollController _scrollController = ScrollController();
   final List<Widget> _listInput = [];
+  double itemWidth = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.initValue != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        await Future.delayed(Duration(milliseconds: 100));
+        _values.addAll(widget.initValue!);
+        for (var e in _values) {
+          _count++;
+          _listInput.add(
+            buildInputAtIndex(
+              width: itemWidth,
+              index: _count - 1,
+              initValue: e,
+            ),
+          );
+          setState(() {});
+        }
+        await Future.delayed(Duration(milliseconds: 200));
+        scrollToEnd();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final itemWidth = constraints.maxWidth - Dimens.size32;
+        itemWidth = constraints.maxWidth - Dimens.size32;
         return SingleChildScrollView(
           controller: _scrollController,
           scrollDirection: Axis.horizontal,
@@ -52,7 +78,7 @@ class _AddOnInputTextState extends State<AddOnInputText> {
   void addItem(double itemWidth) {
     setState(() {
       _count++;
-      _listInput.add(buildInputAtIndex(itemWidth, _count - 1));
+      _listInput.add(buildInputAtIndex(width: itemWidth, index: _count - 1));
       _values.add(null);
     });
     scrollToEnd();
@@ -81,18 +107,23 @@ class _AddOnInputTextState extends State<AddOnInputText> {
   }
 
   List<Widget> _buildTextInputs(double width) {
-    if (_listInput.isEmpty) {
-      _listInput.add(buildInputAtIndex(width, 0));
+    if (_listInput.isEmpty && widget.initValue == null) {
+      _listInput.add(buildInputAtIndex(width: width, index: 0));
       _values.add(null);
       return _listInput;
     }
     return _listInput;
   }
 
-  Widget buildInputAtIndex(double width, int index) {
+  Widget buildInputAtIndex({
+    required double width,
+    required int index,
+    String? initValue,
+  }) {
     return SizedBox(
       width: width,
       child: TextFormField(
+        initialValue: initValue,
         decoration: InputDecoration(
           hintText: AppLang.messagesInputTextHint.tr(),
           border: const OutlineInputBorder(),

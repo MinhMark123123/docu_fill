@@ -7,6 +7,7 @@ abstract class TemplateRepository {
   Future<TemplateConfig?> getTemplateById(int id);
   Future<TemplateConfig?> getTemplateByName(String name);
   Future<void> saveTemplate(TemplateConfig template);
+  Future<void> edit(int id, TemplateConfig template);
   Future<void> deleteTemplate(int id);
   Stream<List<TemplateConfig>> watchAllTemplates();
   Stream<TemplateConfig?> watchTemplateByName(String name);

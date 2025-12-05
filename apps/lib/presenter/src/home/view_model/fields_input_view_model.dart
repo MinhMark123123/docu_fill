@@ -29,17 +29,18 @@ class FieldsInputViewModel extends BaseViewModel {
   late final _directoryExported = "".mtd(this);
   @Bind()
   late final _composedTemplateUI = <int, List<TemplateField>>{}.mtd(this);
+  @Bind()
+  late final _idsSelected = List<int>.empty().mtd(this);
 
   final TextEditingController _nameDocExported = TextEditingController();
 
   TextEditingController get nameDocExported => _nameDocExported;
 
-  List<int> _idsSelected = [];
   final _fieldKeys = <String, String?>{};
   final _singleField = <String, String?>{};
 
-  void performInit(List<int> ids) {
-    _idsSelected = ids;
+  void performInit(List<int>? ids) {
+    _idsSelected.postValue(ids ?? []);
     loadTemplates();
   }
 
@@ -87,12 +88,12 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   Future<void> loadTemplates() async {
-    if (_idsSelected.isEmpty) {
+    if (_idsSelected.data.isEmpty) {
       _templates.postValue([]);
       return;
     }
     final templates = await Future.wait(
-      _idsSelected.map((id) => _templateRepository.getTemplateById(id)),
+      _idsSelected.data.map((id) => _templateRepository.getTemplateById(id)),
     );
     final safeList = templates.where((element) => element != null).toList();
     _templates.postValue(List<TemplateConfig>.from(safeList));
@@ -226,6 +227,7 @@ class FieldsInputViewModel extends BaseViewModel {
     if (result != null) {
       _directoryExported.postValue(result);
     }
+    checkValidate();
   }
 
   void doneExported() {

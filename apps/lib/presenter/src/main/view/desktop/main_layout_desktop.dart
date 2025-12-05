@@ -15,23 +15,22 @@ class MainLayoutDesktop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isHome = GoRouter.of(context).state.fullPath != RoutesPath.home;
     return Scaffold(
-      body: Column(
-        children: [
-          if (GoRouter.of(context).state.fullPath != RoutesPath.home)
-            AppBar(
-              leading: IconButton(
-                onPressed: () => context.pop(),
-                icon: Icon(
-                  Icons.arrow_back,
-                  color: context.appColors?.bodyTextColor,
+      appBar:
+          isHome
+              ? AppBar(
+                leading: IconButton(
+                  onPressed: () => context.pop(),
+                  icon: Icon(
+                    Icons.arrow_back,
+                    color: context.appColors?.bodyTextColor,
+                  ),
                 ),
-              ),
-              backgroundColor: Colors.transparent,
-            ),
-          Expanded(child: child),
-        ],
-      ),
+                backgroundColor: Colors.transparent,
+              )
+              : null,
+      body: child,
     );
   }
 

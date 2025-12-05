@@ -1,3 +1,4 @@
+import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/core/src/events.dart';
 import 'package:docu_fill/presenter/page.dart';
@@ -13,11 +14,12 @@ class UploadViewModel extends BaseViewModel {
   @Bind()
   late final _filePicked = PlatformFile(name: "", size: 0).mtd(this);
 
-  Future<void> pickFile() async {
+  Future<void> pickFile({bool isSettingFile = false}) async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: false,
       type: FileType.custom,
-      allowedExtensions: ['.docx'],
+      allowedExtensions:
+          isSettingFile ? [AppConst.settingFileExtension] : ['docx', 'doc'],
     );
     if (result != null) {
       _filePicked.postValue(result.files.single);
@@ -26,10 +28,28 @@ class UploadViewModel extends BaseViewModel {
 
   Future<void> continuePressed() async {
     if (_filePicked.data.path == null) return;
+    if (_filePicked.data.path!.contains(AppConst.settingFileExtension)) {
+      navigatePage(
+        RoutesPath.homeConfigure,
+        type: NavigatePageType.replace,
+        queryParameters: ConfigurePage.paramsQuery(
+          path: _filePicked.data.path,
+          mode: ConfigureMode.importSetting,
+        ),
+      );
+      return;
+    }
     navigatePage(
       RoutesPath.homeConfigure,
       type: NavigatePageType.replace,
-      queryParameters: ConfigurePage.paramsQuery(path: _filePicked.data.path),
+      queryParameters: ConfigurePage.paramsQuery(
+        path: _filePicked.data.path,
+        mode: ConfigureMode.addNew,
+      ),
     );
+  }
+
+  Future<void> importSetting() async {
+    return pickFile(isSettingFile: true);
   }
 }

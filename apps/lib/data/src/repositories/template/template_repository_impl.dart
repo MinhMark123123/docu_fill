@@ -56,4 +56,10 @@ class TemplateRepositoryImpl implements TemplateRepository {
     final model = await localDataSource.getTemplateById(id);
     return model?.toDomain();
   }
+
+  @override
+  Future<void> edit(int id, TemplateConfig template) async {
+    final model = TemplateConfigModel.fromDomainId(id, template);
+    await localDataSource.saveTemplate(model);
+  }
 }

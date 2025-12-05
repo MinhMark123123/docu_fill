@@ -99,6 +99,7 @@
     "upload_template": "Select a .docx file to upload as a template. The system will automatically detect and configure fields within the document.",
     "document_successfully_create": "Your document has been successfully created.",
     "confirm_create_document": "Are you sure you want to create a new document with the provided name {name}?",
+    "confirm_edit_document": "Are you sure you want to edit document with the provided name {name}?",
     "enter_template_name_hint": "Template name required to confirm.",
     "input_text_hint": "Enter text here",
     "field_is_required": "Field {fields} is required",
@@ -106,6 +107,8 @@
     "name_the_document_exported": "Name the document you want to export",
     "date_format_invalid": "Date format is incorrect.",
     "enter_date_format": "Enter date format. Example: dd/MM/yyyy",
-    "single_line_text_hint": "This line will be removed automatically if empty."
+    "single_line_text_hint": "This line will be removed automatically if empty.",
+    "setting_exported": "Setting Exported Successfully",
+    "import_setting": "Import Setting"
   }
 }

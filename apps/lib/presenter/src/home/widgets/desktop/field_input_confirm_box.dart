@@ -66,6 +66,7 @@ class FieldInputConfirmBox extends StatelessWidget {
   }
 
   Widget nameDocExported() {
+    print("object ${getViewModel<FieldsInputViewModel>().hashCode}");
     return TextField(
       controller: getViewModel<FieldsInputViewModel>().nameDocExported,
       onChanged: (_) => getViewModel<FieldsInputViewModel>().checkValidate(),

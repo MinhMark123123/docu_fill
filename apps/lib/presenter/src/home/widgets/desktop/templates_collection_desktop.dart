@@ -53,10 +53,17 @@ class TemplatesCollectionDesktop extends StatelessWidget {
               id: index.toString(),
               title: templates[index].templateName,
               onItemPressed: () {
-                viewModel.onTemplateSelected(templates[index]);
+                viewModel.onTemplateSelected(
+                  context: context,
+                  data: templates[index],
+                );
               },
               onOptionsMenuPress: (itemMenu) {
-                viewModel.onItemMenuSelected(itemMenu, item: templates[index]);
+                viewModel.onItemMenuSelected(
+                  context: context,
+                  itemMenu: itemMenu,
+                  item: templates[index],
+                );
               },
             );
           },
@@ -105,7 +112,10 @@ class TemplatesCollectionDesktop extends StatelessWidget {
             Switch(
               value: data,
               onChanged: (value) {
-                getViewModel<HomeViewModel>().setOnEnableMultipleChoice(value);
+                getViewModel<HomeViewModel>().setOnEnableMultipleChoice(
+                  context,
+                  value,
+                );
               },
             ),
             Text(
