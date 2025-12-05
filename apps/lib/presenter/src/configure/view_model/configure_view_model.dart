@@ -379,7 +379,7 @@ class ConfigureViewModel extends BaseViewModel {
         //step 1. save doc.x to new app dir file
         final uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
         final newFileName = "$uniqueName.docx";
-        String? path = null;
+        String? path;
         if (_mode.data == ConfigureMode.addNew) {
           path = await DocxUtils.saveDocxToAppDirectory(
             originalDocxPath: _pathFilePicked!,

@@ -227,6 +227,7 @@ class FieldsInputViewModel extends BaseViewModel {
     if (result != null) {
       _directoryExported.postValue(result);
     }
+    checkValidate();
   }
 
   void doneExported() {
