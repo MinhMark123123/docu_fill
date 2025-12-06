@@ -67,22 +67,45 @@ class FieldsInputViewModel extends BaseViewModel {
       return;
     }
     rawData[AppConst.commonUnknow] = [];
+    final listKeys =
+        _templates.data
+            .map((e) => e.fields.map((e) => e.key).toList())
+            .toList();
+    final keyMap = <String, int>{};
+    for (var element in listKeys) {
+      for (var key in element) {
+        if (keyMap[key] != null) {
+          keyMap[key] = keyMap[key]! + 1;
+        } else {
+          keyMap[key] = 1;
+        }
+      }
+    }
+    final commonKeys = keyMap.entries
+        .where((element) => element.value == _templates.data.length)
+        .map((e) => e.key);
     for (var template in _templates.data) {
       final fields = template.fields;
-      rawData[template.id] = fields;
-
-      for (var field in fields) {
+      List<TemplateField> tempList = List.from(fields);
+      final removeList = <TemplateField>[];
+      for (var field in tempList) {
         if (field.defaultValue != null && field.defaultValue!.isNotEmpty) {
           setValue(field: field, value: field.defaultValue);
         }
         if (field.type == FieldType.selection) {
           setValue(field: field, value: field.options?.firstOrNull);
         }
-        if (!rawData[AppConst.commonUnknow]!.contains(field)) {
-          rawData[AppConst.commonUnknow]!.add(field);
-          rawData[AppConst.commonUnknow]!.remove(field);
+        if (commonKeys.contains(field.key)) {
+          if (!rawData[AppConst.commonUnknow]!.any((e) => e.key == field.key)) {
+            rawData[AppConst.commonUnknow]!.add(field);
+          }
+          removeList.add(field);
         }
       }
+      for (var e in removeList) {
+        tempList.remove(e);
+      }
+      rawData[template.id] = tempList;
     }
     _composedTemplateUI.postValue(rawData);
   }
