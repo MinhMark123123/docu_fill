@@ -68,7 +68,7 @@ class TemplatesCollectionDesktop extends StatelessWidget {
             );
           },
           separatorBuilder: (context, index) {
-            return Dimens.spacing.vertical(Dimens.size16);
+            return Dimens.spacing.vertical(Dimens.size4);
           },
           itemCount: templates.length,
         );

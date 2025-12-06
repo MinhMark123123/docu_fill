@@ -1,5 +1,4 @@
 import 'package:docu_fill/const/const.dart';
-import 'package:docu_fill/gen/assets.gen.dart';
 import 'package:docu_fill/ui/ui.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -25,22 +24,33 @@ class ItemDocumentCollection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: Dimens.radii.borderSmall(),
-        side:
-            isSelected
-                ? BorderSide(color: context.colorScheme.primary)
-                : BorderSide.none,
-      ),
+      elevation: Dimens.size2,
+      color:
+          isSelected
+              ? context.colorScheme.primaryFixedDim
+              : context.colorScheme.surface,
+      surfaceTintColor:
+          isSelected
+              ? context.colorScheme.primaryFixedDim
+              : context.colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: Dimens.radii.borderSmall()),
       clipBehavior: Clip.hardEdge,
       child: ListTile(
         contentPadding: EdgeInsets.only(
           left: Dimens.size12,
-          top: Dimens.size12,
-          bottom: Dimens.size12,
+          top: Dimens.size8,
+          bottom: Dimens.size8,
         ),
-        leading: Assets.images.png.imageDocument.image(),
-        title: Text(title, style: context.textTheme.bodyMedium),
+        leading: Icon(
+          Icons.file_copy_outlined,
+          color: isSelected ? context.colorScheme.surface : null,
+        ),
+        title: Text(
+          title,
+          style: context.textTheme.bodyMedium?.copyWith(
+            color: isSelected ? context.colorScheme.surface : null,
+          ),
+        ),
         subtitle:
             subtitle == null
                 ? null
@@ -52,19 +62,27 @@ class ItemDocumentCollection extends StatelessWidget {
   }
 
   Widget trailingMenu() {
+    final childFocusNode = FocusNode();
     return MenuAnchor(
+      onClose: () => FocusManager.instance.rootScope.unfocus(),
+      childFocusNode: childFocusNode,
       builder: (
         BuildContext context,
         MenuController controller,
         Widget? child,
       ) {
         return IconButton(
+          style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.all(Colors.transparent),
+            overlayColor: WidgetStateProperty.all(Colors.transparent),
+          ),
           onPressed: () {
             if (controller.isOpen) {
               controller.close();
             } else {
               controller.open();
             }
+            childFocusNode.unfocus();
           },
           icon: const Icon(Icons.more_horiz),
           tooltip: AppLang.actionsShowMenu.tr(),
@@ -75,6 +93,7 @@ class ItemDocumentCollection extends StatelessWidget {
         (int index) => MenuItemButton(
           onPressed: () {
             onOptionsMenuPress.call(TemplateMenuItem.values[index]);
+            childFocusNode.unfocus();
           },
           child: Text(TemplateMenuItem.values[index].label()),
         ),
