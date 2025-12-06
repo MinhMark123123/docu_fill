@@ -52,60 +52,59 @@ class FieldsInputViewModel extends BaseViewModel {
 
   Future<void> _composedUI() async {
     final rawData = <int, List<TemplateField>>{};
-    if (_templates.data.length == 1) {
-      final template = _templates.data.first;
-      for (var field in template.fields) {
-        if (field.defaultValue != null && field.defaultValue!.isNotEmpty) {
+
+    // Helper to initialize defaults for a list of fields
+    void initializeFields(List<TemplateField> fields) {
+      for (var field in fields) {
+        if (field.defaultValue?.isNotEmpty == true) {
           setValue(field: field, value: field.defaultValue);
-        }
-        if (field.type == FieldType.selection) {
+        } else if (field.type == FieldType.selection) {
           setValue(field: field, value: field.options?.firstOrNull);
         }
       }
+    }
+
+    if (_templates.data.length == 1) {
+      final template = _templates.data.first;
+      initializeFields(template.fields);
       rawData[template.id] = template.fields;
       _composedTemplateUI.postValue(rawData);
       return;
     }
+
+    // Identify common keys across all templates
+    final allFieldKeys = _templates.data.expand(
+      (t) => t.fields.map((f) => f.key),
+    );
+    final keyFrequency = allFieldKeys.fold(<String, int>{}, (map, key) {
+      map[key] = (map[key] ?? 0) + 1;
+      return map;
+    });
+    final commonKeys =
+        keyFrequency.entries
+            .where((e) => e.value == _templates.data.length)
+            .map((e) => e.key)
+            .toSet();
+
     rawData[AppConst.commonUnknow] = [];
-    final listKeys =
-        _templates.data
-            .map((e) => e.fields.map((e) => e.key).toList())
-            .toList();
-    final keyMap = <String, int>{};
-    for (var element in listKeys) {
-      for (var key in element) {
-        if (keyMap[key] != null) {
-          keyMap[key] = keyMap[key]! + 1;
-        } else {
-          keyMap[key] = 1;
-        }
-      }
-    }
-    final commonKeys = keyMap.entries
-        .where((element) => element.value == _templates.data.length)
-        .map((e) => e.key);
+
     for (var template in _templates.data) {
-      final fields = template.fields;
-      List<TemplateField> tempList = List.from(fields);
-      final removeList = <TemplateField>[];
-      for (var field in tempList) {
-        if (field.defaultValue != null && field.defaultValue!.isNotEmpty) {
-          setValue(field: field, value: field.defaultValue);
-        }
-        if (field.type == FieldType.selection) {
-          setValue(field: field, value: field.options?.firstOrNull);
-        }
+      initializeFields(template.fields);
+
+      final specificFields = <TemplateField>[];
+
+      for (var field in template.fields) {
         if (commonKeys.contains(field.key)) {
-          if (!rawData[AppConst.commonUnknow]!.any((e) => e.key == field.key)) {
-            rawData[AppConst.commonUnknow]!.add(field);
+          // Add to common section only if not already added (based on key)
+          final commonList = rawData[AppConst.commonUnknow]!;
+          if (!commonList.any((e) => e.key == field.key)) {
+            commonList.add(field);
           }
-          removeList.add(field);
+        } else {
+          specificFields.add(field);
         }
       }
-      for (var e in removeList) {
-        tempList.remove(e);
-      }
-      rawData[template.id] = tempList;
+      rawData[template.id] = specificFields;
     }
     _composedTemplateUI.postValue(rawData);
   }
