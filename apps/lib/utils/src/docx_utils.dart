@@ -80,7 +80,7 @@ class DocxUtils {
   }) async {
     final originalArchive = ZipDecoder().decodeBytes(originalBytes);
     var newArchive = Archive();
-
+    print(StackTrace.current);
     for (final file in originalArchive) {
       if (file.isFile && isValidDocNamePart(file)) {
         final xmlContent = utf8.decode(file.content);
