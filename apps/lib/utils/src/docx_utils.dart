@@ -80,31 +80,55 @@ class DocxUtils {
   }) async {
     final originalArchive = ZipDecoder().decodeBytes(originalBytes);
     var newArchive = Archive();
-    print(StackTrace.current);
+    imageReplacements?.forEach((key, value) {
+      replacements.remove(key);
+      singleLines.remove(key);
+    });
     for (final file in originalArchive) {
       if (file.isFile && isValidDocNamePart(file)) {
         final xmlContent = utf8.decode(file.content);
         final document = xml.XmlDocument.parse(xmlContent);
-        // ⭐️ 1. Get a list of all paragraphs first.
-        // .toList() creates a copy, preventing modification errors during iteration.
+
+        // 1. Get all paragraphs
         final paragraphs = document.findAllElements('w:p').toList();
 
-        // ⭐️ Use a traditional for-loop to get the index 'i'
         for (int i = 0; i < paragraphs.length; i++) {
           final p = paragraphs[i];
-          final paragraphText =
-              p.findAllElements('w:t').map((t) => t.innerText).join();
+
+          // --- STEP 1: Consolidate Text to handle split XML nodes ---
+          // Word splits "{{key}}" into multiple nodes ("{{", "key", "}}").
+          // We must join them to find the pattern.
+          final textNodes = p.findAllElements('w:t').toList();
+          final String originalFullText =
+              textNodes.map((t) => t.innerText).join();
+          String currentText = originalFullText;
+          bool textChanged = false;
+          bool isImageParagraph = false;
+          // A. First, check if this paragraph is for an image
+          if (imageReplacements != null) {
+            for (final key in imageReplacements.keys) {
+              if (originalFullText.contains(key)) {
+                isImageParagraph = true;
+                // Mark as changed to ensure the node gets consolidated, but don't modify the text yet.
+                // This preserves the placeholder for the image insertion function.
+                textChanged = true;
+                // We found our image key, no need to check others for this paragraph
+                break;
+              }
+            }
+          }
           bool paragraphRemoved = false;
 
+          // --- STEP 2: Handle Single Line Removals ---
           for (final entry in singleLines.entries) {
-            if (paragraphText.contains(entry.key)) {
+            if (currentText.contains(entry.key)) {
               final value = entry.value;
               if (value == null || value.isEmpty) {
-                // 1. Remove the current paragraph
+                // Remove current paragraph
                 p.parent?.children.remove(p);
                 paragraphRemoved = true;
 
-                // ⭐️ 2. Check if the NEXT paragraph exists and is empty
+                // Check if NEXT paragraph is an empty spacer and remove it too
                 if (i + 1 < paragraphs.length) {
                   final nextP = paragraphs[i + 1];
                   final nextPText =
@@ -113,8 +137,6 @@ class DocxUtils {
                           .map((t) => t.innerText)
                           .join()
                           .trim();
-
-                  // If it's an empty spacer line, remove it too
                   if (nextPText.isEmpty) {
                     nextP.parent?.children.remove(nextP);
                   }
@@ -124,100 +146,60 @@ class DocxUtils {
             }
           }
 
-          if (paragraphRemoved) {
-            // Since we might have modified the list, we can continue to the next iteration.
-            // A more robust solution might involve iterating backwards or rebuilding the list,
-            // but for this case, 'continue' is sufficient.
-            continue;
-          }
+          if (paragraphRemoved) continue;
 
-          // --- Logic to REPLACE text if the paragraph was NOT removed ---
-          final textNodes = p.findAllElements('w:t');
-          for (final node in textNodes) {
-            var text = node.innerText;
-            // Apply singleLine replacements that have a value
+          // --- STEP 3: Handle Replacements on the Consolidated Text ---
+          if (!isImageParagraph) {
+            // Apply singleLine replacements (if they have values)
             for (final entry in singleLines.entries) {
               if (entry.value != null && entry.value!.isNotEmpty) {
-                text = text.replaceAll(entry.key, entry.value!);
-                debugPrint("replace single line text : ${entry.key}");
+                if (currentText.contains(entry.key)) {
+                  currentText = currentText.replaceAll(entry.key, entry.value!);
+                  textChanged = true;
+                  debugPrint("Success: Replaced single line ${entry.key}");
+                }
               }
             }
+
             // Apply standard replacements
+
             for (final entry in replacements.entries) {
-              text = text.replaceAll(entry.key, entry.value);
-              debugPrint("replace normal text : ${entry.key}");
+              if (currentText.contains(entry.key)) {
+                currentText = currentText.replaceAll(entry.key, entry.value);
+                textChanged = true;
+                debugPrint("Success: Replaced ${entry.key}");
+              }
             }
-            // Update the node's text
-            node.innerText = text;
+          }
+
+          // --- STEP 4: Write modified text back to XML ---
+          if (textChanged && textNodes.isNotEmpty) {
+            // We put the fully replaced text into the FIRST text node
+            // and clear the others to avoid duplication.
+            textNodes[0].innerText = currentText;
+
+            for (int k = 1; k < textNodes.length; k++) {
+              textNodes[k].innerText = '';
+            }
           }
         }
 
         final updatedXml = utf8.encode(document.toXmlString(pretty: false));
         replaceFileInArchive(newArchive, file.name, updatedXml);
       } else {
-        // Copy unchanged files
         newArchive.addFile(ArchiveFile(file.name, file.size, file.content));
       }
     }
+
     if (imageReplacements != null && imageReplacements.isNotEmpty) {
       debugPrint("replace image start");
-      // ⭐️ Re-assign newArchive with the result from the image insertion function
       newArchive = await insertImagesIntoDocxArchived(
         replacements: imageReplacements,
-        inputArchive: newArchive, // Pass the text-modified archive
+        inputArchive: newArchive,
       );
       debugPrint("replace image end");
     }
     return Uint8List.fromList(ZipEncoder().encode(newArchive)!);
-  }
-
-  static String docxToText(Uint8List bytes, {bool handleNumbering = false}) {
-    final zipDecoder = ZipDecoder();
-
-    final archive = zipDecoder.decodeBytes(bytes);
-    final List<String> list = [];
-
-    void extractTextFromXml(String xmlContent, {bool handleNumbering = false}) {
-      final document = xml.XmlDocument.parse(xmlContent);
-      print(document);
-      final paragraphNodes = document.findAllElements('w:p');
-
-      int number = 0;
-      String lastNumId = '0';
-
-      for (final paragraph in paragraphNodes) {
-        final textNodes = paragraph.findAllElements('w:t');
-        var text = textNodes.map((node) => node.innerText).join();
-
-        if (handleNumbering) {
-          var numbering = paragraph.getElement('w:pPr')?.getElement('w:numPr');
-          if (numbering != null) {
-            final numId =
-                numbering.getElement('w:numId')?.getAttribute('w:val') ?? '';
-
-            if (numId != lastNumId) {
-              number = 0;
-              lastNumId = numId;
-            }
-            number++;
-            text = '$number. $text';
-          }
-        }
-
-        if (text.trim().isNotEmpty) {
-          list.add(text);
-        }
-      }
-    }
-
-    for (final file in archive) {
-      if (file.isFile && isValidDocNamePart(file)) {
-        final fileContent = utf8.decode(file.content);
-        extractTextFromXml(fileContent, handleNumbering: handleNumbering);
-      }
-    }
-
-    return list.join('\n');
   }
 
   /// ❗️ REVISED FUNCTION
@@ -257,7 +239,7 @@ class DocxUtils {
         typesElement
             .findElements('Default')
             .map((e) => e.getAttribute('Extension')?.toLowerCase())
-            .whereNotNull()
+            .nonNulls
             .toSet();
 
     int maxExistingRId = 0;
@@ -295,7 +277,20 @@ class DocxUtils {
               as xml.XmlElement?;
 
       if (targetRunNode == null) continue;
+      if (imagePath.isEmpty) {
+        final parentParagraph = targetTextNode.ancestors.firstWhereOrNull(
+          (n) => n is xml.XmlElement && n.name.local == 'p',
+        );
 
+        if (parentParagraph != null) {
+          parentParagraph.parent?.children.remove(parentParagraph);
+        } else {
+          // Fallback if we can't find the paragraph, just blank out text
+          targetTextNode.innerText = '';
+        }
+
+        continue; // Done with this empty image, move to next
+      }
       final imageRelId = 'rId$imageCounter';
       final imageFileExtension = p.extension(imagePath).toLowerCase();
       final imageFileName = 'image$imageCounter$imageFileExtension';
@@ -410,6 +405,54 @@ class DocxUtils {
       archive.files.removeAt(index);
     }
     archive.addFile(ArchiveFile(filename, newContent.length, newContent));
+  }
+
+  static String docxToText(Uint8List bytes, {bool handleNumbering = false}) {
+    final zipDecoder = ZipDecoder();
+
+    final archive = zipDecoder.decodeBytes(bytes);
+    final List<String> list = [];
+
+    void extractTextFromXml(String xmlContent, {bool handleNumbering = false}) {
+      final document = xml.XmlDocument.parse(xmlContent);
+      final paragraphNodes = document.findAllElements('w:p');
+
+      int number = 0;
+      String lastNumId = '0';
+
+      for (final paragraph in paragraphNodes) {
+        final textNodes = paragraph.findAllElements('w:t');
+        var text = textNodes.map((node) => node.innerText).join();
+
+        if (handleNumbering) {
+          var numbering = paragraph.getElement('w:pPr')?.getElement('w:numPr');
+          if (numbering != null) {
+            final numId =
+                numbering.getElement('w:numId')?.getAttribute('w:val') ?? '';
+
+            if (numId != lastNumId) {
+              number = 0;
+              lastNumId = numId;
+            }
+            number++;
+            text = '$number. $text';
+          }
+        }
+
+        if (text.trim().isNotEmpty) {
+          list.add(text);
+        }
+      }
+    }
+
+    for (final file in archive) {
+      if (file.isFile && isValidDocNamePart(file)) {
+        final fileContent = utf8.decode(file.content);
+        extractTextFromXml(fileContent, handleNumbering: handleNumbering);
+      }
+    }
+
+    return list.join('\n');
   }
 
   static bool isValidDocNamePart(ArchiveFile file) {

@@ -204,9 +204,6 @@ class FieldsInputViewModel extends BaseViewModel {
     required Map<String, (String, Size)> imageReplacements,
     required Map<String, String?> singleLines,
   }) async {
-    print(
-      "==========> _executeSingleTemplate start ${nonNullAbleMap} ${singleLines}",
-    );
     final fileOrigin = File(template.pathTemplate);
     final originalBytes = await fileOrigin.readAsBytes();
     final rawBytes = await DocxUtils.composeModifiedDocxWithPlaceholders(
@@ -221,11 +218,9 @@ class FieldsInputViewModel extends BaseViewModel {
     final fileDir = _directoryExported.data;
     final filePath = "$fileDir${Platform.pathSeparator}$fileName";
     final targetFile = File(filePath);
-    print("==========> _executeSingleTemplate file path ${filePath}");
     if (!targetFile.existsSync()) {
       targetFile.createSync(recursive: true);
     }
-    print("==========> _executeSingleTemplate ${targetFile.path} ");
     targetFile.writeAsBytesSync(rawBytes);
   }
 
