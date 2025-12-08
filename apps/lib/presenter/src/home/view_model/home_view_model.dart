@@ -133,7 +133,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   FutureOr<dynamic> doneExported() {
-    _selectedTemplateIds.postValue([]);
+    //_selectedTemplateIds.postValue([]);
   }
 
   void onItemMenuSelected({

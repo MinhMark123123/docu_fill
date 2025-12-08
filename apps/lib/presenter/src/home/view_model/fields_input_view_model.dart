@@ -155,8 +155,8 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   bool exportedValid(Iterable<String> missingKeys) {
-    return missingKeys.isEmpty &&
-        _nameDocExported.text.isNotEmpty &&
+    print("===> missingKeys ${missingKeys}");
+    return /*missingKeys.isEmpty &&*/ _nameDocExported.text.isNotEmpty &&
         _directoryExported.data.isNotEmpty;
   }
 
@@ -179,6 +179,13 @@ class FieldsInputViewModel extends BaseViewModel {
     required Map<String, (String, Size)> imageReplacements,
     required Map<String, String?> singleLines,
   }) async {
+    final allTempPlate = await _templateRepository.getAllTemplates();
+    final temp = allTempPlate.where(
+      (e) =>
+          e.templateName.contains("BCDG") || e.templateName.contains("TBKQDG"),
+    );
+    _templates.postValue(temp.toList());
+    print("==========> _executedExport ${_templates.data.length} ");
     for (var template in _templates.data) {
       await _executeSingleTemplate(
         template: template,
@@ -186,6 +193,7 @@ class FieldsInputViewModel extends BaseViewModel {
         imageReplacements: imageReplacements,
         singleLines: singleLines,
       );
+      await Future.delayed(Duration(seconds: 3));
     }
     await Future.delayed(Duration(seconds: 2));
   }
@@ -205,7 +213,8 @@ class FieldsInputViewModel extends BaseViewModel {
       singleLines: singleLines,
     );
     final mimeType = template.pathTemplate.split(".").lastOrNull;
-    final fileName = "${_nameDocExported.text}.$mimeType";
+    final fileName =
+        "${_nameDocExported.text}_${template.templateName}.$mimeType";
     final fileDir = _directoryExported.data;
     final filePath = "$fileDir${Platform.pathSeparator}$fileName";
     final targetFile = File(filePath);
@@ -253,9 +262,9 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   void doneExported() {
-    _templates.postValue([]);
+    /*_templates.postValue([]);
     _fieldKeys.clear();
-    _singleField.clear();
+    _singleField.clear();*/
     _nameDocExported.clear();
     _directoryExported.postValue("");
     _enableExported.postValue(false);
