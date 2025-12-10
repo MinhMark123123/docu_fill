@@ -89,6 +89,12 @@ class ConfigureDesktopLayout extends StatelessWidget {
                   },
                 ),
               ),
+              ElevatedButton(
+                onPressed: () {
+                  configureViewModel.openSettingOptions(context);
+                },
+                child: Text(AppLang.labelsImportConfiguration.tr()),
+              ),
               StreamDataConsumer(
                 streamData: configureViewModel.enableConfirm,
                 builder: (context, data) {

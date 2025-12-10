@@ -113,6 +113,23 @@ class ConfigureViewModel extends BaseViewModel {
     _nameController.text = template.templateName;
   }
 
+  void useSetting(BuildContext context, TemplateConfig template) {
+    final fields = template.fields.map(
+      (e) => TableRowData(
+        fieldKey: e.key,
+        inputType: e.type,
+        fieldName: e.label,
+        options: e.options,
+        isRequired: e.required,
+        defaultValue: e.defaultValue,
+        additionalInfo: e.additionalInfo,
+      ),
+    );
+    _fieldsData.postValue(fields.toList());
+    _nameController.text = template.templateName;
+    checkEnableConfirm();
+  }
+
   Future<void> _loadImportSettingModeData() async {
     if (_pathFilePicked == null) return;
     final f = File(_pathFilePicked!);
@@ -470,5 +487,41 @@ class ConfigureViewModel extends BaseViewModel {
       ],
     );
     return accepted.future;
+  }
+
+  Future<void> openSettingOptions(BuildContext context) async {
+    final listTemplate = await _templateRepository.getAllTemplates();
+    showAppRawEventAlertDialog(
+      event: ShowUseSettingDialogEvent(listTemplate: listTemplate),
+    );
+  }
+}
+
+class ShowUseSettingDialogEvent extends ShowDialogEvent<void> {
+  final List<TemplateConfig> listTemplate;
+
+  ShowUseSettingDialogEvent({
+    super.actions,
+    required this.listTemplate,
+    super.content,
+    super.onCompleted,
+    super.title,
+  });
+
+  @override
+  ShowUseSettingDialogEvent copyWith({
+    String? title,
+    String? content,
+    List<DialogAction>? actions,
+    List<TemplateConfig>? listTemplate,
+    Function(void completeData)? onCompleted,
+  }) {
+    return ShowUseSettingDialogEvent(
+      listTemplate: listTemplate ?? this.listTemplate,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      actions: actions ?? this.actions,
+      onCompleted: onCompleted ?? this.onCompleted,
+    );
   }
 }

@@ -56,7 +56,7 @@ abstract class BaseView<T extends BaseViewModel>
     T viewModel,
   ) {
     final sub = viewModel.showDialogEvent.asStream().listen((event) {
-      if (!context.mounted || event.title == null) return;
+      if (!context.mounted) return;
       showDialog(
         context: context,
         barrierDismissible: event.actions == null,
@@ -73,7 +73,7 @@ abstract class BaseView<T extends BaseViewModel>
     BuildContext dialogContext,
   ) {
     return AlertDialog(
-      title: Text(event.title!),
+      title: event.title != null ? Text(event.title!) : null,
       content: Text(event.content ?? ""),
       actions:
           event.actions

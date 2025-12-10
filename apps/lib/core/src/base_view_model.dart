@@ -77,6 +77,16 @@ class BaseViewModel extends ViewModel {
     return completer.future;
   }
 
+  Future<T?> showAppRawEventAlertDialog<T>({
+    required ShowDialogEvent<dynamic> event,
+  }) async {
+    Completer<T?> completer = Completer<T?>();
+    _showDialogEvent.postValue(
+      event.copyWith(onCompleted: (data) => completer.complete(data)),
+    );
+    return completer.future;
+  }
+
   Future<dynamic> loadingGuard(Future<dynamic> future) async {
     _showLoading.postValue(true);
     try {
@@ -88,7 +98,6 @@ class BaseViewModel extends ViewModel {
 
   @override
   void onDispose() {
-    print("====> $runtimeType $hashCode onDispose");
     super.onDispose();
   }
 }
