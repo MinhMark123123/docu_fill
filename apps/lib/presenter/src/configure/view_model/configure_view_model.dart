@@ -114,7 +114,7 @@ class ConfigureViewModel extends BaseViewModel {
   }
 
   void useSetting(BuildContext context, TemplateConfig template) {
-    final fields = template.fields.map(
+    final fieldsTemplate = template.fields.map(
       (e) => TableRowData(
         fieldKey: e.key,
         inputType: e.type,
@@ -125,7 +125,13 @@ class ConfigureViewModel extends BaseViewModel {
         additionalInfo: e.additionalInfo,
       ),
     );
-    _fieldsData.postValue(fields.toList());
+    final fieldsClone = List<TableRowData>.from(_fieldsData.data);
+    for (var e in fieldsTemplate) {
+      final indexKey = fieldsClone.indexWhere((e) => e.fieldKey == e.fieldKey);
+      if (indexKey == AppConst.commonUnknow) continue;
+      fieldsClone[indexKey] = e;
+    }
+    _fieldsData.postValue(fieldsClone);
     _nameController.text = template.templateName;
     checkEnableConfirm();
   }
