@@ -34,6 +34,7 @@ class FieldInputConfirmBox extends StatelessWidget {
                 ],
               ),
               Dimens.spacing.vertical(Dimens.size16),
+              missingKeys(),
               Divider(),
             ],
           ),
@@ -91,6 +92,25 @@ class FieldInputConfirmBox extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: Dimens.size40),
             child: Text(AppLang.actionsExportData.tr()),
           ),
+        );
+      },
+    );
+  }
+
+  Widget missingKeys() {
+    return StreamDataConsumer(
+      streamData: getViewModel<FieldsInputViewModel>().missingKeys,
+      builder: (context, data) {
+        if (data.isEmpty) return SizedBox.shrink();
+        String content = "";
+        if (data.length > 3) {
+          content = "${data.sublist(0, 3).join(",")},...";
+        } else {
+          content = data.join(",");
+        }
+        return SizedBox(
+          width: double.infinity,
+          child: Text("${AppLang.labelsRequired.tr()}: $content"),
         );
       },
     );

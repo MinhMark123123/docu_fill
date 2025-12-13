@@ -31,6 +31,8 @@ class FieldsInputViewModel extends BaseViewModel {
   late final _composedTemplateUI = <int, List<TemplateField>>{}.mtd(this);
   @Bind()
   late final _idsSelected = List<int>.empty().mtd(this);
+  @Bind()
+  late final _missingKeys = List<String>.empty().mtd(this);
 
   final TextEditingController _nameDocExported = TextEditingController();
 
@@ -150,13 +152,15 @@ class FieldsInputViewModel extends BaseViewModel {
       requiredKeys.addAll(childRequired);
     }
     final missingKeys = requiredKeys.where((key) => _fieldKeys[key] == null);
+    _missingKeys.postValue(missingKeys.toList());
     _enableEditNameDoc.postValue(missingKeys.isEmpty);
     _enableExported.postValue(exportedValid(missingKeys));
   }
 
   bool exportedValid(Iterable<String> missingKeys) {
     print("===> missingKeys ${missingKeys}");
-    return /*missingKeys.isEmpty &&*/ _nameDocExported.text.isNotEmpty &&
+    return missingKeys.isEmpty &&
+        _nameDocExported.text.isNotEmpty &&
         _directoryExported.data.isNotEmpty;
   }
 
