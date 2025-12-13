@@ -126,10 +126,12 @@ class ConfigureViewModel extends BaseViewModel {
       ),
     );
     final fieldsClone = List<TableRowData>.from(_fieldsData.data);
-    for (var e in fieldsTemplate) {
-      final indexKey = fieldsClone.indexWhere((e) => e.fieldKey == e.fieldKey);
+    for (var settingItem in fieldsTemplate) {
+      final indexKey = fieldsClone.indexWhere(
+        (e) => e.fieldKey == settingItem.fieldKey,
+      );
       if (indexKey == AppConst.commonUnknow) continue;
-      fieldsClone[indexKey] = e;
+      fieldsClone[indexKey] = settingItem;
     }
     _fieldsData.postValue(fieldsClone);
     _nameController.text = template.templateName;
