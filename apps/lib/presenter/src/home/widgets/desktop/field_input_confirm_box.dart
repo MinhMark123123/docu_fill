@@ -36,10 +36,45 @@ class FieldInputConfirmBox extends StatelessWidget {
               Dimens.spacing.vertical(Dimens.size16),
               missingKeys(),
               Divider(),
+              copyBox(context),
             ],
           ),
         );
       },
+    );
+  }
+
+  Widget copyBox(BuildContext context) {
+    return Row(
+      spacing: Dimens.size16,
+      children: [
+        OutlinedButton(
+          onPressed:
+              () => getViewModel<FieldsInputViewModel>().useCopy(context),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: Dimens.size8),
+            child: Text(
+              AppLang.actionsUseCopy.tr(),
+              style: context.textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+            ),
+          ),
+        ),
+        OutlinedButton(
+          onPressed:
+              () => getViewModel<FieldsInputViewModel>().createCopy(context),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: Dimens.size8),
+            child: Text(
+              AppLang.actionsCreateCopy.tr(),
+              style: context.textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -67,7 +102,6 @@ class FieldInputConfirmBox extends StatelessWidget {
   }
 
   Widget nameDocExported() {
-    print("object ${getViewModel<FieldsInputViewModel>().hashCode}");
     return TextField(
       controller: getViewModel<FieldsInputViewModel>().nameDocExported,
       onChanged: (_) => getViewModel<FieldsInputViewModel>().checkValidate(),

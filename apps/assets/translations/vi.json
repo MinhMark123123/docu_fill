@@ -52,7 +52,14 @@
     "download_document": "Tải tài liệu",
     "select_date_time": "Chọn Ngày & Giờ",
     "show_menu": "Hiện menu",
-    "pick_image": "Chọn ảnh"
+    "pick_image": "Chọn ảnh",
+    "use_copy": "Sử dụng bản sao",
+    "create_copy": "Tạo bản sao",
+    "save_copy_title": "Lưu bản sao",
+    "load_copy_success": "Đã tải dữ liệu từ bản sao thành công!",
+    "load_copy_error": "Lỗi khi tải bản sao: {}",
+    "create_copy_success": "Đã tạo bản sao thành công!",
+    "create_copy_error": "Lỗi khi tạo bản sao: {}"
   },
   "labels": {
     "templates": "Mẫu",

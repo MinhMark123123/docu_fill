@@ -53,7 +53,14 @@
     "download_document": "Download Document",
     "select_date_time": "Select Date & Time",
     "show_menu": "Show Menu",
-    "pick_image": "Pick Image"
+    "pick_image": "Pick Image",
+    "use_copy": "Use copy",
+    "create_copy": "Create copy",
+    "save_copy_title": "Save copy",
+    "load_copy_success": "Data loaded from copy successfully!",
+    "load_copy_error": "Error loading copy: {}",
+    "create_copy_success": "Copy created successfully!",
+    "create_copy_error": "Error creating copy: {}"
   },
   "labels": {
     "templates": "Templates",

@@ -60,6 +60,13 @@ abstract class AppLang {
   static const String actionsSelectDateTime = "actions.select_date_time";
   static const String actionsShowMenu = "actions.show_menu";
   static const String actionsPickImage = "actions.pick_image";
+  static const String actionsUseCopy = "actions.use_copy";
+  static const String actionsCreateCopy = "actions.create_copy";
+  static const String saveCopyTitle = "actions.save_copy_title";
+  static const String loadCopySuccess = "actions.load_copy_success";
+  static const String loadCopyError = "actions.load_copy_error";
+  static const String createCopySuccess = "actions.create_copy_success";
+  static const String createCopyError = "actions.create_copy_error";
 
   // --- Labels ---
   static const String labelsTemplates = "labels.templates";
