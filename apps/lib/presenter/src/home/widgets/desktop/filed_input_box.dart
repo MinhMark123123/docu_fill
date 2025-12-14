@@ -65,17 +65,18 @@ class FiledInputBox extends StatelessWidget {
   }
 
   Widget _buildItemField(BuildContext context, TemplateField e) {
+    final viewModel = getViewModel<FieldsInputViewModel>();
     switch (e.type) {
       case FieldType.text:
-        return textInputItem(context, e);
+        return textInputItem(context, e, viewModel);
       case FieldType.datetime:
-        return dateTimeItem(context, e);
+        return dateTimeItem(context, e, viewModel);
       case FieldType.selection:
-        return selectionItem(context, e);
+        return selectionItem(context, e, viewModel);
       case FieldType.image:
         return imagePickItem(context, e);
       case FieldType.singleLine:
-        return textInputItem(context, e);
+        return textInputItem(context, e, viewModel);
     }
   }
 
@@ -96,13 +97,17 @@ class FiledInputBox extends StatelessWidget {
     );
   }
 
-  Widget selectionItem(BuildContext context, TemplateField e) {
+  Widget selectionItem(
+    BuildContext context,
+    TemplateField e,
+    FieldsInputViewModel viewModel,
+  ) {
     return itemField(
       context: context,
       isRequired: e.required,
       title: e.label,
       child: OutlineDropdownButton(
-        initialValue: e.options?.firstOrNull,
+        initialValue: viewModel.getInitValue(e: e),
         items: e.options ?? [],
         onSelected:
             (value) => getViewModel<FieldsInputViewModel>().setValue(
@@ -113,12 +118,19 @@ class FiledInputBox extends StatelessWidget {
     );
   }
 
-  Widget dateTimeItem(BuildContext context, TemplateField e) {
+  Widget dateTimeItem(
+    BuildContext context,
+    TemplateField e,
+    FieldsInputViewModel viewModel,
+  ) {
+    print("build ${DateTime.tryParse(viewModel.getInitValue(e: e) ?? "")}");
+
     return itemField(
       context: context,
       isRequired: e.required,
       title: e.label,
       child: DateTimePickerButton(
+        initialDateTime: DateTime.tryParse(viewModel.getInitValue(e: e) ?? ""),
         onDateTimeChanged: (time) {
           getViewModel<FieldsInputViewModel>().setValue(
             field: e,
@@ -129,14 +141,18 @@ class FiledInputBox extends StatelessWidget {
     );
   }
 
-  Widget textInputItem(BuildContext context, TemplateField e) {
+  Widget textInputItem(
+    BuildContext context,
+    TemplateField e,
+    FieldsInputViewModel viewModel,
+  ) {
     return itemField(
       context: context,
       isRequired: e.required,
       title: e.label,
       child: TextFormField(
         key: Key(e.key),
-        initialValue: e.defaultValue,
+        initialValue: viewModel.getInitValue(e: e),
         maxLines: 8,
         minLines: 1,
         decoration: InputDecoration(

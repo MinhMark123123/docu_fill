@@ -1,6 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
-import 'package:docu_fill/const/src/app_const.dart';
+import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/data/data.dart';
 import 'package:docu_fill/data/src/dimensions.dart';
@@ -40,6 +41,16 @@ class FieldsInputViewModel extends BaseViewModel {
 
   final _fieldKeys = <String, String?>{};
   final _singleField = <String, String?>{};
+
+  String? getInitValue({required TemplateField e}) {
+    if (e.type == FieldType.selection) {
+      return _fieldKeys[e.key] ?? e.options?.firstOrNull;
+    }
+    if (e.type == FieldType.singleLine) {
+      return _singleField[e.key] ?? e.defaultValue;
+    }
+    return _fieldKeys[e.key] ?? e.defaultValue;
+  }
 
   void performInit(List<int>? ids) {
     _idsSelected.postValue(ids ?? []);
@@ -158,7 +169,6 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   bool exportedValid(Iterable<String> missingKeys) {
-    print("===> missingKeys ${missingKeys}");
     return missingKeys.isEmpty &&
         _nameDocExported.text.isNotEmpty &&
         _directoryExported.data.isNotEmpty;
@@ -300,5 +310,125 @@ class FieldsInputViewModel extends BaseViewModel {
       nonNullAbleMap.remove(e.key);
     }
     return result;
+  }
+
+  Future<void> useCopy(BuildContext context) async {
+    try {
+      // 1. Chọn file JSON bản sao
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+      final cloned = Map<int, List<TemplateField>>.from(
+        _composedTemplateUI.data,
+      );
+      _composedTemplateUI.postValue(<int, List<TemplateField>>{});
+      await Future.delayed(Duration(seconds: 1));
+      if (result != null && result.files.single.path != null) {
+        final file = File(result.files.single.path!);
+        final String content = await file.readAsString();
+
+        // 2. Decode dữ liệu
+        final Map<String, dynamic> data = jsonDecode(content);
+        final listTemplates = <TemplateField>[];
+        final currentKeys = cloned.values.fold(listTemplates, (a, b) {
+          a.addAll(b);
+          return a;
+        });
+        final keysCompare = currentKeys.asMap().map(
+          (key, e) => MapEntry(e.key, e),
+        );
+        // 3. Khôi phục dữ liệu vào các biến Map
+        if (data['fields'] != null) {
+          final fields = Map<String, dynamic>.from(data['fields']);
+          fields.forEach((key, value) {
+            if (value != null && keysCompare.containsKey(key)) {
+              // Chỉ cập nhật nếu key không phải là trường hình ảnh (để an toàn)
+              _fieldKeys[key] = value.toString();
+            }
+          });
+        }
+
+        if (data['singleLines'] != null) {
+          final singles = Map<String, dynamic>.from(data['singleLines']);
+          singles.forEach((key, value) {
+            if (value != null && keysCompare.containsKey(key)) {
+              _singleField[key] = value.toString();
+            }
+          });
+        }
+        _composedTemplateUI.postValue(cloned);
+        await Future.delayed(Duration.zero);
+        // 4. Validate lại để cập nhật trạng thái UI (nút Export)
+        await checkValidate();
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(AppLang.loadCopySuccess.tr())));
+        }
+      }
+    } catch (e) {
+      debugPrint("Error using copy: $e");
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(AppLang.loadCopyError.tr())));
+      }
+    }
+  }
+
+  Future<void> createCopy(BuildContext context) async {
+    try {
+      // 1. Xác định các key là hình ảnh để loại bỏ
+      final imageKeys = <String>{};
+      for (var template in _templates.data) {
+        for (var field in template.fields) {
+          if (field.type == FieldType.image) {
+            imageKeys.add(field.key);
+          }
+        }
+      }
+
+      // 2. Tạo Map dữ liệu fields đã lọc bỏ hình ảnh
+      final fieldsToSave = Map<String, dynamic>.from(_fieldKeys);
+      // Xóa các key thuộc về hình ảnh
+      fieldsToSave.removeWhere((key, value) => imageKeys.contains(key));
+
+      // 3. Đóng gói dữ liệu
+      final data = {'fields': fieldsToSave, 'singleLines': _singleField};
+
+      // 4. Chuyển đổi sang JSON string
+      final String jsonString = jsonEncode(data);
+
+      // 5. Chọn nơi lưu file
+      String? outputFile = await FilePicker.platform.saveFile(
+        dialogTitle: AppLang.saveCopyTitle.tr(),
+        fileName: 'copy_${DateTime.now().millisecondsSinceEpoch}.json',
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+
+      // 6. Ghi file
+      if (outputFile != null) {
+        final file = File(outputFile);
+        await file.writeAsString(jsonString);
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLang.createCopySuccess.tr())),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("Error creating copy: $e");
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text((AppLang.createCopyError.tr(args: [e.toString()]))),
+          ),
+        );
+      }
+    }
   }
 }
