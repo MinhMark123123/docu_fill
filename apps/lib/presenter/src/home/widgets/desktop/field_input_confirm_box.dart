@@ -1,6 +1,5 @@
 import 'package:docu_fill/const/src/app_lang.dart';
 import 'package:docu_fill/presenter/src/home/view_model/fields_input_view_model.dart';
-import 'package:docu_fill/presenter/src/home/view_model/home_view_model.dart';
 import 'package:docu_fill/ui/src/methodology/tokens/dimens.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -49,8 +48,7 @@ class FieldInputConfirmBox extends StatelessWidget {
       spacing: Dimens.size16,
       children: [
         OutlinedButton(
-          onPressed:
-              () => getViewModel<FieldsInputViewModel>().useCopy(context),
+          onPressed: () => getViewModel<FieldsInputViewModel>().useCopy(),
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: Dimens.size8),
             child: Text(
@@ -62,8 +60,7 @@ class FieldInputConfirmBox extends StatelessWidget {
           ),
         ),
         OutlinedButton(
-          onPressed:
-              () => getViewModel<FieldsInputViewModel>().createCopy(context),
+          onPressed: () => getViewModel<FieldsInputViewModel>().createCopy(),
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: Dimens.size8),
             child: Text(
@@ -118,9 +115,7 @@ class FieldInputConfirmBox extends StatelessWidget {
         return ElevatedButton(
           onPressed:
               data
-                  ? () => getViewModel<FieldsInputViewModel>()
-                      .exported(context)
-                      .then((_) => getViewModel<HomeViewModel>().doneExported())
+                  ? () => getViewModel<FieldsInputViewModel>().exported()
                   : null,
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: Dimens.size40),

@@ -1,10 +1,8 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/data/data.dart';
-import 'package:docu_fill/data/src/dimensions.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -16,9 +14,13 @@ part 'fields_input_view_model.g.dart';
 @BindableViewModel()
 class FieldsInputViewModel extends BaseViewModel {
   final TemplateRepository _templateRepository;
+  final TemplateService _templateService;
 
-  FieldsInputViewModel({required TemplateRepository templateRepository})
-    : _templateRepository = templateRepository;
+  FieldsInputViewModel({
+    required TemplateRepository templateRepository,
+    required TemplateService templateService,
+  }) : _templateRepository = templateRepository,
+       _templateService = templateService;
 
   @Bind()
   late final _templates = List<TemplateConfig>.empty().mtd(this);
@@ -64,62 +66,31 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   Future<void> _composedUI() async {
-    final rawData = <int, List<TemplateField>>{};
+    final rawData = _templateService.groupFields(_templates.data);
 
-    // Helper to initialize defaults for a list of fields
-    void initializeFields(List<TemplateField> fields) {
+    // Initialize defaults for all groups
+    for (var fields in rawData.values) {
       for (var field in fields) {
-        if (field.defaultValue?.isNotEmpty == true) {
-          setValue(field: field, value: field.defaultValue);
-        } else if (field.type == FieldType.selection) {
-          setValue(field: field, value: field.options?.firstOrNull);
-        }
-      }
-    }
-
-    if (_templates.data.length == 1) {
-      final template = _templates.data.first;
-      initializeFields(template.fields);
-      rawData[template.id] = template.fields;
-      _composedTemplateUI.postValue(rawData);
-      return;
-    }
-
-    // Identify common keys across all templates
-    final allFieldKeys = _templates.data.expand(
-      (t) => t.fields.map((f) => f.key),
-    );
-    final keyFrequency = allFieldKeys.fold(<String, int>{}, (map, key) {
-      map[key] = (map[key] ?? 0) + 1;
-      return map;
-    });
-    final commonKeys =
-        keyFrequency.entries
-            .where((e) => e.value == _templates.data.length)
-            .map((e) => e.key)
-            .toSet();
-
-    rawData[AppConst.commonUnknow] = [];
-
-    for (var template in _templates.data) {
-      initializeFields(template.fields);
-
-      final specificFields = <TemplateField>[];
-
-      for (var field in template.fields) {
-        if (commonKeys.contains(field.key)) {
-          // Add to common section only if not already added (based on key)
-          final commonList = rawData[AppConst.commonUnknow]!;
-          if (!commonList.any((e) => e.key == field.key)) {
-            commonList.add(field);
+        if (_fieldKeys[field.key] == null) {
+          if (field.defaultValue?.isNotEmpty == true) {
+            setValue(
+              field: field,
+              value: field.defaultValue,
+              shouldCheckValidate: false,
+            );
+          } else if (field.type == FieldType.selection) {
+            setValue(
+              field: field,
+              value: field.options?.firstOrNull,
+              shouldCheckValidate: false,
+            );
           }
-        } else {
-          specificFields.add(field);
         }
       }
-      rawData[template.id] = specificFields;
     }
+
     _composedTemplateUI.postValue(rawData);
+    checkValidate();
   }
 
   Future<void> loadTemplates() async {
@@ -153,17 +124,12 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   Future<void> checkValidate() async {
-    final requiredKeys = List<String>.empty(growable: true);
+    final missingKeys = _templateService.validateFields(
+      _templates.data,
+      _fieldKeys,
+    );
 
-    for (var template in _templates.data) {
-      final rawFields = template.fields
-          .where((element) => element.required)
-          .map((e) => e.key);
-      final childRequired = rawFields.toList();
-      requiredKeys.addAll(childRequired);
-    }
-    final missingKeys = requiredKeys.where((key) => _fieldKeys[key] == null);
-    _missingKeys.postValue(missingKeys.toList());
+    _missingKeys.postValue(missingKeys);
     _enableEditNameDoc.postValue(missingKeys.isEmpty);
     _enableExported.postValue(exportedValid(missingKeys));
   }
@@ -174,97 +140,19 @@ class FieldsInputViewModel extends BaseViewModel {
         _directoryExported.data.isNotEmpty;
   }
 
-  Future<void> exported(BuildContext context) async {
-    final nonNullAbleMap = prettyData();
-    final imageReplacements = getImageReplacements(nonNullAbleMap);
+  Future<void> exported() async {
     await loadingGuard(
-      _executedExport(
-        nonNullAbleMap: nonNullAbleMap,
-        imageReplacements: imageReplacements,
+      _templateService.executeExport(
+        templates: _templates.data,
+        exportDirectory: _directoryExported.data,
+        baseFileName: _nameDocExported.text,
+        fieldKeys: _fieldKeys,
         singleLines: _singleField,
+        composedUI: _composedTemplateUI.data,
       ),
     );
     await Future.delayed(Duration(milliseconds: 200));
     doneExported();
-  }
-
-  Future<void> _executedExport({
-    required Map<String, String> nonNullAbleMap,
-    required Map<String, (String, Size)> imageReplacements,
-    required Map<String, String?> singleLines,
-  }) async {
-    final allTempPlate = await _templateRepository.getAllTemplates();
-    final temp = allTempPlate.where(
-      (e) =>
-          e.templateName.contains("BCDG") || e.templateName.contains("TBKQDG"),
-    );
-    _templates.postValue(temp.toList());
-    print("==========> _executedExport ${_templates.data.length} ");
-    for (var template in _templates.data) {
-      await _executeSingleTemplate(
-        template: template,
-        nonNullAbleMap: nonNullAbleMap,
-        imageReplacements: imageReplacements,
-        singleLines: singleLines,
-      );
-      await Future.delayed(Duration(seconds: 3));
-    }
-    await Future.delayed(Duration(seconds: 2));
-  }
-
-  Future<void> _executeSingleTemplate({
-    required TemplateConfig template,
-    required Map<String, String> nonNullAbleMap,
-    required Map<String, (String, Size)> imageReplacements,
-    required Map<String, String?> singleLines,
-  }) async {
-    final fileOrigin = File(template.pathTemplate);
-    final originalBytes = await fileOrigin.readAsBytes();
-    final rawBytes = await DocxUtils.composeModifiedDocxWithPlaceholders(
-      originalBytes: originalBytes,
-      replacements: nonNullAbleMap,
-      imageReplacements: imageReplacements,
-      singleLines: singleLines,
-    );
-    final mimeType = template.pathTemplate.split(".").lastOrNull;
-    final fileName =
-        "${_nameDocExported.text}_${template.templateName}.$mimeType";
-    final fileDir = _directoryExported.data;
-    final filePath = "$fileDir${Platform.pathSeparator}$fileName";
-    final targetFile = File(filePath);
-    if (!targetFile.existsSync()) {
-      targetFile.createSync(recursive: true);
-    }
-    targetFile.writeAsBytesSync(rawBytes);
-  }
-
-  Map<String, String> prettyData() {
-    final fields = <TemplateField>[];
-    for (var template in _templates.data) {
-      fields.addAll(template.fields);
-    }
-    for (var element in fields) {
-      final valueInput = _fieldKeys[element.key];
-      if (element.type == FieldType.datetime && valueInput != null) {
-        final format = element.additionalInfo;
-        if (format != null && format.isNotEmpty) {
-          setValue(
-            field: element,
-            value: DateTimeUtils.format(valueInput, format: format),
-            shouldCheckValidate: false,
-          );
-        }
-      }
-      if (_fieldKeys[element.key] == null) {
-        setValue(field: element, value: element.defaultValue ?? "");
-        setValue(
-          field: element,
-          value: element.defaultValue ?? "",
-          shouldCheckValidate: false,
-        );
-      }
-    }
-    return _fieldKeys.map((key, value) => MapEntry(key, value!));
   }
 
   Future<void> pickFolder() async {
@@ -276,9 +164,6 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   void doneExported() {
-    /*_templates.postValue([]);
-    _fieldKeys.clear();
-    _singleField.clear();*/
     _nameDocExported.clear();
     _directoryExported.postValue("");
     _enableExported.postValue(false);
@@ -290,97 +175,60 @@ class FieldsInputViewModel extends BaseViewModel {
     return _templates.data.firstWhere((e) => e.id == templateId).templateName;
   }
 
-  Map<String, (String, Size)> getImageReplacements(
-    Map<String, String> nonNullAbleMap,
-  ) {
-    List<TemplateField> raw = [];
-    for (var e in _composedTemplateUI.data.values) {
-      raw.addAll(e);
-    }
-    final imageField = raw.where((e) => e.type == FieldType.image);
-    final result = <String, (String, Size)>{};
-    //clear image field
-    for (var e in imageField) {
-      final key = e.key;
-      final dimension = Dimensions.from(e.additionalInfo);
-      final size = dimension?.toInches();
-      if (dimension != null && nonNullAbleMap[key] != null && size != null) {
-        result[key] = (nonNullAbleMap[key]!, size);
-      }
-      nonNullAbleMap.remove(e.key);
-    }
-    return result;
-  }
-
-  Future<void> useCopy(BuildContext context) async {
+  Future<void> useCopy() async {
     try {
-      // 1. Chọn file JSON bản sao
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['json'],
       );
+      if (result == null || result.files.single.path == null) return;
+
       final cloned = Map<int, List<TemplateField>>.from(
         _composedTemplateUI.data,
       );
       _composedTemplateUI.postValue(<int, List<TemplateField>>{});
-      await Future.delayed(Duration(seconds: 1));
-      if (result != null && result.files.single.path != null) {
-        final file = File(result.files.single.path!);
-        final String content = await file.readAsString();
 
-        // 2. Decode dữ liệu
-        final Map<String, dynamic> data = jsonDecode(content);
-        final listTemplates = <TemplateField>[];
-        final currentKeys = cloned.values.fold(listTemplates, (a, b) {
-          a.addAll(b);
-          return a;
+      final file = File(result.files.single.path!);
+      final String content = await file.readAsString();
+      final Map<String, dynamic> data = _templateService.parseCopyData(content);
+
+      final listTemplates = <TemplateField>[];
+      final currentKeys = cloned.values.fold(listTemplates, (a, b) {
+        a.addAll(b);
+        return a;
+      });
+      final keysCompare = currentKeys.asMap().map(
+        (key, e) => MapEntry(e.key, e),
+      );
+
+      if (data['fields'] != null) {
+        final fields = Map<String, dynamic>.from(data['fields']);
+        fields.forEach((key, value) {
+          if (value != null && keysCompare.containsKey(key)) {
+            _fieldKeys[key] = value.toString();
+          }
         });
-        final keysCompare = currentKeys.asMap().map(
-          (key, e) => MapEntry(e.key, e),
-        );
-        // 3. Khôi phục dữ liệu vào các biến Map
-        if (data['fields'] != null) {
-          final fields = Map<String, dynamic>.from(data['fields']);
-          fields.forEach((key, value) {
-            if (value != null && keysCompare.containsKey(key)) {
-              // Chỉ cập nhật nếu key không phải là trường hình ảnh (để an toàn)
-              _fieldKeys[key] = value.toString();
-            }
-          });
-        }
-
-        if (data['singleLines'] != null) {
-          final singles = Map<String, dynamic>.from(data['singleLines']);
-          singles.forEach((key, value) {
-            if (value != null && keysCompare.containsKey(key)) {
-              _singleField[key] = value.toString();
-            }
-          });
-        }
-        _composedTemplateUI.postValue(cloned);
-        await Future.delayed(Duration.zero);
-        // 4. Validate lại để cập nhật trạng thái UI (nút Export)
-        await checkValidate();
-
-        if (context.mounted) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(AppLang.loadCopySuccess.tr())));
-        }
       }
+
+      if (data['singleLines'] != null) {
+        final singles = Map<String, dynamic>.from(data['singleLines']);
+        singles.forEach((key, value) {
+          if (value != null && keysCompare.containsKey(key)) {
+            _singleField[key] = value.toString();
+          }
+        });
+      }
+      _composedTemplateUI.postValue(cloned);
+      await checkValidate();
+      showSnackbar(AppLang.loadCopySuccess.tr());
     } catch (e) {
       debugPrint("Error using copy: $e");
-      if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(AppLang.loadCopyError.tr())));
-      }
+      showSnackbar(AppLang.loadCopyError.tr());
     }
   }
 
-  Future<void> createCopy(BuildContext context) async {
+  Future<void> createCopy() async {
     try {
-      // 1. Xác định các key là hình ảnh để loại bỏ
       final imageKeys = <String>{};
       for (var template in _templates.data) {
         for (var field in template.fields) {
@@ -390,18 +238,12 @@ class FieldsInputViewModel extends BaseViewModel {
         }
       }
 
-      // 2. Tạo Map dữ liệu fields đã lọc bỏ hình ảnh
-      final fieldsToSave = Map<String, dynamic>.from(_fieldKeys);
-      // Xóa các key thuộc về hình ảnh
-      fieldsToSave.removeWhere((key, value) => imageKeys.contains(key));
+      final jsonString = _templateService.createCopyData(
+        fieldKeys: _fieldKeys,
+        singleField: _singleField,
+        imageKeys: imageKeys,
+      );
 
-      // 3. Đóng gói dữ liệu
-      final data = {'fields': fieldsToSave, 'singleLines': _singleField};
-
-      // 4. Chuyển đổi sang JSON string
-      final String jsonString = jsonEncode(data);
-
-      // 5. Chọn nơi lưu file
       String? outputFile = await FilePicker.platform.saveFile(
         dialogTitle: AppLang.saveCopyTitle.tr(),
         fileName: 'copy_${DateTime.now().millisecondsSinceEpoch}.json',
@@ -409,26 +251,14 @@ class FieldsInputViewModel extends BaseViewModel {
         allowedExtensions: ['json'],
       );
 
-      // 6. Ghi file
       if (outputFile != null) {
         final file = File(outputFile);
         await file.writeAsString(jsonString);
-
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(AppLang.createCopySuccess.tr())),
-          );
-        }
+        showSnackbar(AppLang.createCopySuccess.tr());
       }
     } catch (e) {
       debugPrint("Error creating copy: $e");
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text((AppLang.createCopyError.tr(args: [e.toString()]))),
-          ),
-        );
-      }
+      showSnackbar(AppLang.createCopyError.tr(args: [e.toString()]));
     }
   }
 }

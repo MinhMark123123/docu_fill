@@ -6,3 +6,5 @@ export 'src/repositories/template/template_repository.dart';
 export 'src/repositories/template/template_repository_impl.dart';
 export 'src/template_config.dart';
 export 'src/template_field.dart';
+export 'src/services/template_service.dart';
+export 'src/dimensions.dart';

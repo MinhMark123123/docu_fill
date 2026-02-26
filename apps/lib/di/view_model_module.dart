@@ -1,3 +1,4 @@
+import 'package:docu_fill/data/src/services/template_service.dart';
 import 'package:docu_fill/presenter/page.dart';
 import 'package:docu_fill/presenter/src/home/view_model/fields_input_view_model.dart';
 import 'package:docu_fill/presenter/src/home/view_model/home_view_model.dart';
@@ -8,9 +9,17 @@ import 'app_get_it.dart';
 
 void setupViewModelModule() {
   registerViewModel(() => MainViewModel());
-  registerViewModel(() => HomeViewModel(templateRepository: inject()));
+  registerViewModel(
+    () =>
+        HomeViewModel(templateRepository: inject(), templateService: inject()),
+  );
   registerViewModel(() => SettingViewModel());
   registerViewModel(() => UploadViewModel());
   registerViewModel(() => ConfigureViewModel(templateRepository: inject()));
-  registerViewModel(() => FieldsInputViewModel(templateRepository: inject()));
+  registerViewModel(
+    () => FieldsInputViewModel(
+      templateRepository: inject(),
+      templateService: inject(),
+    ),
+  );
 }
