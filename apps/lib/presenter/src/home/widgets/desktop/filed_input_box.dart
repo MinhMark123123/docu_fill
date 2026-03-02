@@ -42,24 +42,53 @@ class FiledInputBox extends StatelessWidget {
     required int templateId,
     required List<TemplateField> fields,
   }) {
+    final title =
+        templateId == AppConst.commonUnknow
+            ? AppLang.labelsTemplates.tr()
+            : getViewModel<FieldsInputViewModel>().getTemplateName(templateId);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(
-          templateId == AppConst.commonUnknow
-              ? AppLang.labelsTemplates.tr()
-              : getViewModel<FieldsInputViewModel>().getTemplateName(
-                templateId,
+        Padding(
+          padding: EdgeInsets.symmetric(vertical: Dimens.size24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: context.textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: context.colorScheme.primary,
+                ),
               ),
-          style: context.textTheme.displayLarge,
+              Dimens.spacing.vertical(Dimens.size4),
+              Container(
+                width: Dimens.size40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: context.colorScheme.primary.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ],
+          ),
         ),
-        Dimens.spacing.vertical(Dimens.size16),
-        Column(
-          spacing: Dimens.size16,
-          mainAxisSize: MainAxisSize.min,
-          children: fields.map((e) => _buildItemField(context, e)).toList(),
+        Container(
+          padding: EdgeInsets.all(Dimens.size24),
+          decoration: BoxDecoration(
+            color: context.colorScheme.surfaceContainerHighest.withOpacity(0.2),
+            borderRadius: Dimens.radii.borderLarge(),
+            border: Border.all(
+              color: context.colorScheme.outlineVariant.withOpacity(0.5),
+            ),
+          ),
+          child: Column(
+            spacing: Dimens.size20,
+            children: fields.map((e) => _buildItemField(context, e)).toList(),
+          ),
         ),
+        Dimens.spacing.vertical(Dimens.size32),
       ],
     );
   }
@@ -174,33 +203,31 @@ class FiledInputBox extends StatelessWidget {
     required Widget child,
     bool isRequired = false,
   }) {
-    final textStyle = context.textTheme.bodyMedium;
-    return Row(
-      children: [
-        Expanded(
-          flex: 1,
-          child: RichText(
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: Dimens.size4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RichText(
             text: TextSpan(
-              style: textStyle,
-              // Default style for all TextSpans unless overridden
+              style: context.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: context.colorScheme.onSurface,
+              ),
               children: <TextSpan>[
                 TextSpan(text: title),
                 if (isRequired)
                   TextSpan(
                     text: ' *',
-                    // Note the space before the asterisk for better visual separation
-                    style: textStyle?.copyWith(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(color: context.colorScheme.error),
                   ),
-                TextSpan(text: " :"),
               ],
             ),
           ),
-        ),
-        Expanded(flex: 2, child: child),
-      ],
+          Dimens.spacing.vertical(Dimens.size8),
+          child,
+        ],
+      ),
     );
   }
 }

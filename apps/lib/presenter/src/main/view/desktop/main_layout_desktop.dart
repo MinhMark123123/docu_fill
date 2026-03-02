@@ -1,12 +1,9 @@
-import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/presenter/page.dart';
-import 'package:docu_fill/presenter/src/main/view/widgets/desktop_header_bar.dart';
-import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:docu_fill/ui/ui.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
+import 'package:docu_fill/presenter/src/main/view_model/main_view_model.dart';
 
 class MainLayoutDesktop extends StatelessWidget {
   final Widget child;
@@ -15,65 +12,61 @@ class MainLayoutDesktop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isHome = GoRouter.of(context).state.fullPath != RoutesPath.home;
+    final viewModel = getViewModel<MainViewModel>();
     return Scaffold(
-      appBar:
-          isHome
-              ? AppBar(
-                leading: IconButton(
-                  onPressed: () => context.pop(),
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: context.appColors?.bodyTextColor,
-                  ),
+      body: Row(
+        children: [
+          StreamDataConsumer(
+            streamData: viewModel.currentMenu,
+            builder: (context, currentMenu) {
+              return NavigationRail(
+                extended: false,
+                labelType: NavigationRailLabelType.all,
+                backgroundColor: context.colorScheme.surface,
+                indicatorColor: context.colorScheme.primaryContainer,
+                selectedIconTheme: IconThemeData(
+                  color: context.colorScheme.primary,
                 ),
-                backgroundColor: Colors.transparent,
-              )
-              : null,
-      body: child,
+                unselectedIconTheme: IconThemeData(
+                  color: context.colorScheme.onSurfaceVariant,
+                ),
+                selectedLabelTextStyle: context.textTheme.labelSmall?.copyWith(
+                  color: context.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+                unselectedLabelTextStyle: context.textTheme.labelSmall
+                    ?.copyWith(color: context.colorScheme.onSurfaceVariant),
+                destinations:
+                    MainDesktopMenu.values.map((e) {
+                      return NavigationRailDestination(
+                        icon: Icon(e.icon()),
+                        selectedIcon: Icon(e.selectedIcon()),
+                        label: Text(e.label()),
+                      );
+                    }).toList(),
+                selectedIndex: MainDesktopMenu.values.indexOf(currentMenu),
+                onDestinationSelected: (index) {
+                  viewModel.selectMenu(context, MainDesktopMenu.values[index]);
+                },
+                leading: Padding(
+                  padding: EdgeInsets.symmetric(vertical: Dimens.size24),
+                  child: AppAvatar(displayName: ""),
+                ),
+              );
+            },
+          ),
+          VerticalDivider(
+            thickness: 1,
+            width: 1,
+            color: context.colorScheme.outlineVariant,
+          ),
+          Expanded(child: child),
+        ],
+      ),
     );
-  }
-
-  Widget headerBar() {
-    final items = MainDesktopMenu.values;
-
-    return StreamDataConsumer(
-      streamData: getViewModel<MainViewModel>().currentMenu,
-      builder: (context, currentMenu) {
-        final style = context.textTheme.titleMedium;
-        return DesktopHeaderBar(
-          title: AppLang.appName.tr(),
-          leadingChildren: itemMenuList(context, items, currentMenu, style),
-          trailChildren: [AppAvatar(displayName: "")],
-        );
-      },
-    );
-  }
-
-  List<Transform> itemMenuList(
-    BuildContext context,
-    List<MainDesktopMenu> items,
-    MainDesktopMenu currentMenu,
-    TextStyle? style,
-  ) {
-    return items.map((e) {
-      final textStyle =
-          e == currentMenu
-              ? style?.copyWith(fontWeight: FontWeight.bold)
-              : style;
-      return Transform.translate(
-        offset: Offset(0, 0),
-        child: TextButton(
-          onPressed: () {
-            getViewModel<MainViewModel>().selectMenu(context, e);
-          },
-          child: Text(e.label(), style: textStyle),
-        ),
-      );
-    }).toList();
   }
 
   Widget body() {
-    return Placeholder();
+    return const Placeholder();
   }
 }

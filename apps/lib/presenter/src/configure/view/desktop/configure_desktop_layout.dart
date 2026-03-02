@@ -1,7 +1,6 @@
 import 'package:docu_fill/const/src/app_lang.dart';
 import 'package:docu_fill/presenter/src/configure/view/widgets/configure_table_fields.dart';
 import 'package:docu_fill/presenter/src/configure/view_model/configure_view_model.dart';
-import 'package:docu_fill/presenter/src/widgets/desktop_top_title.dart';
 import 'package:docu_fill/ui/ui.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -16,101 +15,131 @@ class ConfigureDesktopLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.colorScheme.surface,
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: Dimens.size20),
+        padding: EdgeInsets.symmetric(
+          horizontal: Dimens.size32,
+          vertical: Dimens.size24,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: Dimens.size16,
           children: [
-            DesktopTopTitle(
-              aspectRatio: 960 / 100,
-              title: AppLang.labelsConfigureTemplateFields.tr(),
-              subtitle: AppLang.messagesReviewAndConfigureFields.tr(),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: Dimens.size16),
-              child: confirmBox(context),
-            ),
-            configureTable(),
+            header(context),
+            Dimens.spacing.vertical(Dimens.size32),
+            confirmBox(context),
+            Dimens.spacing.vertical(Dimens.size24),
+            Expanded(child: configureTable(context)),
           ],
         ),
       ),
     );
   }
 
+  Widget header(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppLang.labelsConfigureTemplateFields.tr(),
+          style: context.textTheme.headlineLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: context.colorScheme.onSurface,
+          ),
+        ),
+        Dimens.spacing.vertical(Dimens.size8),
+        Text(
+          AppLang.messagesReviewAndConfigureFields.tr(),
+          style: context.textTheme.bodyLarge?.copyWith(
+            color: context.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget confirmBox(BuildContext context) {
-    return StreamDataConsumer(
-      streamData: configureViewModel.mode,
-      builder: (context, mode) {
-        switch (mode) {
-          case ConfigureMode.addNew:
-          case ConfigureMode.importSetting:
-            return addNewConfirmBox(context);
-          case ConfigureMode.edit:
-            return editConfirmBox(context);
-        }
-      },
+    return Container(
+      padding: EdgeInsets.all(Dimens.size20),
+      decoration: BoxDecoration(
+        color: context.colorScheme.surfaceContainerLow,
+        borderRadius: Dimens.radii.borderLarge(),
+        border: Border.all(
+          color: context.colorScheme.outlineVariant.withOpacity(0.5),
+        ),
+      ),
+      child: StreamDataConsumer(
+        streamData: configureViewModel.mode,
+        builder: (context, mode) {
+          switch (mode) {
+            case ConfigureMode.addNew:
+            case ConfigureMode.importSetting:
+              return addNewConfirmBox(context);
+            case ConfigureMode.edit:
+              return editConfirmBox(context);
+          }
+        },
+      ),
     );
   }
 
   Widget addNewConfirmBox(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Icon(Icons.auto_awesome, color: context.colorScheme.primary),
+        Dimens.spacing.horizontal(Dimens.size12),
         Text(
           AppLang.labelsDetectedFields.tr(),
-          style: context.textTheme.headlineSmall,
+          style: context.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        Padding(
-          padding: EdgeInsets.only(right: Dimens.size16),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: Dimens.size16,
-            children: [
-              SizedBox(
-                width: Dimens.size400,
-                child: StreamDataConsumer(
-                  streamData: configureViewModel.enableNameTemplate,
-                  builder: (context, data) {
-                    return Visibility(
-                      visible: data,
-                      replacement: SizedBox.shrink(),
-                      child: TextField(
-                        controller: configureViewModel.nameController,
-                        onChanged:
-                            (_) => configureViewModel.checkEnableConfirm(),
-                        decoration: InputDecoration(
-                          hintText: AppLang.messagesEnterTemplateNameHint.tr(),
-                          labelText: AppLang.labelsTemplateName.tr(),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                    );
-                  },
+        const Spacer(),
+        SizedBox(
+          width: Dimens.size300,
+          child: StreamDataConsumer(
+            streamData: configureViewModel.enableNameTemplate,
+            builder: (context, data) {
+              if (!data) return const SizedBox.shrink();
+              return TextField(
+                controller: configureViewModel.nameController,
+                onChanged: (_) => configureViewModel.checkEnableConfirm(),
+                decoration: InputDecoration(
+                  hintText: AppLang.messagesEnterTemplateNameHint.tr(),
+                  labelText: AppLang.labelsTemplateName.tr(),
+                  isDense: true,
+                ),
+              );
+            },
+          ),
+        ),
+        Dimens.spacing.horizontal(Dimens.size16),
+        OutlinedButton.icon(
+          onPressed: () => configureViewModel.openSettingOptions(context),
+          icon: const Icon(Icons.file_download_outlined, size: 18),
+          label: Text(AppLang.labelsImportConfiguration.tr()),
+          style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: Dimens.radii.borderMedium(),
+            ),
+          ),
+        ),
+        Dimens.spacing.horizontal(Dimens.size12),
+        StreamDataConsumer(
+          streamData: configureViewModel.enableConfirm,
+          builder: (context, data) {
+            return ElevatedButton(
+              onPressed:
+                  data ? () => configureViewModel.confirm(context) : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: context.colorScheme.primary,
+                foregroundColor: context.colorScheme.onPrimary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: Dimens.radii.borderMedium(),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  configureViewModel.openSettingOptions(context);
-                },
-                child: Text(AppLang.labelsImportConfiguration.tr()),
-              ),
-              StreamDataConsumer(
-                streamData: configureViewModel.enableConfirm,
-                builder: (context, data) {
-                  return ElevatedButton(
-                    onPressed:
-                        data
-                            ? () {
-                              configureViewModel.confirm(context);
-                            }
-                            : null,
-                    child: Text(AppLang.actionsConfirm.tr()),
-                  );
-                },
-              ),
-            ],
-          ),
+              child: Text(AppLang.actionsConfirm.tr()),
+            );
+          },
         ),
       ],
     );
@@ -118,57 +147,58 @@ class ConfigureDesktopLayout extends StatelessWidget {
 
   Widget editConfirmBox(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Icon(Icons.edit_note, color: context.colorScheme.primary),
+        Dimens.spacing.horizontal(Dimens.size12),
         Text(
           AppLang.labelsDetectedFields.tr(),
-          style: context.textTheme.headlineSmall,
-        ),
-        Dimens.size16.wBox(),
-        Padding(
-          padding: EdgeInsets.only(right: Dimens.size16),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: Dimens.size16,
-            children: [
-              SizedBox(
-                width: Dimens.size400,
-                child: StreamDataConsumer(
-                  streamData: configureViewModel.enableNameTemplate,
-                  builder: (context, data) {
-                    return TextField(
-                      enabled: false,
-                      controller: configureViewModel.nameController,
-                      decoration: InputDecoration(
-                        hintText: AppLang.messagesEnterTemplateNameHint.tr(),
-                        labelText: AppLang.labelsTemplateName.tr(),
-                        border: OutlineInputBorder(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () => configureViewModel.edit(context),
-                child: Text(AppLang.actionsConfirm.tr()),
-              ),
-            ],
+          style: context.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
           ),
+        ),
+        const Spacer(),
+        SizedBox(
+          width: Dimens.size300,
+          child: TextField(
+            enabled: false,
+            controller: configureViewModel.nameController,
+            decoration: InputDecoration(
+              labelText: AppLang.labelsTemplateName.tr(),
+              isDense: true,
+            ),
+          ),
+        ),
+        Dimens.spacing.horizontal(Dimens.size16),
+        ElevatedButton(
+          onPressed: () => configureViewModel.edit(context),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: context.colorScheme.primary,
+            foregroundColor: context.colorScheme.onPrimary,
+            shape: RoundedRectangleBorder(
+              borderRadius: Dimens.radii.borderMedium(),
+            ),
+          ),
+          child: Text(AppLang.actionsConfirm.tr()),
         ),
       ],
     );
   }
 
-  Expanded configureTable() {
-    return Expanded(
-      child: Padding(
-        padding: EdgeInsets.only(left: Dimens.size16, right: Dimens.size32),
-        child: StreamDataConsumer(
-          streamData: configureViewModel.fieldsData,
-          builder: (context, data) {
-            return CustomScrollableTable(data: data);
-          },
+  Widget configureTable(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: Dimens.radii.borderLarge(),
+        border: Border.all(
+          color: context.colorScheme.outlineVariant.withOpacity(0.5),
         ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: StreamDataConsumer(
+        streamData: configureViewModel.fieldsData,
+        builder: (context, data) {
+          return CustomScrollableTable(data: data);
+        },
       ),
     );
   }

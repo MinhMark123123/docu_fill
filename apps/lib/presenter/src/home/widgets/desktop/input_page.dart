@@ -1,7 +1,5 @@
-import 'package:adaptive_layout/adaptive_layout.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/presenter/src/home/view_model/fields_input_view_model.dart';
-import 'package:docu_fill/presenter/src/home/widgets/mobile/field_input_mobile.dart';
 import 'package:docu_fill/route/routers.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -38,10 +36,7 @@ class InputPage extends BaseView<FieldsInputViewModel> {
   Widget build(BuildContext context, FieldsInputViewModel viewModel) {
     return Scaffold(
       backgroundColor: context.appColors?.containerBackground,
-      body: AdaptiveLayout(
-        smallLayout: const FieldInputMobile(),
-        mediumLayout: const FieldInputDesktop(),
-      ),
+      body: const FieldInputDesktop(),
     );
   }
 }

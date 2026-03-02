@@ -21,17 +21,7 @@ class TemplatesCollectionDesktop extends StatelessWidget {
   }
 
   Expanded templateBox(BuildContext context) {
-    return Expanded(
-      child: Theme(
-        data: context.theme.copyWith(
-          cardTheme: context.theme.cardTheme.copyWith(
-            color: Colors.white,
-            elevation: Dimens.size4,
-          ),
-        ),
-        child: templateList(),
-      ),
-    );
+    return Expanded(child: templateList());
   }
 
   Widget templateList() {

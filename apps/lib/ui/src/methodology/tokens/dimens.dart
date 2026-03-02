@@ -227,6 +227,8 @@ class Dimens {
 
   static double get size232 => 232.w;
 
+  static double get size300 => 300.w;
+
   // Add more dimensions as needed
 }
 
