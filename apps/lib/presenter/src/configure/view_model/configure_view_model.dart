@@ -107,6 +107,7 @@ class ConfigureViewModel extends BaseViewModel {
         isRequired: e.required,
         defaultValue: e.defaultValue,
         additionalInfo: e.additionalInfo,
+        section: e.section,
       ),
     );
     _fieldsData.postValue(fields.toList());
@@ -123,6 +124,7 @@ class ConfigureViewModel extends BaseViewModel {
         isRequired: e.required,
         defaultValue: e.defaultValue,
         additionalInfo: e.additionalInfo,
+        section: e.section,
       ),
     );
     final fieldsClone = List<TableRowData>.from(_fieldsData.data);
@@ -199,6 +201,7 @@ class ConfigureViewModel extends BaseViewModel {
             isRequired: e.required,
             defaultValue: e.defaultValue,
             additionalInfo: e.additionalInfo,
+            section: e.section,
           ),
         );
         _fieldsData.postValue(fields.toList());
@@ -287,6 +290,12 @@ class ConfigureViewModel extends BaseViewModel {
 
   Future<void> updateInputType(String key, {FieldType? inputType}) async {
     updateFieldData(key, fieldOfKey(key).copyWith(inputType: inputType));
+    notifyDataChanged();
+    await checkEnableConfirm();
+  }
+
+  Future<void> updateSection(String key, {String? section}) async {
+    updateFieldData(key, fieldOfKey(key).copyWith(section: section));
     notifyDataChanged();
     await checkEnableConfirm();
   }

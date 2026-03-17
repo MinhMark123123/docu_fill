@@ -76,46 +76,47 @@ class TemplateService {
     return jsonDecode(content);
   }
 
-  Map<int, List<TemplateField>> groupFields(List<TemplateConfig> templates) {
-    final rawData = <int, List<TemplateField>>{};
+  Map<String, List<TemplateField>> groupFields(List<TemplateConfig> templates) {
+    if (templates.isEmpty) return {};
 
-    if (templates.length == 1) {
-      final template = templates.first;
-      rawData[template.id] = template.fields;
-      return rawData;
+    final groupedData = <String, List<TemplateField>>{};
+
+    // 1. Identify common fields (only if multiple templates)
+    Set<String> commonKeys = {};
+    if (templates.length > 1) {
+      final allFieldKeys = templates.expand((t) => t.fields.map((f) => f.key));
+      final keyFrequency = allFieldKeys.fold(<String, int>{}, (map, key) {
+        map[key] = (map[key] ?? 0) + 1;
+        return map;
+      });
+      commonKeys =
+          keyFrequency.entries
+              .where((e) => e.value == templates.length)
+              .map((e) => e.key)
+              .toSet();
+
+      if (commonKeys.isNotEmpty) {
+        groupedData[AppLang.labelsCommon.tr()] = [];
+      }
     }
 
-    // Identify common keys across all templates
-    final allFieldKeys = templates.expand((t) => t.fields.map((f) => f.key));
-    final keyFrequency = allFieldKeys.fold(<String, int>{}, (map, key) {
-      map[key] = (map[key] ?? 0) + 1;
-      return map;
-    });
-    final commonKeys =
-        keyFrequency.entries
-            .where((e) => e.value == templates.length)
-            .map((e) => e.key)
-            .toSet();
-
-    rawData[AppConst.commonUnknow] = [];
-
+    // 2. Group fields by section
     for (var template in templates) {
-      final specificFields = <TemplateField>[];
-
       for (var field in template.fields) {
         if (commonKeys.contains(field.key)) {
-          // Add to common section only if not already added (based on key)
-          final commonList = rawData[AppConst.commonUnknow]!;
+          final commonList = groupedData[AppLang.labelsCommon.tr()]!;
           if (!commonList.any((e) => e.key == field.key)) {
             commonList.add(field);
           }
-        } else {
-          specificFields.add(field);
+          continue;
         }
+
+        final sectionName = field.section ?? AppLang.labelsGeneral.tr();
+        groupedData.putIfAbsent(sectionName, () => []).add(field);
       }
-      rawData[template.id] = specificFields;
     }
-    return rawData;
+
+    return groupedData;
   }
 
   List<String> validateFields(
@@ -166,9 +167,10 @@ class TemplateService {
     final processedFieldKeys = _processFields(templates, fieldKeys);
 
     // 2. Extract image replacements
+    final Map<String, String> fieldKeysForImages = Map.from(processedFieldKeys);
     final imageReplacements = getImageReplacements(
       composedUI: composedUI,
-      fieldKeys: processedFieldKeys,
+      fieldKeys: fieldKeysForImages,
     );
 
     // 3. Run individual template exports

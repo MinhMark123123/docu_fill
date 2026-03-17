@@ -13,10 +13,13 @@ import 'cell_field_name.dart';
 import 'cell_field_options.dart';
 import 'cell_field_required.dart';
 
+import 'cell_field_section.dart';
+
 enum TableColumn {
   fieldKey,
   isRequired,
   fieldName,
+  section,
   inputType,
   defaultValue,
   options;
@@ -30,10 +33,12 @@ enum TableColumn {
       case 2:
         return TableColumn.fieldName;
       case 3:
-        return TableColumn.inputType;
+        return TableColumn.section;
       case 4:
-        return TableColumn.defaultValue;
+        return TableColumn.inputType;
       case 5:
+        return TableColumn.defaultValue;
+      case 6:
         return TableColumn.options;
       default:
         return TableColumn.isRequired;
@@ -46,6 +51,8 @@ enum TableColumn {
         return AppLang.labelsFieldKey.tr();
       case TableColumn.fieldName:
         return AppLang.labelsFieldName.tr();
+      case TableColumn.section:
+        return AppLang.labelsSection.tr();
       case TableColumn.inputType:
         return AppLang.labelsInputType.tr();
       case TableColumn.options:
@@ -72,6 +79,8 @@ enum TableColumn {
         return cellBox(child: CellFieldKey(data: data));
       case TableColumn.fieldName:
         return cellBox(child: CellFieldName(data: data));
+      case TableColumn.section:
+        return cellBox(child: CellFieldSection(data: data));
       case TableColumn.inputType:
         return cellBox(child: CellFieldInput(data: data));
       case TableColumn.options:
@@ -104,6 +113,7 @@ class CustomScrollableTable extends StatelessWidget {
     FixedSpanExtent(Dimens.size180),
     FixedSpanExtent(Dimens.size94),
     FixedSpanExtent(Dimens.size232),
+    FixedSpanExtent(Dimens.size180), // For Section
     FixedSpanExtent(Dimens.size150),
     FixedSpanExtent(Dimens.size232),
     RemainingSpanExtent(),

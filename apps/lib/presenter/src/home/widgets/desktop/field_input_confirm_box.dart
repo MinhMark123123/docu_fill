@@ -25,42 +25,58 @@ class FieldInputConfirmBox extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            spacing: Dimens.size24,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: Dimens.size16,
-                  children: [folderPicker(context), nameDocExported(context)],
-                ),
-              ),
-              Container(
-                width: 1,
-                height: Dimens.size80,
-                color: context.colorScheme.outlineVariant.withOpacity(0.5),
-              ),
-              exportButton(context),
-            ],
-          ),
           StreamDataConsumer(
-            streamData: viewModel.missingKeys,
-            builder: (context, data) {
-              if (data.isEmpty) return const SizedBox.shrink();
-              return Padding(
-                padding: EdgeInsets.only(top: Dimens.size16),
-                child: missingKeys(context, data),
+            streamData: viewModel.showSummary,
+            builder: (context, showSummary) {
+              if (!showSummary) return _buildQuickActions(context);
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    spacing: Dimens.size24,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: Dimens.size16,
+                          children: [
+                            _buildFolderPicker(context),
+                            _buildNameInput(context),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: 1,
+                        height: Dimens.size80,
+                        color: context.colorScheme.outlineVariant.withOpacity(
+                          0.5,
+                        ),
+                      ),
+                      _buildExportButton(context),
+                    ],
+                  ),
+                  StreamDataConsumer(
+                    streamData: viewModel.missingKeys,
+                    builder: (context, data) {
+                      if (data.isEmpty) return const SizedBox.shrink();
+                      return Padding(
+                        padding: EdgeInsets.only(top: Dimens.size16),
+                        child: _buildMissingKeys(context, data),
+                      );
+                    },
+                  ),
+                  Dimens.spacing.vertical(Dimens.size20),
+                  _buildQuickActions(context),
+                ],
               );
             },
           ),
-          Dimens.spacing.vertical(Dimens.size20),
-          copyBox(context),
         ],
       ),
     );
   }
 
-  Widget copyBox(BuildContext context) {
+  Widget _buildQuickActions(BuildContext context) {
     return Row(
       spacing: Dimens.size12,
       children: [
@@ -96,7 +112,7 @@ class FieldInputConfirmBox extends StatelessWidget {
     );
   }
 
-  Widget folderPicker(BuildContext context) {
+  Widget _buildFolderPicker(BuildContext context) {
     return StreamDataConsumer(
       streamData: viewModel.directoryExported,
       builder: (context, data) {
@@ -160,7 +176,7 @@ class FieldInputConfirmBox extends StatelessWidget {
     );
   }
 
-  Widget nameDocExported(BuildContext context) {
+  Widget _buildNameInput(BuildContext context) {
     return TextField(
       controller: viewModel.nameDocExported,
       onChanged: (_) => viewModel.checkValidate(),
@@ -172,7 +188,7 @@ class FieldInputConfirmBox extends StatelessWidget {
     );
   }
 
-  Widget exportButton(BuildContext context) {
+  Widget _buildExportButton(BuildContext context) {
     return StreamDataConsumer(
       streamData: viewModel.enableExported,
       builder: (context, data) {
@@ -194,7 +210,7 @@ class FieldInputConfirmBox extends StatelessWidget {
     );
   }
 
-  Widget missingKeys(BuildContext context, List<String> data) {
+  Widget _buildMissingKeys(BuildContext context, List<String> data) {
     String content =
         data.length > 3
             ? "${data.sublist(0, 3).join(", ")}, ..."

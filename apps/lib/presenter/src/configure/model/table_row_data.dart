@@ -9,6 +9,7 @@ class TableRowData {
   bool isRequired;
   String? additionalInfo;
   String? defaultValue;
+  String? section;
 
   TableRowData({
     required this.fieldKey,
@@ -18,6 +19,7 @@ class TableRowData {
     this.isRequired = false,
     this.additionalInfo,
     this.defaultValue,
+    this.section,
   });
 
   TableRowData copyWith({
@@ -28,6 +30,7 @@ class TableRowData {
     bool? isRequired,
     String? additionalInfo,
     String? defaultValue,
+    String? section,
   }) {
     return TableRowData(
       fieldKey: fieldKey ?? this.fieldKey,
@@ -37,6 +40,7 @@ class TableRowData {
       isRequired: isRequired ?? this.isRequired,
       additionalInfo: additionalInfo ?? this.additionalInfo,
       defaultValue: defaultValue ?? this.defaultValue,
+      section: section ?? this.section,
     );
   }
 
@@ -48,6 +52,7 @@ class TableRowData {
       isRequired: isRequired,
       additionalInfo: additionalInfo,
       defaultValue: defaultValue,
+      section: section,
     );
   }
 
@@ -60,6 +65,7 @@ class TableRowData {
       required: isRequired,
       additionalInfo: additionalInfo,
       defaultValue: defaultValue,
+      section: section,
     );
   }
 }

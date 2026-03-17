@@ -105,6 +105,9 @@ abstract class AppLang {
   static const String labelsHeight = "labels.height";
   static const String labelsUnit = "labels.unit";
   static const String labelsCm = "labels.cm";
+  static const String labelsCommon = "Common";
+  static const String labelsGeneral = "General";
+  static const String labelsSection = "Section";
 
   // --- Messages ---
   static const String messagesReviewAndConfigureFields =

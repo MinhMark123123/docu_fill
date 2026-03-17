@@ -31,11 +31,41 @@ class FieldsInputViewModel extends BaseViewModel {
   @Bind()
   late final _directoryExported = "".mtd(this);
   @Bind()
-  late final _composedTemplateUI = <int, List<TemplateField>>{}.mtd(this);
+  late final _composedTemplateUI = <String, List<TemplateField>>{}.mtd(this);
   @Bind()
   late final _idsSelected = List<int>.empty().mtd(this);
   @Bind()
   late final _missingKeys = List<String>.empty().mtd(this);
+  @Bind()
+  late final _currentSectionIndex = 0.mtd(this);
+  @Bind()
+  late final _showSummary = false.mtd(this);
+
+  List<String> get sections => _composedTemplateUI.data.keys.toList();
+
+  String get currentSection =>
+      sections.isNotEmpty ? sections[_currentSectionIndex.data] : "";
+
+  void updateCurrentSectionIndex(int index) {
+    _showSummary.postValue(false);
+    _currentSectionIndex.postValue(index);
+  }
+
+  void nextSection() {
+    if (_currentSectionIndex.data < sections.length - 1) {
+      _currentSectionIndex.postValue(_currentSectionIndex.data + 1);
+    } else {
+      _showSummary.postValue(true);
+    }
+  }
+
+  void previousSection() {
+    if (_showSummary.data) {
+      _showSummary.postValue(false);
+    } else if (_currentSectionIndex.data > 0) {
+      _currentSectionIndex.postValue(_currentSectionIndex.data - 1);
+    }
+  }
 
   final TextEditingController _nameDocExported = TextEditingController();
 
@@ -170,9 +200,8 @@ class FieldsInputViewModel extends BaseViewModel {
     _enableEditNameDoc.postValue(false);
   }
 
-  String getTemplateName(int templateId) {
-    if (_templates.data.isEmpty) return AppConst.empty;
-    return _templates.data.firstWhere((e) => e.id == templateId).templateName;
+  String getSectionName(String sectionKey) {
+    return sectionKey;
   }
 
   Future<void> useCopy() async {
@@ -183,10 +212,10 @@ class FieldsInputViewModel extends BaseViewModel {
       );
       if (result == null || result.files.single.path == null) return;
 
-      final cloned = Map<int, List<TemplateField>>.from(
+      final cloned = Map<String, List<TemplateField>>.from(
         _composedTemplateUI.data,
       );
-      _composedTemplateUI.postValue(<int, List<TemplateField>>{});
+      _composedTemplateUI.postValue(<String, List<TemplateField>>{});
 
       final file = File(result.files.single.path!);
       final String content = await file.readAsString();

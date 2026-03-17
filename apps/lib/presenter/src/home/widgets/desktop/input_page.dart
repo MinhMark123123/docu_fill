@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
+import '../mobile/field_input_mobile.dart';
 import 'field_input_desktop.dart';
 
 class InputPage extends BaseView<FieldsInputViewModel> {
@@ -34,9 +35,11 @@ class InputPage extends BaseView<FieldsInputViewModel> {
 
   @override
   Widget build(BuildContext context, FieldsInputViewModel viewModel) {
+    final isDesktop = MediaQuery.of(context).size.width > 900;
     return Scaffold(
       backgroundColor: context.appColors?.containerBackground,
-      body: const FieldInputDesktop(),
+      appBar: !isDesktop ? AppBar(title: Text("Template Fill")) : null,
+      body: isDesktop ? const FieldInputDesktop() : const FieldInputMobile(),
     );
   }
 }
