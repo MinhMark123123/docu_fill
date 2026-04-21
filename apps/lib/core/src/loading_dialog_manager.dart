@@ -11,24 +11,42 @@ class LoadingDialogManager {
   LoadingDialogManager._internal();
 
   BuildContext? _context;
+  bool _isShowing = false;
 
   void showLoadingDialog(BuildContext context) {
-    if (_context != null) return;
+    if (_isShowing) return;
+    _isShowing = true;
 
-    print("----------------> show dialog");
     showGeneralDialog(
       context: context,
       barrierDismissible: false,
-      pageBuilder: (context, _, _) {
-        _context = context;
-        return Center(child: CircularProgressIndicator());
+      pageBuilder: (dialogContext, _, _) {
+        _context = dialogContext;
+        // If closeLoadingDialog was already called while the dialog was opening,
+        // we should close it as soon as we have a context.
+        if (!_isShowing) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (_context != null && _context!.mounted) {
+              Navigator.of(_context!).pop();
+              _context = null;
+            }
+          });
+        }
+        return const Center(child: CircularProgressIndicator());
       },
-    );
+    ).then((_) {
+      // Ensure state is reset when the dialog is dismissed for any reason.
+      _isShowing = false;
+      _context = null;
+    });
   }
 
   void closeLoadingDialog() {
-    if (_context == null || _context?.mounted == false) return;
-    Navigator.of(_context!).pop();
-    _context = null;
+    _isShowing = false;
+    if (_context != null && _context!.mounted) {
+      Navigator.of(_context!).pop();
+      _context = null;
+    }
   }
 }
+

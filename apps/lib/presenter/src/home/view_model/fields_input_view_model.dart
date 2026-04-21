@@ -211,56 +211,60 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   Future<void> useCopy() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['json'],
-      );
-      if (result == null || result.files.single.path == null) return;
+    await loadingGuard(Future(() async {
+      try {
+        FilePickerResult? result = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: ['json'],
+        );
+        if (result == null || result.files.single.path == null) return;
 
-      final cloned = Map<String, List<TemplateField>>.from(
-        _composedTemplateUI.data,
-      );
-      _composedTemplateUI.postValue(<String, List<TemplateField>>{});
+        final cloned = Map<String, List<TemplateField>>.from(
+          _composedTemplateUI.data,
+        );
+        _composedTemplateUI.postValue(<String, List<TemplateField>>{});
 
-      final file = File(result.files.single.path!);
-      final String content = await file.readAsString();
-      final Map<String, dynamic> data = _templateService.parseCopyData(content);
+        final file = File(result.files.single.path!);
+        final String content = await file.readAsString();
+        final Map<String, dynamic> data =
+            _templateService.parseCopyData(content);
 
-      final listTemplates = <TemplateField>[];
-      final currentKeys = cloned.values.fold(listTemplates, (a, b) {
-        a.addAll(b);
-        return a;
-      });
-      final keysCompare = currentKeys.asMap().map(
-        (key, e) => MapEntry(e.key, e),
-      );
-
-      if (data['fields'] != null) {
-        final fields = Map<String, dynamic>.from(data['fields']);
-        fields.forEach((key, value) {
-          if (value != null && keysCompare.containsKey(key)) {
-            _fieldKeys[key] = value.toString();
-          }
+        final listTemplates = <TemplateField>[];
+        final currentKeys = cloned.values.fold(listTemplates, (a, b) {
+          a.addAll(b);
+          return a;
         });
-      }
+        final keysCompare = currentKeys.asMap().map(
+          (key, e) => MapEntry(e.key, e),
+        );
 
-      if (data['singleLines'] != null) {
-        final singles = Map<String, dynamic>.from(data['singleLines']);
-        singles.forEach((key, value) {
-          if (value != null && keysCompare.containsKey(key)) {
-            _singleField[key] = value.toString();
-          }
-        });
+        if (data['fields'] != null) {
+          final fields = Map<String, dynamic>.from(data['fields']);
+          fields.forEach((key, value) {
+            if (value != null && keysCompare.containsKey(key)) {
+              _fieldKeys[key] = value.toString();
+            }
+          });
+        }
+
+        if (data['singleLines'] != null) {
+          final singles = Map<String, dynamic>.from(data['singleLines']);
+          singles.forEach((key, value) {
+            if (value != null && keysCompare.containsKey(key)) {
+              _singleField[key] = value.toString();
+            }
+          });
+        }
+        _composedTemplateUI.postValue(cloned);
+        await checkValidate();
+        showSnackbar(AppLang.loadCopySuccess.tr());
+      } catch (e) {
+        debugPrint("Error using copy: $e");
+        showSnackbar(AppLang.loadCopyError.tr());
       }
-      _composedTemplateUI.postValue(cloned);
-      await checkValidate();
-      showSnackbar(AppLang.loadCopySuccess.tr());
-    } catch (e) {
-      debugPrint("Error using copy: $e");
-      showSnackbar(AppLang.loadCopyError.tr());
-    }
+    }));
   }
+
 
   Future<void> createCopy() async {
     try {
@@ -349,8 +353,10 @@ class FieldsInputViewModel extends BaseViewModel {
       );
     } catch (e) {
       debugPrint("Error importing from file: $e");
-      showSnackbar("Error: ${e.toString()}");
+      final errorMessage = e.toString().replaceFirst('Exception: ', '');
+      showSnackbar("Error: $errorMessage");
     }
+
   }
 
 }

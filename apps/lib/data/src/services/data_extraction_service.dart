@@ -43,7 +43,8 @@ class DataExtractionService {
         if (sheet == null) continue;
 
         for (var row in sheet.rows) {
-          final rowData = row.map((cell) => cell?.value?.toString() ?? '').join(' | ');
+          final rowData =
+              row.map((cell) => cell?.value?.toString() ?? '').join(' | ');
           if (rowData.trim().isNotEmpty) {
             buffer.writeln(rowData);
           }
@@ -52,9 +53,16 @@ class DataExtractionService {
       return buffer.toString();
     } catch (e) {
       debugPrint('Error extracting from Excel: $e');
-      return '';
+      if (e.toString().contains('numFmtId')) {
+        throw Exception(
+          'Excel Format Error: This file uses a number format that is currently unsupported. '
+          'Please try opening the file in Microsoft Excel and "Saving As" a new .xlsx file to resolve this.',
+        );
+      }
+      rethrow;
     }
   }
+
 
   Future<String> _extractFromPdf(File file) async {
     try {
