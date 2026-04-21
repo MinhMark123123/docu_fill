@@ -134,7 +134,7 @@ class TemplateService {
   }
 
   Map<String, (String, Size)> getImageReplacements({
-    required Map<int, List<TemplateField>> composedUI,
+    required Map<String, List<TemplateField>> composedUI,
     required Map<String, String> fieldKeys,
   }) {
     final allFields = composedUI.values.expand((element) => element);
@@ -161,7 +161,7 @@ class TemplateService {
     required String baseFileName,
     required Map<String, String?> fieldKeys,
     required Map<String, String?> singleLines,
-    required Map<int, List<TemplateField>> composedUI,
+    required Map<String, List<TemplateField>> composedUI,
   }) async {
     // 1. Prepare data (Date formatting, defaults)
     final processedFieldKeys = _processFields(templates, fieldKeys);

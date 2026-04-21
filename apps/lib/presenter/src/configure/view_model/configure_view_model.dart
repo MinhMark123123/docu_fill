@@ -527,18 +527,19 @@ class ShowUseSettingDialogEvent extends ShowDialogEvent<void> {
 
   @override
   ShowUseSettingDialogEvent copyWith({
-    String? titleLarge,
+    String? title,
     String? content,
     List<DialogAction>? actions,
     List<TemplateConfig>? listTemplate,
-    Function(void completeData)? onCompleted,
+    Function(void)? onCompleted,
   }) {
     return ShowUseSettingDialogEvent(
       listTemplate: listTemplate ?? this.listTemplate,
-      title: title ?? title,
+      title: title ?? this.title,
       content: content ?? this.content,
       actions: actions ?? this.actions,
       onCompleted: onCompleted ?? this.onCompleted,
     );
   }
+
 }

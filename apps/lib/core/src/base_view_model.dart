@@ -95,5 +95,4 @@ class BaseViewModel extends ViewModel {
       _showLoading.postValue(false);
     }
   }
-
 }

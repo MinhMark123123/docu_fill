@@ -19,10 +19,11 @@ class SettingViewModel extends BaseViewModel {
   final TextEditingController apiKeyController = TextEditingController();
 
   @override
-  void onInit() {
-    super.onInit();
+  void onInitState() {
+    super.onInitState();
     loadSettings();
   }
+
 
   Future<void> loadSettings() async {
     final settings = await _settingsRepository.getSettings();

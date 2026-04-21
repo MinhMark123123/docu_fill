@@ -1,7 +1,7 @@
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/ui/ui.dart';
+import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
 import 'view_model/setting_view_model.dart';
 
@@ -21,9 +21,7 @@ class SettingPage extends BaseView<SettingViewModel> {
         padding: EdgeInsets.all(Dimens.size24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildGeminiSection(context, viewModel),
-          ],
+          children: [_buildGeminiSection(context, viewModel)],
         ),
       ),
     );

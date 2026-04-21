@@ -308,10 +308,14 @@ class FieldsInputViewModel extends BaseViewModel {
       await loadingGuard(
         Future(() async {
           final file = File(result.files.single.path!);
-          final extractedText = await _dataExtractionService.extractText(file);
+          final extractedText = await _dataExtractionService.extractText(
+            file,
+          );
 
           if (extractedText.isEmpty) {
-            throw Exception('Could not extract any text from the selected file.');
+            throw Exception(
+              'Could not extract any text from the selected file.',
+            );
           }
 
           final allFields = _templates.data.expand((t) => t.fields).toList();
@@ -348,4 +352,5 @@ class FieldsInputViewModel extends BaseViewModel {
       showSnackbar("Error: ${e.toString()}");
     }
   }
+
 }
