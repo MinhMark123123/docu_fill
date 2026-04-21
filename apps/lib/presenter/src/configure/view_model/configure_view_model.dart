@@ -527,7 +527,7 @@ class ShowUseSettingDialogEvent extends ShowDialogEvent<void> {
 
   @override
   ShowUseSettingDialogEvent copyWith({
-    String? title,
+    String? titleLarge,
     String? content,
     List<DialogAction>? actions,
     List<TemplateConfig>? listTemplate,
@@ -535,7 +535,7 @@ class ShowUseSettingDialogEvent extends ShowDialogEvent<void> {
   }) {
     return ShowUseSettingDialogEvent(
       listTemplate: listTemplate ?? this.listTemplate,
-      title: title ?? this.title,
+      title: title ?? title,
       content: content ?? this.content,
       actions: actions ?? this.actions,
       onCompleted: onCompleted ?? this.onCompleted,

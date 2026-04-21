@@ -2,3 +2,14 @@ name: docu_fill
 packages:
   - apps/*
   - packages/*
+
+scripts:
+  build:
+    run: melos exec -- "dart run build_runner build --delete-conflicting-outputs"
+    description: "Run build_runner build for all packages."
+    packageFilters:
+      dependsOn: build_runner
+
+  get:
+    run: melos exec -- "flutter pub get"
+    description: "Run flutter pub get for all packages."

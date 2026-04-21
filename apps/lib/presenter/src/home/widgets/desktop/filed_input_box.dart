@@ -325,7 +325,7 @@ class FiledInputBox extends StatelessWidget {
                     vertical: Dimens.size8,
                   ),
                   decoration: BoxDecoration(
-                    color: context.colorScheme.surfaceVariant.withOpacity(0.3),
+                    color: context.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     borderRadius: Dimens.radii.borderMedium(),
                   ),
                   child: Column(

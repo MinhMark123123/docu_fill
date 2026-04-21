@@ -15,12 +15,18 @@ part 'fields_input_view_model.g.dart';
 class FieldsInputViewModel extends BaseViewModel {
   final TemplateRepository _templateRepository;
   final TemplateService _templateService;
+  final DataExtractionService _dataExtractionService;
+  final GeminiService _geminiService;
 
   FieldsInputViewModel({
     required TemplateRepository templateRepository,
     required TemplateService templateService,
+    required DataExtractionService dataExtractionService,
+    required GeminiService geminiService,
   }) : _templateRepository = templateRepository,
-       _templateService = templateService;
+       _templateService = templateService,
+       _dataExtractionService = dataExtractionService,
+       _geminiService = geminiService;
 
   @Bind()
   late final _templates = List<TemplateConfig>.empty().mtd(this);
@@ -288,6 +294,58 @@ class FieldsInputViewModel extends BaseViewModel {
     } catch (e) {
       debugPrint("Error creating copy: $e");
       showSnackbar(AppLang.createCopyError.tr(args: [e.toString()]));
+    }
+  }
+
+  Future<void> importFromFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'docx', 'xlsx', 'xls'],
+      );
+      if (result == null || result.files.single.path == null) return;
+
+      await loadingGuard(
+        Future(() async {
+          final file = File(result.files.single.path!);
+          final extractedText = await _dataExtractionService.extractText(file);
+
+          if (extractedText.isEmpty) {
+            throw Exception('Could not extract any text from the selected file.');
+          }
+
+          final allFields = _templates.data.expand((t) => t.fields).toList();
+          final templateConfig = {for (var f in allFields) f.key: ""};
+
+          final mappedData = await _geminiService.mapTextToTemplate(
+            rawText: extractedText,
+            templateConfig: templateConfig,
+          );
+
+          final cloned = Map<String, List<TemplateField>>.from(
+            _composedTemplateUI.data,
+          );
+          _composedTemplateUI.postValue(<String, List<TemplateField>>{});
+
+          for (var field in allFields) {
+            final value = mappedData[field.key];
+            if (value != null && value.isNotEmpty) {
+              if (field.type == FieldType.singleLine) {
+                _singleField[field.key] = value;
+              } else {
+                _fieldKeys[field.key] = value;
+              }
+            }
+          }
+
+          _composedTemplateUI.postValue(cloned);
+          await checkValidate();
+          showSnackbar("Form auto-filled from file successfully!");
+        }),
+      );
+    } catch (e) {
+      debugPrint("Error importing from file: $e");
+      showSnackbar("Error: ${e.toString()}");
     }
   }
 }

@@ -108,6 +108,16 @@ class FieldInputConfirmBox extends StatelessWidget {
             ),
           ),
         ),
+        OutlinedButton.icon(
+          onPressed: () => viewModel.importFromFile(),
+          icon: const Icon(Icons.auto_awesome, size: 16),
+          label: Text(AppLang.actionsImportData.tr()),
+          style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: Dimens.radii.borderMedium(),
+            ),
+          ),
+        ),
       ],
     );
   }

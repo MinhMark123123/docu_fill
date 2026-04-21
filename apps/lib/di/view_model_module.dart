@@ -13,13 +13,15 @@ void setupViewModelModule() {
     () =>
         HomeViewModel(templateRepository: inject(), templateService: inject()),
   );
-  registerViewModel(() => SettingViewModel());
+  registerViewModel(() => SettingViewModel(settingsRepository: inject()));
   registerViewModel(() => UploadViewModel());
   registerViewModel(() => ConfigureViewModel(templateRepository: inject()));
-  registerViewModel(
+  sl.registerFactory<FieldsInputViewModel>(
     () => FieldsInputViewModel(
       templateRepository: inject(),
       templateService: inject(),
+      dataExtractionService: inject(),
+      geminiService: inject(),
     ),
   );
 }

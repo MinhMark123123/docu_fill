@@ -17,7 +17,7 @@ class IsarDatabase {
   Future<void> initialize() async {
     final dir = await getApplicationDocumentsDirectory();
     _isar = await Isar.open(
-      [TemplateConfigModelSchema],
+      [TemplateConfigModelSchema, AppSettingsModelSchema],
       directory: dir.path,
       name: 'docu_fill',
     );

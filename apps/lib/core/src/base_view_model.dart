@@ -96,8 +96,4 @@ class BaseViewModel extends ViewModel {
     }
   }
 
-  @override
-  void onDispose() {
-    super.onDispose();
-  }
 }
