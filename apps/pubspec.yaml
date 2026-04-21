@@ -32,7 +32,7 @@ dependencies:
   archive: ^3.3.6
   image_picker: ^1.2.0
   google_generative_ai: ^0.4.5
-  excel: ^4.1.0
+  spreadsheet_decoder: ^2.3.0
   syncfusion_flutter_pdf: ^28.2.3
   #architec
   maac_mvvm_with_get_it: ^0.2.1+2

@@ -1,3 +1,4 @@
+import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/ui/ui.dart';
 import 'package:docu_fill/utils/utils.dart';
@@ -13,7 +14,7 @@ class SettingPage extends BaseView<SettingViewModel> {
     return Scaffold(
       backgroundColor: context.appColors?.containerBackground,
       appBar: AppBar(
-        title: const Text("Settings"),
+        title: Text(AppLang.labelsSettings.tr()),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
@@ -21,7 +22,63 @@ class SettingPage extends BaseView<SettingViewModel> {
         padding: EdgeInsets.all(Dimens.size24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildGeminiSection(context, viewModel)],
+          children: [
+            _buildGeneralSection(context, viewModel),
+            Dimens.spacing.vertical(Dimens.size24),
+            _buildGeminiSection(context, viewModel),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGeneralSection(
+    BuildContext context,
+    SettingViewModel viewModel,
+  ) {
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: Dimens.radii.borderMedium()),
+      child: Padding(
+        padding: EdgeInsets.all(Dimens.size24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.settings, color: context.colorScheme.primary),
+                Dimens.spacing.horizontal(Dimens.size12),
+                Text(
+                  AppLang.settingsGeneralTitle.tr(),
+                  style: context.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            Dimens.spacing.vertical(Dimens.size16),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(AppLang.settingsGeneralLanguage.tr()),
+              trailing: DropdownButton<Locale>(
+                value: context.locale,
+                onChanged: (Locale? newLocale) {
+                  if (newLocale != null) {
+                    viewModel.changeLocale(context, newLocale);
+                  }
+                },
+                items: [
+                  DropdownMenuItem(
+                    value: const Locale('en', 'US'),
+                    child: Text(AppLang.settingsGeneralEnglish.tr()),
+                  ),
+                  DropdownMenuItem(
+                    value: const Locale('vi', 'VN'),
+                    child: Text(AppLang.settingsGeneralVietnamese.tr()),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -40,7 +97,7 @@ class SettingPage extends BaseView<SettingViewModel> {
                 Icon(Icons.auto_awesome, color: context.colorScheme.primary),
                 Dimens.spacing.horizontal(Dimens.size12),
                 Text(
-                  "Gemini AI Configuration",
+                  AppLang.settingsGeminiTitle.tr(),
                   style: context.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -48,28 +105,67 @@ class SettingPage extends BaseView<SettingViewModel> {
               ],
             ),
             Dimens.spacing.vertical(Dimens.size16),
-            const Text(
-              "In order to use the 'Import from File' feature, you need to provide a Gemini API Key.",
-              style: TextStyle(height: 1.5),
+            Text(
+              AppLang.messagesGeminiConfigDesc.tr(),
+              style: const TextStyle(height: 1.5),
             ),
             Dimens.spacing.vertical(Dimens.size24),
             TextField(
               controller: viewModel.apiKeyController,
-              decoration: const InputDecoration(
-                labelText: "Gemini API Key",
-                hintText: "Enter your API key here",
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.key),
+              decoration: InputDecoration(
+                labelText: AppLang.settingsGeminiApiKey.tr(),
+                hintText: AppLang.messagesGeminiApiKeyHint.tr(),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.key),
               ),
               obscureText: true,
+            ),
+            Dimens.spacing.vertical(Dimens.size24),
+            Text(
+              AppLang.settingsGeminiModel.tr(),
+              style: context.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Dimens.spacing.vertical(Dimens.size8),
+            Text(
+              AppLang.messagesGeminiModelDesc.tr(),
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            Dimens.spacing.vertical(Dimens.size12),
+            StreamDataConsumer(
+              streamData: viewModel.selectedModel,
+              builder: (context, String selectedModel) {
+                return DropdownButtonFormField<String>(
+                  value: selectedModel,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                  onChanged: (String? newValue) {
+                    viewModel.onModelSelected(newValue);
+                  },
+                  items:
+                      viewModel.availableModels.map<DropdownMenuItem<String>>((
+                        String value,
+                      ) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                );
+              },
             ),
             Dimens.spacing.vertical(Dimens.size24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () => viewModel.saveSettings(),
+                onPressed: () => viewModel.saveGeminiApiKey(),
                 icon: const Icon(Icons.save),
-                label: const Text("Save Gemini Settings"),
+                label: Text(AppLang.settingsGeminiSaveBtn.tr()),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.all(Dimens.size16),
                   shape: RoundedRectangleBorder(

@@ -16,13 +16,13 @@ class GeminiService {
     final apiKey = settings?.geminiApiKey;
 
     if (apiKey == null || apiKey.isEmpty) {
-      throw Exception('Gemini API Key is not configured. Please set it in settings.');
+      throw Exception(
+        'Gemini API Key is not configured. Please set it in settings.',
+      );
     }
 
-    final model = GenerativeModel(
-      model: 'gemini-1.5-flash',
-      apiKey: apiKey,
-    );
+    final modelName = settings?.geminiModel ?? 'gemini-1.5-flash';
+    final model = GenerativeModel(model: modelName, apiKey: apiKey);
 
     final fieldKeys = templateConfig.keys.toList();
 
@@ -66,7 +66,9 @@ JSON OUTPUT:
       }
       throw Exception('Could not find JSON in Gemini response');
     } catch (e) {
-      throw Exception('Failed to parse Gemini response: $e\nResponse: $responseText');
+      throw Exception(
+        'Failed to parse Gemini response: $e\nResponse: $responseText',
+      );
     }
   }
 }

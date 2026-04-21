@@ -7,6 +7,10 @@ class AppSettingsModel {
   Id id = Isar.autoIncrement;
 
   String? geminiApiKey;
+  String? geminiModel;
+  String? languageCode;
+  String? countryCode;
 
   // You can add more settings here in the future
 }
+

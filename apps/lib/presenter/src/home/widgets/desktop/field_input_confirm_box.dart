@@ -82,7 +82,7 @@ class FieldInputConfirmBox extends StatelessWidget {
       children: [
         Icon(Icons.history, size: 18, color: context.colorScheme.primary),
         Text(
-          "Quick Actions:",
+          AppLang.labelsQuickActions.tr(),
           style: context.textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.bold,
           ),

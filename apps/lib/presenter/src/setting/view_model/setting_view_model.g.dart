@@ -10,4 +10,8 @@ extension $SettingViewModel on SettingViewModel {
   /// This getter is used to access the stream of data
   /// associated with the private field _geminiApiKey.
   StreamData<String> get geminiApiKey => _geminiApiKey.streamData;
+
+  /// This getter is used to access the stream of data
+  /// associated with the private field _selectedModel.
+  StreamData<String> get selectedModel => _selectedModel.streamData;
 }

@@ -180,7 +180,7 @@ class FiledInputBox extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "Please fill in the information below.",
+                    AppLang.messagesFillInfoBelow.tr(),
                     style: context.textTheme.bodySmall?.copyWith(
                       color: context.colorScheme.onSurfaceVariant,
                     ),
@@ -284,13 +284,13 @@ class FiledInputBox extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Input Summary",
+                    AppLang.labelsInputSummary.tr(),
                     style: context.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    "Please review all information before exporting.",
+                    AppLang.messagesReviewBeforeExport.tr(),
                     style: context.textTheme.bodySmall?.copyWith(
                       color: context.colorScheme.onSurfaceVariant,
                     ),

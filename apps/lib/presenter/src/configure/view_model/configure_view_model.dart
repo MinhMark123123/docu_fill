@@ -215,7 +215,7 @@ class ConfigureViewModel extends BaseViewModel {
         await checkEnableConfirm();
       } else {
         // Handle error: Missing files inside the package
-        debugPrint("Error: Invalid package format. Missing config or docx.");
+        debugPrint("${AppLang.labelsError.tr()}: Invalid package format. Missing config or docx.");
       }
     } catch (e) {
       debugPrint("Error importing settings: $e");
@@ -443,7 +443,7 @@ class ConfigureViewModel extends BaseViewModel {
     }
     await Future.delayed(Duration.zero);
     if (result) {
-      showSnackbar(AppLang.documentSuccessFullyCreate.tr());
+      showSnackbar(AppLang.messagesDocumentSuccessfullyCreate.tr());
       navigatePage(RoutesPath.home);
     }
   }
@@ -470,7 +470,7 @@ class ConfigureViewModel extends BaseViewModel {
     );
     await Future.delayed(Duration.zero);
     if (result) {
-      showSnackbar(AppLang.documentSuccessFullyCreate.tr());
+      showSnackbar(AppLang.messagesDocumentSuccessfullyCreate.tr());
       navigatePage(RoutesPath.home);
     }
   }

@@ -257,10 +257,10 @@ class FieldsInputViewModel extends BaseViewModel {
         }
         _composedTemplateUI.postValue(cloned);
         await checkValidate();
-        showSnackbar(AppLang.loadCopySuccess.tr());
+        showSnackbar(AppLang.actionsLoadCopySuccess.tr());
       } catch (e) {
         debugPrint("Error using copy: $e");
-        showSnackbar(AppLang.loadCopyError.tr());
+        showSnackbar(AppLang.actionsLoadCopyError.tr());
       }
     }));
   }
@@ -284,7 +284,7 @@ class FieldsInputViewModel extends BaseViewModel {
       );
 
       String? outputFile = await FilePicker.platform.saveFile(
-        dialogTitle: AppLang.saveCopyTitle.tr(),
+        dialogTitle: AppLang.actionsSaveCopyTitle.tr(),
         fileName: 'copy_${DateTime.now().millisecondsSinceEpoch}.json',
         type: FileType.custom,
         allowedExtensions: ['json'],
@@ -293,11 +293,11 @@ class FieldsInputViewModel extends BaseViewModel {
       if (outputFile != null) {
         final file = File(outputFile);
         await file.writeAsString(jsonString);
-        showSnackbar(AppLang.createCopySuccess.tr());
+        showSnackbar(AppLang.actionsCreateCopySuccess.tr());
       }
     } catch (e) {
       debugPrint("Error creating copy: $e");
-      showSnackbar(AppLang.createCopyError.tr(args: [e.toString()]));
+      showSnackbar(AppLang.actionsCreateCopyError.tr(args: [e.toString()]));
     }
   }
 
@@ -317,9 +317,7 @@ class FieldsInputViewModel extends BaseViewModel {
           );
 
           if (extractedText.isEmpty) {
-            throw Exception(
-              'Could not extract any text from the selected file.',
-            );
+            throw Exception(AppLang.messagesExtractNoText.tr());
           }
 
           final allFields = _templates.data.expand((t) => t.fields).toList();
@@ -348,13 +346,13 @@ class FieldsInputViewModel extends BaseViewModel {
 
           _composedTemplateUI.postValue(cloned);
           await checkValidate();
-          showSnackbar("Form auto-filled from file successfully!");
+          showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
         }),
       );
     } catch (e) {
       debugPrint("Error importing from file: $e");
       final errorMessage = e.toString().replaceFirst('Exception: ', '');
-      showSnackbar("Error: $errorMessage");
+      showSnackbar("${AppLang.labelsError.tr()}: $errorMessage");
     }
 
   }

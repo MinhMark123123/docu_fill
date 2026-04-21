@@ -4,7 +4,10 @@ import 'package:isar_community/isar.dart';
 
 abstract class SettingsRepository {
   Future<AppSettingsModel?> getSettings();
+  Future<void> saveSettings(AppSettingsModel settings);
   Future<void> saveGeminiApiKey(String apiKey);
+  Future<void> saveGeminiModel(String model);
+  Future<void> saveLocale(String languageCode, String countryCode);
 }
 
 class SettingsRepositoryImpl implements SettingsRepository {
@@ -18,11 +21,32 @@ class SettingsRepositoryImpl implements SettingsRepository {
   }
 
   @override
-  Future<void> saveGeminiApiKey(String apiKey) async {
-    final settings = await getSettings() ?? AppSettingsModel();
-    settings.geminiApiKey = apiKey;
+  Future<void> saveSettings(AppSettingsModel settings) async {
     await _isar.writeTxn(() async {
       await _isar.appSettingsModels.put(settings);
     });
   }
+
+  @override
+  Future<void> saveGeminiApiKey(String apiKey) async {
+    final settings = await getSettings() ?? AppSettingsModel();
+    settings.geminiApiKey = apiKey;
+    await saveSettings(settings);
+  }
+
+  @override
+  Future<void> saveGeminiModel(String model) async {
+    final settings = await getSettings() ?? AppSettingsModel();
+    settings.geminiModel = model;
+    await saveSettings(settings);
+  }
+
+  @override
+  Future<void> saveLocale(String languageCode, String countryCode) async {
+    final settings = await getSettings() ?? AppSettingsModel();
+    settings.languageCode = languageCode;
+    settings.countryCode = countryCode;
+    await saveSettings(settings);
+  }
 }
+
