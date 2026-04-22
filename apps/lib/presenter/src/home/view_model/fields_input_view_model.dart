@@ -223,6 +223,7 @@ class FieldsInputViewModel extends BaseViewModel {
           _composedTemplateUI.data,
         );
         _composedTemplateUI.postValue(<String, List<TemplateField>>{});
+        await Future.delayed(Duration.zero);
 
         final file = File(result.files.single.path!);
         final String content = await file.readAsString();
@@ -332,6 +333,7 @@ class FieldsInputViewModel extends BaseViewModel {
             _composedTemplateUI.data,
           );
           _composedTemplateUI.postValue(<String, List<TemplateField>>{});
+          await Future.delayed(Duration.zero);
 
           for (var field in allFields) {
             final value = mappedData[field.key];

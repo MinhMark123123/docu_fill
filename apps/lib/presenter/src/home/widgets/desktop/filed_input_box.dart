@@ -5,6 +5,7 @@ import 'package:docu_fill/presenter/src/home/widgets/image_picker_widget.dart';
 import 'package:docu_fill/ui/src/atom/date_time_picker_button.dart';
 import 'package:docu_fill/ui/src/atom/outline_dropdown_button.dart';
 import 'package:docu_fill/ui/src/methodology/tokens/dimens.dart';
+import 'package:docu_fill/ui/src/atom/reactive_text_form_field.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
@@ -464,7 +465,7 @@ class FiledInputBox extends StatelessWidget {
       context: context,
       isRequired: e.required,
       title: e.label,
-      child: TextFormField(
+      child: ReactiveTextFormField(
         key: Key(e.key),
         initialValue: viewModel.getInitValue(e: e),
         maxLines: 8,

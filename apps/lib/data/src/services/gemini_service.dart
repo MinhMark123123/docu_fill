@@ -52,13 +52,13 @@ JSON OUTPUT:
 ''';
 
     final content = [Content.text(prompt)];
-    // final response = await model.generateContent(content);
+    final response = await model.generateContent(content);
 
-    // final responseText = response.text;
-    // if (responseText == null) {
-    //   throw Exception('Gemini response was empty');
-    // }
-    const responseText = "{}"; // DEBUG: Dummy response for prompt verification
+    final responseText = response.text;
+    if (responseText == null) {
+      throw Exception('Gemini response was empty');
+    }
+    // const responseText = "{}"; // DEBUG: Dummy response for prompt verification
 
     if (settings?.enableApiLogging ?? false) {
       await _logToFile(prompt, responseText);
