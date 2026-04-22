@@ -31,6 +31,18 @@ class BaseViewModel extends ViewModel {
     //
   }
 
+  @override
+  void onPause() {
+    print("====> $runtimeType $hashCode onPause");
+    super.onPause();
+  }
+
+  @override
+  void onDispose() {
+    print("====> $runtimeType $hashCode onDispose");
+    super.onDispose();
+  }
+
   Future<T?> navigatePage<T>(
     String routeName, {
     Map<String, dynamic>? queryParameters,

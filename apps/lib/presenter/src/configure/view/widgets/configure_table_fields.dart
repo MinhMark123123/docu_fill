@@ -1,4 +1,5 @@
 import 'package:docu_fill/const/const.dart';
+import 'package:docu_fill/data/data.dart';
 import 'package:docu_fill/presenter/src/configure/model/table_row_data.dart';
 import 'package:docu_fill/presenter/src/configure/view/widgets/cell_default_value.dart';
 import 'package:docu_fill/ui/src/methodology/tokens/dimens.dart';
@@ -74,31 +75,34 @@ enum TableColumn {
       return cellBox(child: Text(labels(), style: context.textTheme.bodySmall));
     }
     if (data == null) return const SizedBox();
+    final alignment =
+        data.inputType == FieldType.selection ? Alignment(-1, -1) : null;
+
     switch (this) {
       case TableColumn.fieldKey:
-        return cellBox(child: CellFieldKey(data: data));
+        return cellBox(child: CellFieldKey(data: data), alignment: alignment);
       case TableColumn.fieldName:
-        return cellBox(child: CellFieldName(data: data));
+        return cellBox(child: CellFieldName(data: data), alignment: alignment);
       case TableColumn.section:
-        return cellBox(child: CellFieldSection(data: data));
+        return cellBox(child: CellFieldSection(data: data), alignment: alignment);
       case TableColumn.inputType:
-        return cellBox(child: CellFieldInput(data: data));
+        return cellBox(child: CellFieldInput(data: data), alignment: alignment);
       case TableColumn.options:
-        return cellBox(child: CellFieldOptions(data: data));
+        return cellBox(child: CellFieldOptions(data: data), alignment: alignment);
       case TableColumn.isRequired:
-        return cellBox(child: CellFieldRequired(data: data));
+        return cellBox(child: CellFieldRequired(data: data), alignment: alignment);
       case TableColumn.defaultValue:
-        return cellBox(child: CellDefaultValue(data: data));
+        return cellBox(child: CellDefaultValue(data: data), alignment: alignment);
     }
   }
 
-  Widget cellBox({required Widget child}) {
+  Widget cellBox({required Widget child, AlignmentGeometry? alignment}) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: Dimens.size16,
         vertical: Dimens.size12,
       ),
-      alignment: Alignment(-1, 0),
+      alignment: alignment ?? Alignment(-1, 0),
       child: child,
     );
   }
@@ -110,13 +114,13 @@ class CustomScrollableTable extends StatelessWidget {
   // Define column widths - you can adjust these as needed
   // Using FixedTableSpanExtent for fixed widths, but you can explore others.
   final List<TableSpanExtent> columnWidths = [
-    FixedSpanExtent(Dimens.size180),
-    FixedSpanExtent(Dimens.size94),
-    FixedSpanExtent(Dimens.size232),
-    FixedSpanExtent(Dimens.size180), // For Section
-    FixedSpanExtent(Dimens.size150),
-    FixedSpanExtent(Dimens.size232),
-    RemainingSpanExtent(),
+    FixedSpanExtent(200), // fieldKey
+    FixedSpanExtent(100), // isRequired
+    FixedSpanExtent(250), // fieldName
+    FixedSpanExtent(200), // section
+    FixedSpanExtent(180), // inputType
+    FixedSpanExtent(250), // defaultValue
+    FixedSpanExtent(300), // options
   ];
 
   CustomScrollableTable({super.key, required this.data});
@@ -125,6 +129,9 @@ class CustomScrollableTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return TableView.builder(
       verticalDetails: ScrollableDetails.vertical(
+        physics: ClampingScrollPhysics(),
+      ),
+      horizontalDetails: ScrollableDetails.horizontal(
         physics: ClampingScrollPhysics(),
       ),
       columnCount: TableColumn.values.length,
@@ -165,20 +172,36 @@ class CustomScrollableTable extends StatelessWidget {
   }
 
   TableSpan _buildRowSpan(BuildContext context, int index) {
+    final isHeader = index == 0;
+    double extent = isHeader ? Dimens.size46 : Dimens.size72;
+
+    if (!isHeader && data.isNotEmpty) {
+      final rowData = data[index - 1];
+      if (rowData.inputType == FieldType.selection) {
+        final optionsCount = rowData.options?.length ?? 1;
+        // Calculation: (options * (inputHeight + spacing)) + addButtonHeight + cellVerticalPadding
+        // Estimating 60px for input field, 48px for add button, and 24px for cell padding
+        final calculatedHeight =
+            (optionsCount * (Dimens.size40 + Dimens.size12)) +
+            Dimens.size48 +
+            Dimens.size24;
+        if (calculatedHeight > extent) {
+          extent = calculatedHeight;
+        }
+      }
+    }
+
     return TableSpan(
       foregroundDecoration: TableSpanDecoration(
         border: TableSpanBorder(
-          leading: index == 0 ? borderSideDecoration(context) : BorderSide.none,
+          leading: isHeader ? borderSideDecoration(context) : BorderSide.none,
           trailing:
-              (index == data.length || index == 0)
+              (index == data.length || isHeader)
                   ? borderSideDecoration(context)
                   : BorderSide.none,
         ),
       ),
-      extent:
-          index == 0
-              ? FixedSpanExtent(Dimens.size46)
-              : FixedSpanExtent(Dimens.size72),
+      extent: FixedSpanExtent(extent),
     );
   }
 

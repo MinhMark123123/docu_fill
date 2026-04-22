@@ -248,10 +248,11 @@ class ConfigureViewModel extends BaseViewModel {
     if (index == AppConst.commonUnknow) return;
     final newData = removeUselessInput(newData: data);
     _fieldsData.data[index] = newData;
+    await notifyDataChanged();
   }
 
   Future<void> updateFieldName(String key, {required String fieldName}) async {
-    updateFieldData(key, fieldOfKey(key).copyWith(fieldName: fieldName));
+    await updateFieldData(key, fieldOfKey(key).copyWith(fieldName: fieldName));
     await checkEnableConfirm();
   }
 
@@ -259,7 +260,7 @@ class ConfigureViewModel extends BaseViewModel {
     String key, {
     required String defaultValue,
   }) async {
-    updateFieldData(key, fieldOfKey(key).copyWith(defaultValue: defaultValue));
+    await updateFieldData(key, fieldOfKey(key).copyWith(defaultValue: defaultValue));
     await checkEnableConfirm();
   }
 
@@ -278,25 +279,22 @@ class ConfigureViewModel extends BaseViewModel {
     String key, {
     required List<String> options,
   }) async {
-    updateFieldData(key, fieldOfKey(key).copyWith(options: options));
+    await updateFieldData(key, fieldOfKey(key).copyWith(options: options));
     await checkEnableConfirm();
   }
 
   Future<void> updateIsRequired(String key, {bool? isRequired}) async {
-    updateFieldData(key, fieldOfKey(key).copyWith(isRequired: isRequired));
+    await updateFieldData(key, fieldOfKey(key).copyWith(isRequired: isRequired));
     await checkEnableConfirm();
-    notifyDataChanged();
   }
 
   Future<void> updateInputType(String key, {FieldType? inputType}) async {
-    updateFieldData(key, fieldOfKey(key).copyWith(inputType: inputType));
-    notifyDataChanged();
+    await updateFieldData(key, fieldOfKey(key).copyWith(inputType: inputType));
     await checkEnableConfirm();
   }
 
   Future<void> updateSection(String key, {String? section}) async {
-    updateFieldData(key, fieldOfKey(key).copyWith(section: section));
-    notifyDataChanged();
+    await updateFieldData(key, fieldOfKey(key).copyWith(section: section));
     await checkEnableConfirm();
   }
 
