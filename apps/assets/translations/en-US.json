@@ -103,7 +103,12 @@
     "section": "Section",
     "input_summary": "Input Summary",
     "quick_actions": "Quick Actions:",
-    "template_fill": "Template Fill"
+    "template_fill": "Template Fill",
+    "log_history": "API History Logs",
+    "log_details": "Log Details",
+    "timestamp": "Timestamp",
+    "prompt": "Prompt",
+    "response": "Response"
   },
   "messages": {
     "review_and_configure_fields": "Review and configure the fields detected in your template. Ensure all fields are correctly identified and assigned the appropriate input type for accurate data collection.",
@@ -133,7 +138,9 @@
     "import_from_file_success": "Form auto-filled from file successfully!",
     "gemini_model_desc": "Select the Gemini model version to use for data extraction.",
     "fill_info_below": "Please fill in the information below.",
-    "review_before_export": "Please review all information before exporting."
+    "review_before_export": "Please review all information before exporting.",
+    "no_logs_found": "No API logs found.",
+    "confirm_delete_all_logs": "Are you sure you want to delete all log files? This action cannot be undone."
   },
   "settings": {
     "general": {
@@ -146,6 +153,8 @@
       "title": "Gemini AI Configuration",
       "api_key": "Gemini API Key",
       "model": "Gemini Model",
+      "enable_logging": "Enable API Logging",
+      "open_logs": "Open Logs Folder",
       "save_btn": "Save Gemini Settings"
     }
   }

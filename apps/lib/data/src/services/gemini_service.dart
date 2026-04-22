@@ -1,7 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/widgets.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:docu_fill/data/data.dart';
 import 'package:docu_fill/data/src/repositories/settings/settings_repository.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:intl/intl.dart';
 
 class GeminiService {
   final SettingsRepository _settingsRepository;
@@ -48,11 +52,16 @@ JSON OUTPUT:
 ''';
 
     final content = [Content.text(prompt)];
-    final response = await model.generateContent(content);
+    // final response = await model.generateContent(content);
 
-    final responseText = response.text;
-    if (responseText == null) {
-      throw Exception('Gemini response was empty');
+    // final responseText = response.text;
+    // if (responseText == null) {
+    //   throw Exception('Gemini response was empty');
+    // }
+    const responseText = "{}"; // DEBUG: Dummy response for prompt verification
+
+    if (settings?.enableApiLogging ?? false) {
+      await _logToFile(prompt, responseText);
     }
 
     // Attempt to parse JSON
@@ -69,6 +78,37 @@ JSON OUTPUT:
       throw Exception(
         'Failed to parse Gemini response: $e\nResponse: $responseText',
       );
+    }
+  }
+
+  Future<void> _logToFile(String prompt, String response) async {
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final logsPath = "${directory.path}/api_logs";
+      final logsDir = Directory(logsPath);
+
+      if (!await logsDir.exists()) {
+        await logsDir.create(recursive: true);
+      }
+
+      final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
+      final logFile = File("$logsPath/log_$timestamp.txt");
+
+      final content = '''
+      --- GEMINI API LOG ---
+      TIMESTAMP: ${DateTime.now()}
+      
+      --- PROMPT ---
+      $prompt
+      
+      --- RESPONSE ---
+      $response
+      ----------------------
+      ''';
+
+      await logFile.writeAsString(content);
+    } catch (e) {
+      debugPrint("Error writing log file: $e");
     }
   }
 }

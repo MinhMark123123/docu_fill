@@ -8,6 +8,7 @@ class AppSettingsModel {
 
   String? geminiApiKey;
   String? geminiModel;
+  bool enableApiLogging = false;
   String? languageCode;
   String? countryCode;
 

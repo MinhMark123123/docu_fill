@@ -93,12 +93,16 @@ abstract class AppLang {
   static const String labelsInputOptions = "labels.input_options";
   static const String labelsInputSummary = "labels.input_summary";
   static const String labelsInputType = "labels.input_type";
+  static const String labelsLogDetails = "labels.log_details";
+  static const String labelsLogHistory = "labels.log_history";
   static const String labelsMultiple = "labels.multiple";
   static const String labelsNewTemplate = "labels.new_template";
   static const String labelsOptions = "labels.options";
+  static const String labelsPrompt = "labels.prompt";
   static const String labelsQuickActions = "labels.quick_actions";
   static const String labelsRecentTemplates = "labels.recent_templates";
   static const String labelsRequired = "labels.required";
+  static const String labelsResponse = "labels.response";
   static const String labelsSection = "labels.section";
   static const String labelsSettings = "labels.settings";
   static const String labelsSingle = "labels.single";
@@ -107,12 +111,14 @@ abstract class AppLang {
   static const String labelsTemplateName = "labels.template_name";
   static const String labelsTemplates = "labels.templates";
   static const String labelsThemeColor = "labels.theme_color";
+  static const String labelsTimestamp = "labels.timestamp";
   static const String labelsUnit = "labels.unit";
   static const String labelsUploadDocxFile = "labels.upload_docx_file";
   static const String labelsWidth = "labels.width";
 
   // --- Messages ---
   static const String messagesConfirmCreateDocument = "messages.confirm_create_document";
+  static const String messagesConfirmDeleteAllLogs = "messages.confirm_delete_all_logs";
   static const String messagesConfirmEditDocument = "messages.confirm_edit_document";
   static const String messagesDateFormatInvalid = "messages.date_format_invalid";
   static const String messagesDocumentExportedReadyForDownload = "messages.document_exported_ready_for_download";
@@ -133,6 +139,7 @@ abstract class AppLang {
   static const String messagesImportSetting = "messages.import_setting";
   static const String messagesInputTextHint = "messages.input_text_hint";
   static const String messagesNameTheDocumentExported = "messages.name_the_document_exported";
+  static const String messagesNoLogsFound = "messages.no_logs_found";
   static const String messagesPickFolderToExport = "messages.pick_folder_to_export";
   static const String messagesReviewAndConfigureFields = "messages.review_and_configure_fields";
   static const String messagesReviewBeforeExport = "messages.review_before_export";
@@ -143,7 +150,9 @@ abstract class AppLang {
 
   // --- Settings ---
   static const String settingsGeminiApiKey = "settings.gemini.api_key";
+  static const String settingsGeminiEnableLogging = "settings.gemini.enable_logging";
   static const String settingsGeminiModel = "settings.gemini.model";
+  static const String settingsGeminiOpenLogs = "settings.gemini.open_logs";
   static const String settingsGeminiSaveBtn = "settings.gemini.save_btn";
   static const String settingsGeminiTitle = "settings.gemini.title";
   static const String settingsGeneralEnglish = "settings.general.english";

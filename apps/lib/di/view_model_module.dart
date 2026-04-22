@@ -23,5 +23,6 @@ void setupViewModelModule() {
       geminiService: inject(),
     ),
   );
+  registerViewModel(() => LogHistoryViewModel());
+  registerViewModel(() => LogDetailViewModel());
 }
-

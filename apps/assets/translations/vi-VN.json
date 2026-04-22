@@ -102,7 +102,12 @@
     "section": "Phần",
     "input_summary": "Tóm tắt nhập liệu",
     "quick_actions": "Thao tác nhanh:",
-    "template_fill": "Điền mẫu"
+    "template_fill": "Điền mẫu",
+    "log_history": "Nhật ký lịch sử API",
+    "log_details": "Chi tiết nhật ký",
+    "timestamp": "Dấu mốc thời gian",
+    "prompt": "Câu lệnh (Prompt)",
+    "response": "Kết quả trả về"
   },
   "messages": {
     "review_and_configure_fields": "Xem lại và cấu hình các trường được phát hiện trong mẫu của bạn. Đảm bảo tất cả các trường được xác định chính xác và gán loại đầu vào phù hợp để thu thập dữ liệu chính xác.",
@@ -132,7 +137,9 @@
     "import_from_file_success": "Đã tự động điền dữ liệu từ tệp thành công!",
     "gemini_model_desc": "Chọn phiên bản Gemini model để sử dụng trích xuất dữ liệu.",
     "fill_info_below": "Vui lòng điền thông tin bên dưới.",
-    "review_before_export": "Vui lòng kiểm tra lại tất cả thông tin trước khi xuất."
+    "review_before_export": "Vui lòng kiểm tra lại tất cả thông tin trước khi xuất.",
+    "no_logs_found": "Không tìm thấy nhật ký API nào.",
+    "confirm_delete_all_logs": "Bạn có chắc chắn muốn xóa tất cả các tệp nhật ký? Hành động này không thể hoàn tác."
   },
   "settings": {
     "general": {
@@ -145,6 +152,8 @@
       "title": "Cấu hình Gemini AI",
       "api_key": "Gemini API Key",
       "model": "Gemini Model",
+      "enable_logging": "Bật ghi nhật ký API",
+      "open_logs": "Mở thư mục nhật ký",
       "save_btn": "Lưu cài đặt Gemini"
     }
   }

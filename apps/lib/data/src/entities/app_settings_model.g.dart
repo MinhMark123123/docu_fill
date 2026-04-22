@@ -22,18 +22,23 @@ const AppSettingsModelSchema = CollectionSchema(
       name: r'countryCode',
       type: IsarType.string,
     ),
-    r'geminiApiKey': PropertySchema(
+    r'enableApiLogging': PropertySchema(
       id: 1,
+      name: r'enableApiLogging',
+      type: IsarType.bool,
+    ),
+    r'geminiApiKey': PropertySchema(
+      id: 2,
       name: r'geminiApiKey',
       type: IsarType.string,
     ),
     r'geminiModel': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'geminiModel',
       type: IsarType.string,
     ),
     r'languageCode': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'languageCode',
       type: IsarType.string,
     ),
@@ -94,9 +99,10 @@ void _appSettingsModelSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.countryCode);
-  writer.writeString(offsets[1], object.geminiApiKey);
-  writer.writeString(offsets[2], object.geminiModel);
-  writer.writeString(offsets[3], object.languageCode);
+  writer.writeBool(offsets[1], object.enableApiLogging);
+  writer.writeString(offsets[2], object.geminiApiKey);
+  writer.writeString(offsets[3], object.geminiModel);
+  writer.writeString(offsets[4], object.languageCode);
 }
 
 AppSettingsModel _appSettingsModelDeserialize(
@@ -107,10 +113,11 @@ AppSettingsModel _appSettingsModelDeserialize(
 ) {
   final object = AppSettingsModel();
   object.countryCode = reader.readStringOrNull(offsets[0]);
-  object.geminiApiKey = reader.readStringOrNull(offsets[1]);
-  object.geminiModel = reader.readStringOrNull(offsets[2]);
+  object.enableApiLogging = reader.readBool(offsets[1]);
+  object.geminiApiKey = reader.readStringOrNull(offsets[2]);
+  object.geminiModel = reader.readStringOrNull(offsets[3]);
   object.id = id;
-  object.languageCode = reader.readStringOrNull(offsets[3]);
+  object.languageCode = reader.readStringOrNull(offsets[4]);
   return object;
 }
 
@@ -124,10 +131,12 @@ P _appSettingsModelDeserializeProp<P>(
     case 0:
       return (reader.readStringOrNull(offset)) as P;
     case 1:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
+      return (reader.readStringOrNull(offset)) as P;
+    case 4:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -386,6 +395,15 @@ extension AppSettingsModelQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(property: r'countryCode', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  enableApiLoggingEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'enableApiLogging', value: value),
       );
     });
   }
@@ -946,6 +964,20 @@ extension AppSettingsModelQuerySortBy
   }
 
   QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByEnableApiLogging() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableApiLogging', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByEnableApiLoggingDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableApiLogging', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
   sortByGeminiApiKey() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'geminiApiKey', Sort.asc);
@@ -1001,6 +1033,20 @@ extension AppSettingsModelQuerySortThenBy
   thenByCountryCodeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'countryCode', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByEnableApiLogging() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableApiLogging', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByEnableApiLoggingDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableApiLogging', Sort.desc);
     });
   }
 
@@ -1070,6 +1116,13 @@ extension AppSettingsModelQueryWhereDistinct
   }
 
   QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
+  distinctByEnableApiLogging() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'enableApiLogging');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
   distinctByGeminiApiKey({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'geminiApiKey', caseSensitive: caseSensitive);
@@ -1103,6 +1156,13 @@ extension AppSettingsModelQueryProperty
   countryCodeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'countryCode');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, bool, QQueryOperations>
+  enableApiLoggingProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'enableApiLogging');
     });
   }
 

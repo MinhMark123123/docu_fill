@@ -7,6 +7,7 @@ abstract class SettingsRepository {
   Future<void> saveSettings(AppSettingsModel settings);
   Future<void> saveGeminiApiKey(String apiKey);
   Future<void> saveGeminiModel(String model);
+  Future<void> saveApiLoggingSetting(bool enabled);
   Future<void> saveLocale(String languageCode, String countryCode);
 }
 
@@ -38,6 +39,13 @@ class SettingsRepositoryImpl implements SettingsRepository {
   Future<void> saveGeminiModel(String model) async {
     final settings = await getSettings() ?? AppSettingsModel();
     settings.geminiModel = model;
+    await saveSettings(settings);
+  }
+
+  @override
+  Future<void> saveApiLoggingSetting(bool enabled) async {
+    final settings = await getSettings() ?? AppSettingsModel();
+    settings.enableApiLogging = enabled;
     await saveSettings(settings);
   }
 

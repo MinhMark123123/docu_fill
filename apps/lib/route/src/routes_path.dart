@@ -12,6 +12,8 @@ class RoutesPath {
   static const String configure = 'configure'; // Relative to /main/configure
   static const String upload = 'upload'; // Relative to /main/setting
   static const String theme = 'theme'; // Relative to /main/setting
+  static const String logHistory = 'log-history'; // Relative to /main/setting
+  static const String logDetail = 'log-detail'; // Relative to /main/setting
 
   // --- Full Paths (Optional but helpful for navigation) ---
   // You can construct full paths here if you frequently navigate to them directly.
