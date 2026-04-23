@@ -223,6 +223,24 @@ class FieldsInputViewModel extends BaseViewModel {
     doneExported();
   }
 
+  Future<void> exportSummaryText() async {
+    if (_directoryExported.data.isEmpty) {
+      showSnackbar(AppLang.messagesPickFolderToExport.tr());
+      return;
+    }
+    final fileName = _nameDocExported.text.isEmpty ? "export" : _nameDocExported.text;
+    await loadingGuard(
+      _templateService.exportSummaryText(
+        exportDirectory: _directoryExported.data,
+        baseFileName: fileName,
+        composedUI: _composedTemplateUI.data,
+        fieldKeys: _fieldKeys,
+        singleLines: _singleField,
+      ),
+    );
+    showSnackbar(AppLang.messagesExportSummarySuccess.tr());
+  }
+
   Future<void> pickFolder() async {
     final result = await FilePicker.platform.getDirectoryPath();
     if (result != null) {

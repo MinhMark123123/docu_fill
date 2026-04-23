@@ -1,5 +1,4 @@
 import 'package:localization/localization.dart';
-import 'package:core/core.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/core/src/events.dart' show ShowDialogEvent;
 import 'package:docu_fill/features/src/configure/view/desktop/configure_desktop_layout.dart';

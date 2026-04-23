@@ -52,6 +52,7 @@ dependencies:
   isar_community_flutter_libs: # contains Isar Core
     version: *isar_version
 
+  get_it: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

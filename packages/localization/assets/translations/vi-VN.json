@@ -59,7 +59,8 @@
     "load_copy_success": "Đã tải dữ liệu từ bản sao thành công!",
     "load_copy_error": "Lỗi khi tải bản sao: {}",
     "create_copy_success": "Đã tạo bản sao thành công!",
-    "create_copy_error": "Lỗi khi tạo bản sao: {}"
+    "create_copy_error": "Lỗi khi tạo bản sao: {}",
+    "export_summary": "Xuất tóm tắt (Text)"
   },
   "labels": {
     "templates": "Mẫu",
@@ -141,7 +142,8 @@
     "fill_info_below": "Vui lòng điền thông tin bên dưới.",
     "review_before_export": "Vui lòng kiểm tra lại tất cả thông tin trước khi xuất.",
     "no_logs_found": "Không tìm thấy nhật ký API nào.",
-    "confirm_delete_all_logs": "Bạn có chắc chắn muốn xóa tất cả các tệp nhật ký? Hành động này không thể hoàn tác."
+    "confirm_delete_all_logs": "Bạn có chắc chắn muốn xóa tất cả các tệp nhật ký? Hành động này không thể hoàn tác.",
+    "export_summary_success": "Đã xuất tóm tắt thành công!"
   },
   "settings": {
     "general": {
@@ -160,4 +162,3 @@
     }
   }
 }
-

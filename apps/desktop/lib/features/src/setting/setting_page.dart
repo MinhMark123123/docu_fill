@@ -1,5 +1,4 @@
 import 'package:localization/localization.dart';
-import 'package:core/core.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:design/ui.dart';
 import 'package:flutter/material.dart';
@@ -140,7 +139,7 @@ class SettingPage extends BaseView<SettingViewModel> {
               streamData: viewModel.selectedModel,
               builder: (context, String selectedModel) {
                 return DropdownButtonFormField<String>(
-                  value: selectedModel,
+                  initialValue: selectedModel,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     contentPadding: EdgeInsets.symmetric(horizontal: 12),

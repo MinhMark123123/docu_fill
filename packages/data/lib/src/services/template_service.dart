@@ -4,8 +4,10 @@ import 'dart:ui';
 
 import 'package:archive/archive.dart';
 import 'package:core/const/const.dart';
-import 'package:data/data.dart';
 import 'package:core/utils/utils.dart';
+import 'package:data/data.dart';
+import 'package:flutter/foundation.dart';
+import 'package:path/path.dart' as p;
 
 class TemplateService {
   final TemplateRepository _templateRepository;
@@ -54,8 +56,8 @@ class TemplateService {
 
   Future<void> saveRawBytes(List<int> bytes, String path) async {
     final targetFile = File(path);
-    if (!targetFile.existsSync()) {
-      targetFile.createSync(recursive: true);
+    if (!targetFile.parent.existsSync()) {
+      targetFile.parent.createSync(recursive: true);
     }
     await targetFile.writeAsBytes(bytes);
   }
@@ -80,14 +82,9 @@ class TemplateService {
   static const String commonSectionKey = '__common__';
 
   /// Groups template fields by their [TemplateField.section] value.
-  ///
-  /// Returns a [Map] where:
-  /// - Key [commonSectionKey]: fields shared across ALL templates (multi-template only).
-  /// - Key `null`: fields that belong to no specific section.
-  /// - Any other key: fields belonging to a named section.
-  ///
-  /// Localization of section display names is the responsibility of the caller.
-  Map<String?, List<TemplateField>> groupFields(List<TemplateConfig> templates) {
+  Map<String?, List<TemplateField>> groupFields(
+    List<TemplateConfig> templates,
+  ) {
     if (templates.isEmpty) return {};
 
     final groupedData = <String?, List<TemplateField>>{};
@@ -123,14 +120,14 @@ class TemplateService {
         }
 
         // field.section is null when no section was configured
-        final sectionKey = field.section?.trim().isEmpty == true ? null : field.section;
+        final sectionKey =
+            field.section?.trim().isEmpty == true ? null : field.section;
         groupedData.putIfAbsent(sectionKey, () => []).add(field);
       }
     }
 
     return groupedData;
   }
-
 
   List<String> validateFields(
     List<TemplateConfig> templates,
@@ -191,20 +188,59 @@ class TemplateService {
       final fileOrigin = File(template.pathTemplate);
       if (!fileOrigin.existsSync()) continue;
 
+      final extension = template.pathTemplate.split('.').last.toLowerCase();
       final originalBytes = await fileOrigin.readAsBytes();
-      final rawBytes = await DocxUtils.composeModifiedDocxWithPlaceholders(
-        originalBytes: originalBytes,
-        replacements: processedFieldKeys,
-        imageReplacements: imageReplacements,
-        singleLines: singleLines,
-      );
+      Uint8List rawBytes;
 
-      final extension = template.pathTemplate.split(".").lastOrNull;
+      if (extension == 'docx') {
+        rawBytes = await DocxUtils.composeModifiedDocxWithPlaceholders(
+          originalBytes: originalBytes,
+          replacements: processedFieldKeys,
+          imageReplacements: imageReplacements,
+          singleLines: singleLines,
+        );
+      } else if (extension == 'xlsx') {
+        rawBytes = await ExcelUtils.composeModifiedExcel(
+          originalBytes: originalBytes,
+          replacements: processedFieldKeys,
+        );
+      } else {
+        // Skip unsupported formats
+        continue;
+      }
+
       final fileName = "${baseFileName}_${template.templateName}.$extension";
-      final filePath = [exportDirectory, fileName].join(Platform.pathSeparator);
+      final filePath = p.join(exportDirectory, fileName);
 
       await saveRawBytes(rawBytes, filePath);
     }
+  }
+
+  /// Exports the input summary as a plain text file.
+  Future<void> exportSummaryText({
+    required String exportDirectory,
+    required String baseFileName,
+    required Map<String, List<TemplateField>> composedUI,
+    required Map<String, String?> fieldKeys,
+    required Map<String, String?> singleLines,
+  }) async {
+    final buffer = StringBuffer();
+    buffer.writeln("DOCUFILL - INPUT SUMMARY");
+    buffer.writeln("Generated on: ${DateTime.now()}");
+    buffer.writeln("=" * 30);
+
+    composedUI.forEach((section, fields) {
+      buffer.writeln("\n[$section]");
+      for (var field in fields) {
+        final value = fieldKeys[field.key] ?? singleLines[field.key] ?? "-";
+        buffer.writeln("${field.label}: $value");
+      }
+    });
+
+    final fileName = "${baseFileName}_summary.txt";
+    final filePath = p.join(exportDirectory, fileName);
+    final file = File(filePath);
+    await file.writeAsString(buffer.toString());
   }
 
   Map<String, String> _processFields(

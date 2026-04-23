@@ -29,6 +29,7 @@ abstract class AppLang {
   static const String actionsDownloadDocument = "actions.download_document";
   static const String actionsEdit = "actions.edit";
   static const String actionsExportData = "actions.export_data";
+  static const String actionsExportSummary = "actions.export_summary";
   static const String actionsFillDocument = "actions.fill_document";
   static const String actionsFinishProcess = "actions.finish_process";
   static const String actionsGetStartedNow = "actions.get_started_now";
@@ -130,6 +131,7 @@ abstract class AppLang {
   static const String messagesEnterDateFormat = "messages.enter_date_format";
   static const String messagesEnterTemplateNameHint = "messages.enter_template_name_hint";
   static const String messagesExcelUnsupportedFormat = "messages.excel_unsupported_format";
+  static const String messagesExportSummarySuccess = "messages.export_summary_success";
   static const String messagesExtractNoText = "messages.extract_no_text";
   static const String messagesFieldIsRequired = "messages.field_is_required";
   static const String messagesFillInfoBelow = "messages.fill_info_below";

@@ -1,5 +1,4 @@
 import 'package:localization/localization.dart';
-import 'package:core/core.dart';
 import 'package:data/data.dart';
 import 'package:docu_fill/features/src/configure/model/table_row_data.dart';
 import 'package:docu_fill/features/src/configure/view/widgets/cell_default_value.dart';

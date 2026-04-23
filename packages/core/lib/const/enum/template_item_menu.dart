@@ -1,4 +1,3 @@
-import 'package:core/const/const.dart';
 import 'package:localization/localization.dart';
 
 enum TemplateMenuItem {

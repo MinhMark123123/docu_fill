@@ -1,7 +1,6 @@
 import 'package:localization/localization.dart';
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:design/ui.dart';
-import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 

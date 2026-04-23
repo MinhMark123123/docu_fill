@@ -1,5 +1,4 @@
 import 'package:localization/localization.dart';
-import 'package:core/core.dart';
 import 'package:design/ui.dart';
 import 'package:flutter/material.dart';
 

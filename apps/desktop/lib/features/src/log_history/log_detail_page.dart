@@ -1,4 +1,3 @@
-import 'package:core/core.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:design/ui.dart';
 import 'package:localization/localization.dart';
@@ -55,7 +54,7 @@ class LogDetailPage extends BaseView<LogDetailViewModel> {
                    _buildSectionTitle(context, fileName, Icons.file_present),
                   const SizedBox(height: 16),
                   Card(
-                    color: context.colorScheme.surfaceVariant.withOpacity(0.3),
+                    color: context.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     child: Padding(
                       padding: EdgeInsets.all(Dimens.size16),
                       child: Text(

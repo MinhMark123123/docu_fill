@@ -13,3 +13,19 @@ scripts:
   get:
     run: melos exec -- "flutter pub get"
     description: "Run flutter pub get for all packages."
+
+  analyze:
+    run: melos exec -- "flutter analyze"
+    description: "Run flutter analyze for all packages."
+
+  lint:fix:
+    run: melos exec -- "dart fix --apply"
+    description: "Automatically fix lint issues for all packages."
+
+  format:
+    run: melos exec -- "dart format ."
+    description: "Format code for all packages."
+
+  fix:all:
+    run: melos run format && melos run lint:fix
+    description: "Run both format and lint fix for all packages."

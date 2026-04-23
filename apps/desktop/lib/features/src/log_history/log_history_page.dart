@@ -1,7 +1,6 @@
 import 'package:localization/localization.dart';
 import 'dart:io';
 
-import 'package:core/core.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:design/ui.dart';
 import 'package:flutter/material.dart';

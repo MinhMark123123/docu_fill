@@ -1,7 +1,6 @@
 import 'package:localization/localization.dart';
 import 'dart:io';
 
-import 'package:core/core.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:data/data.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
