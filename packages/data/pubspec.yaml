@@ -23,7 +23,8 @@ dependencies:
   syncfusion_flutter_pdf: ^28.2.3
   xml: ^6.5.0
   archive: ^3.3.6
-  easy_localization: ^3.0.7+1
+  localization:
+    path: ../localization
 
 dev_dependencies:
   flutter_test:

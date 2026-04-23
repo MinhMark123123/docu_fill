@@ -10,7 +10,7 @@ class EasyLocalizationWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return EasyLocalization(
       supportedLocales: [Locale('en', 'US'), Locale('vi', 'VN')],
-      path: 'assets/translations',
+      path: 'packages/localization/assets/translations',
       fallbackLocale: Locale('vi', 'VN'),
       startLocale: Locale('vi', 'VN'),
       child: child,

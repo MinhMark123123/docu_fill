@@ -1,5 +1,5 @@
 import 'package:core/const/const.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:localization/localization.dart';
 
 enum TemplateMenuItem {
   edit,

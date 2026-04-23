@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 void main() async {
-  // Paths are relative to the root of the project
-  final jsonFile = File('apps/assets/translations/en-US.json');
-  final outputFile = File('apps/lib/const/src/app_lang.dart');
+  final jsonFile = File('packages/localization/assets/translations/en-US.json');
+  final outputFile = File('packages/localization/lib/src/app_lang.dart');
 
   if (!await jsonFile.exists()) {
     print('Error: en-US.json not found at ${jsonFile.path}');

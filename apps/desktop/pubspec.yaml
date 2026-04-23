@@ -19,6 +19,8 @@ dependencies:
     path: ../../packages/core
   data:
     path: ../../packages/data
+  localization:
+    path: ../../packages/localization
   #design
   cupertino_icons: ^1.0.8
   google_fonts: ^6.2.1
@@ -44,7 +46,6 @@ dependencies:
   maac_mvvm_with_get_it: ^0.2.1+2
 
   maac_mvvm_annotation: ^0.0.2
-  easy_localization: ^3.0.7+1
   json_annotation: ^4.7.0
   isar_community:
     version: *isar_version
@@ -76,7 +77,5 @@ dependency_overrides:
 flutter:
   uses-material-design: true
   assets:
-    - assets/translations/
     - assets/images/
     - assets/images/png/
-

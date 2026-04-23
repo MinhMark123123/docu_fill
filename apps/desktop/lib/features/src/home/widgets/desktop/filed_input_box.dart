@@ -1,4 +1,4 @@
-import 'package:core/core.dart';
+import 'package:localization/localization.dart';
 import 'package:data/data.dart';
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:docu_fill/features/src/home/widgets/image_picker_widget.dart';
@@ -519,11 +519,7 @@ class FiledInputBox extends StatelessWidget {
       padding: EdgeInsets.symmetric(vertical: Dimens.size4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          titleWidget,
-          Dimens.spacing.vertical(Dimens.size8),
-          child,
-        ],
+        children: [titleWidget, Dimens.spacing.vertical(Dimens.size8), child],
       ),
     );
   }

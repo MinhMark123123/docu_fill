@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:core/const/enum/template_item_menu.dart';
 import 'package:core/const/src/app_const.dart';
-import 'package:core/const/src/app_lang.dart';
+import 'package:localization/localization.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:data/data.dart';
 import 'package:docu_fill/features/src/configure/configure_page.dart';

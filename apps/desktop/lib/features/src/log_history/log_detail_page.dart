@@ -1,7 +1,7 @@
 import 'package:core/core.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:design/ui.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:localization/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';

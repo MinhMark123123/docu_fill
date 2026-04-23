@@ -1,7 +1,7 @@
 import 'package:docu_fill/app.dart';
 import 'package:docu_fill/di/repositories_module.dart';
 import 'package:docu_fill/di/view_model_module.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:localization/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:window_manager/window_manager.dart';

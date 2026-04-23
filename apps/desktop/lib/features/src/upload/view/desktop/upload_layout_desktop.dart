@@ -1,3 +1,4 @@
+import 'package:localization/localization.dart';
 import 'package:core/core.dart';
 import 'package:docu_fill/gen/assets.gen.dart';
 import 'package:docu_fill/features/src/upload/view_model/upload_view_model.dart';

@@ -1,3 +1,4 @@
+import 'package:localization/localization.dart';
 import 'package:core/core.dart';
 import 'package:docu_fill/features/src/home/view_model/home_view_model.dart';
 import 'package:docu_fill/features/src/home/widgets/item_document_collection.dart';

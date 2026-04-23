@@ -1,4 +1,4 @@
-import 'package:core/const/src/app_lang.dart';
+import 'package:localization/localization.dart';
 import 'package:docu_fill/features/src/configure/model/table_row_data.dart';
 import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
 import 'package:core/core.dart';

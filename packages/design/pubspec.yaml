@@ -11,9 +11,10 @@ dependencies:
     sdk: flutter
   core:
     path: ../core
+  localization:
+    path: ../localization
   flutter_screenutil: ^5.9.3
   google_fonts: ^6.2.1
-  easy_localization: ^3.0.7+1
   cached_network_image: ^3.4.1
   flutter_svg: ^2.2.0
 

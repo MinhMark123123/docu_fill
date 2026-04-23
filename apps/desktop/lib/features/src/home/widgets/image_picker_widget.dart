@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:core/const/src/app_lang.dart';
+import 'package:localization/localization.dart';
 import 'package:data/data.dart';
 import 'package:design/ui.dart';
 import 'package:core/core.dart';

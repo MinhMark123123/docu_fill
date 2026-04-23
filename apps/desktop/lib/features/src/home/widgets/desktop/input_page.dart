@@ -1,3 +1,4 @@
+import 'package:localization/localization.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:docu_fill/route/routers.dart';

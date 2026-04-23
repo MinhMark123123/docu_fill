@@ -6,7 +6,7 @@ import 'package:archive/archive.dart';
 import 'package:core/const/const.dart';
 import 'package:data/data.dart';
 import 'package:core/utils/utils.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:localization/localization.dart';
 
 class TemplateService {
   final TemplateRepository _templateRepository;

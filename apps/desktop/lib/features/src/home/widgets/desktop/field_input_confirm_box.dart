@@ -1,4 +1,4 @@
-import 'package:core/const/src/app_lang.dart';
+import 'package:localization/localization.dart';
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:design/ui.dart';
 import 'package:core/core.dart';
