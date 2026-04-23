@@ -1,11 +1,10 @@
-import 'package:localization/localization.dart';
 import 'dart:io';
 
-import 'package:core/core.dart';
-import 'package:docu_fill/core/core.dart';
 import 'package:data/data.dart';
+import 'package:docu_fill/core/core.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
@@ -136,9 +135,13 @@ class FieldsInputViewModel extends BaseViewModel {
 
     final localized = <String, List<TemplateField>>{};
 
-    // --- "Tổng quan" tab: all fields flat, always first ---
-    final allFields = rawData.values.expand((f) => f).toList();
-    localized[AppLang.labelsOverview.tr()] = allFields;
+    // Named sections
+    for (final entry in rawData.entries) {
+      if (entry.key == null || entry.key == TemplateService.commonSectionKey) {
+        continue;
+      }
+      localized[entry.key!] = entry.value;
+    }
 
     // Put "common" bucket when it exists
     if (rawData.containsKey(TemplateService.commonSectionKey)) {
@@ -154,14 +157,6 @@ class FieldsInputViewModel extends BaseViewModel {
               : AppLang.labelsGeneral.tr(); // only group → keep it simple
       localized[label] = rawData[null]!;
     }
-    // Named sections
-    for (final entry in rawData.entries) {
-      if (entry.key == null || entry.key == TemplateService.commonSectionKey) {
-        continue;
-      }
-      localized[entry.key!] = entry.value;
-    }
-
     _composedTemplateUI.postValue(localized);
     checkValidate();
   }
@@ -357,7 +352,7 @@ class FieldsInputViewModel extends BaseViewModel {
           try {
             extractedText = await _dataExtractionService.extractText(file);
           } catch (e) {
-            if (e.toString().contains("Unsupported file format: .pdf")) {
+            if (e.toString().toLowerCase().contains("pdf")) {
               pdfError = true;
             } else {
               rethrow;

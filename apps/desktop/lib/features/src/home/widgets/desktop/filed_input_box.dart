@@ -1,9 +1,9 @@
-import 'package:localization/localization.dart';
 import 'package:data/data.dart';
+import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:docu_fill/features/src/home/widgets/image_picker_widget.dart';
-import 'package:design/ui.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
 class FiledInputBox extends StatelessWidget {
@@ -299,7 +299,9 @@ class FiledInputBox extends StatelessWidget {
           Dimens.spacing.vertical(Dimens.size32),
           ...data.entries.map((entry) {
             final sectionFields = entry.value.where(
-              (f) => viewModel.getInitValue(e: f) != null,
+              (f) =>
+                  viewModel.getInitValue(e: f) != null &&
+                  entry.key != AppLang.labelsOverview.tr(),
             );
             if (sectionFields.isEmpty) return SizedBox.shrink();
 
@@ -370,7 +372,8 @@ class FiledInputBox extends StatelessWidget {
   }
 
   IconData _getSectionIcon(String sectionKey) {
-    if (sectionKey == AppLang.labelsOverview.tr()) return Icons.dashboard_outlined;
+    if (sectionKey == AppLang.labelsOverview.tr())
+      return Icons.dashboard_outlined;
     if (sectionKey == AppLang.labelsCommon.tr()) return Icons.layers;
     if (sectionKey == AppLang.labelsGeneral.tr()) return Icons.info_outline;
     if (sectionKey == AppLang.labelsGeneralInfo.tr()) return Icons.info_outline;

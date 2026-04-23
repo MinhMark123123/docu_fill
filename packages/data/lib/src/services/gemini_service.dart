@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/widgets.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+
 import 'package:data/data.dart';
 import 'package:data/src/repositories/settings/settings_repository.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/widgets.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:intl/intl.dart';
 import 'package:mime/mime.dart';
+import 'package:path_provider/path_provider.dart';
 
 class GeminiService {
   final SettingsRepository _settingsRepository;
@@ -41,7 +42,7 @@ RULES:
 1. Return ONLY a valid JSON object.
 2. The keys in the JSON must exactly match the "FIELD KEYS" provided.
 3. Values should be extracted from the "EXTRACTED TEXT".
-4. If a value represents a date, format it as "YYYY-MM-DD" if possible.
+4. If a value represents a date, format it as "DD-MM-YYYY" if possible.
 5. If a value is not found in the text, return an empty string "" for that key.
 
 FIELD KEYS:
@@ -117,7 +118,7 @@ Your goal is to analyze the content of the file and map the information into the
 RULES:
 1. Return ONLY a valid JSON object.
 2. The keys in the JSON must exactly match the "FIELD KEYS" provided.
-3. If a value represents a date, format it as "YYYY-MM-DD".
+3. If a value represents a date, format it as "DD-MM-YYYY".
 4. If a value is not found in the file, return an empty string "" for that key.
 5. Extract values in their original language found in the document.
 
