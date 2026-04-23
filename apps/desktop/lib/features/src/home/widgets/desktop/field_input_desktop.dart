@@ -1,0 +1,35 @@
+import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
+import 'package:docu_fill/features/src/home/widgets/desktop/field_input_confirm_box.dart';
+import 'package:docu_fill/features/src/home/widgets/desktop/filed_input_box.dart';
+import 'package:docu_fill/features/src/home/widgets/empty_fields_widget.dart';
+import 'package:design/ui.dart';
+import 'package:flutter/material.dart';
+import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
+
+class FieldInputDesktop extends StatelessWidget {
+  const FieldInputDesktop({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamDataConsumer(
+      streamData: getViewModel<FieldsInputViewModel>().idsSelected,
+      builder: (context, data) {
+        if (data.isEmpty) return EmptyFieldsWidget();
+        return Column(
+          children: [FieldInputConfirmBox(), Expanded(child: FiledInputBox())],
+        );
+      },
+    );
+  }
+
+  Widget decorationBox({required Widget child}) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: Dimens.size8),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: Dimens.radii.borderSmall()),
+        elevation: Dimens.size1,
+        child: child,
+      ),
+    );
+  }
+}
