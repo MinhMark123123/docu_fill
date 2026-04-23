@@ -370,8 +370,10 @@ class FiledInputBox extends StatelessWidget {
   }
 
   IconData _getSectionIcon(String sectionKey) {
+    if (sectionKey == AppLang.labelsOverview.tr()) return Icons.dashboard_outlined;
     if (sectionKey == AppLang.labelsCommon.tr()) return Icons.layers;
     if (sectionKey == AppLang.labelsGeneral.tr()) return Icons.info_outline;
+    if (sectionKey == AppLang.labelsGeneralInfo.tr()) return Icons.info_outline;
     return Icons.folder_open;
   }
 

@@ -73,6 +73,8 @@ class FieldsInputViewModel extends BaseViewModel {
     }
   }
 
+  void goToSummary() => _showSummary.postValue(true);
+
   final TextEditingController _nameDocExported = TextEditingController();
 
   TextEditingController get nameDocExported => _nameDocExported;
@@ -125,7 +127,40 @@ class FieldsInputViewModel extends BaseViewModel {
       }
     }
 
-    _composedTemplateUI.postValue(rawData);
+    // Translate raw section keys → localized display names.
+    // null key = no section configured on field.
+    // TemplateService.commonSectionKey = shared across all templates.
+    final hasNamedSections = rawData.keys.any(
+      (k) => k != null && k != TemplateService.commonSectionKey,
+    );
+
+    final localized = <String, List<TemplateField>>{};
+
+    // --- "Tổng quan" tab: all fields flat, always first ---
+    final allFields = rawData.values.expand((f) => f).toList();
+    localized[AppLang.labelsOverview.tr()] = allFields;
+
+    // Put "common" bucket when it exists
+    if (rawData.containsKey(TemplateService.commonSectionKey)) {
+      localized[AppLang.labelsCommon.tr()] =
+          rawData[TemplateService.commonSectionKey]!;
+    }
+    // Unsectioned fields (null key)
+    if (rawData.containsKey(null)) {
+      final label = hasNamedSections
+          ? AppLang.labelsGeneralInfo.tr() // coexists with named sections
+          : AppLang.labelsGeneral.tr();    // only group → keep it simple
+      localized[label] = rawData[null]!;
+    }
+    // Named sections
+    for (final entry in rawData.entries) {
+      if (entry.key == null || entry.key == TemplateService.commonSectionKey) {
+        continue;
+      }
+      localized[entry.key!] = entry.value;
+    }
+
+    _composedTemplateUI.postValue(localized);
     checkValidate();
   }
 

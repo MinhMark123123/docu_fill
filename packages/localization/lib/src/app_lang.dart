@@ -85,6 +85,7 @@ abstract class AppLang {
   static const String labelsFieldKey = "labels.field_key";
   static const String labelsFieldName = "labels.field_name";
   static const String labelsGeneral = "labels.general";
+  static const String labelsGeneralInfo = "labels.general_info";
   static const String labelsHeight = "labels.height";
   static const String labelsImportConfiguration = "labels.import_configuration";
   static const String labelsImportExportConfiguration = "labels.import_export_configuration";
@@ -98,6 +99,7 @@ abstract class AppLang {
   static const String labelsMultiple = "labels.multiple";
   static const String labelsNewTemplate = "labels.new_template";
   static const String labelsOptions = "labels.options";
+  static const String labelsOverview = "labels.overview";
   static const String labelsPrompt = "labels.prompt";
   static const String labelsQuickActions = "labels.quick_actions";
   static const String labelsRecentTemplates = "labels.recent_templates";
