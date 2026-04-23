@@ -31,7 +31,8 @@ const TemplateFieldModelSchema = Schema(
       type: IsarType.stringList,
     ),
     r'required': PropertySchema(id: 5, name: r'required', type: IsarType.bool),
-    r'type': PropertySchema(id: 6, name: r'type', type: IsarType.string),
+    r'section': PropertySchema(id: 6, name: r'section', type: IsarType.string),
+    r'type': PropertySchema(id: 7, name: r'type', type: IsarType.string),
   },
 
   estimateSize: _templateFieldModelEstimateSize,
@@ -72,6 +73,12 @@ int _templateFieldModelEstimateSize(
       }
     }
   }
+  {
+    final value = object.section;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.type.length * 3;
   return bytesCount;
 }
@@ -88,7 +95,8 @@ void _templateFieldModelSerialize(
   writer.writeString(offsets[3], object.label);
   writer.writeStringList(offsets[4], object.options);
   writer.writeBool(offsets[5], object.required);
-  writer.writeString(offsets[6], object.type);
+  writer.writeString(offsets[6], object.section);
+  writer.writeString(offsets[7], object.type);
 }
 
 TemplateFieldModel _templateFieldModelDeserialize(
@@ -104,7 +112,8 @@ TemplateFieldModel _templateFieldModelDeserialize(
     label: reader.readStringOrNull(offsets[3]) ?? '',
     options: reader.readStringList(offsets[4]),
     required: reader.readBoolOrNull(offsets[5]) ?? false,
-    type: reader.readStringOrNull(offsets[6]) ?? '',
+    section: reader.readStringOrNull(offsets[6]),
+    type: reader.readStringOrNull(offsets[7]) ?? '',
   );
   return object;
 }
@@ -129,6 +138,8 @@ P _templateFieldModelDeserializeProp<P>(
     case 5:
       return (reader.readBoolOrNull(offset) ?? false) as P;
     case 6:
+      return (reader.readStringOrNull(offset)) as P;
+    case 7:
       return (reader.readStringOrNull(offset) ?? '') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -950,6 +961,165 @@ extension TemplateFieldModelQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(property: r'required', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'section'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'section'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'section',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'section',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'section',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'section',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'section',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'section',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'section',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'section',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'section', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  sectionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'section', value: ''),
       );
     });
   }

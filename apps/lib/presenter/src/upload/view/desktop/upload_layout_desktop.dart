@@ -1,7 +1,6 @@
 import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/gen/assets.gen.dart';
-import 'package:docu_fill/presenter/page.dart';
-import 'package:docu_fill/presenter/src/widgets/desktop_top_title.dart';
+import 'package:docu_fill/presenter/src/upload/view_model/upload_view_model.dart';
 import 'package:docu_fill/ui/ui.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/gestures.dart';
@@ -14,83 +13,110 @@ class UploadLayoutDesktop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: Dimens.size20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Dimens.spacing.vertical(Dimens.size20),
-            header(context),
-            dropBox(context),
-            bottomLabel(context),
-            continueButton(),
-          ],
+      backgroundColor: context.colorScheme.surface,
+      body: Center(
+        child: Container(
+          constraints: BoxConstraints(maxWidth: Dimens.size928),
+          padding: EdgeInsets.symmetric(
+            horizontal: Dimens.size24,
+            vertical: Dimens.size40,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              header(context),
+              Dimens.spacing.vertical(Dimens.size32),
+              dropBox(context),
+              Dimens.spacing.vertical(Dimens.size24),
+              bottomLabel(context),
+              Dimens.spacing.vertical(Dimens.size40),
+              continueButton(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Expanded continueButton() => Expanded(
-    child: Center(
-      child: StreamDataConsumer(
-        streamData: getViewModel<UploadViewModel>().filePicked,
-        builder: (context, data) {
-          return Visibility(
-            visible: data.path != null,
-            maintainAnimation: true,
-            maintainState: true,
-            child: ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all(
-                  context.colorScheme.primary,
-                ),
+  Widget continueButton() => StreamDataConsumer(
+    streamData: getViewModel<UploadViewModel>().filePicked,
+    builder: (context, data) {
+      final isVisible = data.path != null;
+      return AnimatedOpacity(
+        opacity: isVisible ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 300),
+        child: IgnorePointer(
+          ignoring: !isVisible,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size(Dimens.size200, Dimens.size48),
+              backgroundColor: context.colorScheme.primary,
+              foregroundColor: context.colorScheme.onPrimary,
+              shape: RoundedRectangleBorder(
+                borderRadius: Dimens.radii.borderMedium(),
               ),
-              onPressed: () {
-                getViewModel<UploadViewModel>().continuePressed();
-              },
-              child: Text(AppLang.actionsContinue.tr()),
             ),
-          );
-        },
-      ),
-    ),
+            onPressed: () {
+              getViewModel<UploadViewModel>().continuePressed();
+            },
+            child: Text(
+              AppLang.actionsContinue.tr(),
+              style: context.textTheme.titleMedium?.copyWith(
+                color: context.colorScheme.onPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      );
+    },
   );
 
-  AspectRatio dropBox(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 960 / 264,
-      child: Padding(
-        padding: EdgeInsets.all(Dimens.size16),
+  Widget dropBox(BuildContext context) {
+    return GestureDetector(
+      onTap: () => getViewModel<UploadViewModel>().pickFile(),
+      child: Container(
+        width: double.infinity,
+        height: Dimens.size232 * 1.2,
+        decoration: BoxDecoration(
+          color: context.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+          borderRadius: Dimens.radii.borderLarge(),
+          border: Border.all(
+            color: context.colorScheme.primary.withOpacity(0.5),
+            width: 2,
+            style: BorderStyle.solid,
+          ),
+        ),
         child: DashedBorderContainer(
-          strokeWidth: Dimens.size2,
-          dashWidth: Dimens.size8,
-          borderColor: context.appColors?.dashColor,
+          strokeWidth: 2,
+          dashWidth: 10,
+          borderColor: context.colorScheme.primary.withOpacity(0.5),
+          borderRadius: Dimens.radii.borderLarge(),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Icon(
+                Icons.cloud_upload_outlined,
+                size: Dimens.size64,
+                color: context.colorScheme.primary,
+              ),
+              Dimens.spacing.vertical(Dimens.size16),
               Text(
                 AppLang.messagesDragAndDropDocx.tr(),
-                style: context.textTheme.headlineSmall,
+                style: context.textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Dimens.spacing.vertical(Dimens.size8),
               Text(
                 AppLang.actionsBrowseFiles.tr(),
-                style: context.textTheme.bodySmall,
-              ),
-              Dimens.spacing.vertical(Dimens.size34),
-              filePickedBuilder(context),
-              FilledButton(
-                onPressed: () => getViewModel<UploadViewModel>().pickFile(),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: Dimens.size4),
-                  child: Text(
-                    AppLang.labelsUploadDocxFile.tr(),
-                    style: context.textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: context.colorScheme.onSurfaceVariant,
                 ),
               ),
+              Dimens.spacing.vertical(Dimens.size24),
+              filePickedBuilder(context),
             ],
           ),
         ),
@@ -99,42 +125,49 @@ class UploadLayoutDesktop extends StatelessWidget {
   }
 
   Widget header(BuildContext context) {
-    return DesktopTopTitle(
-      aspectRatio: 960 / 105,
-      title: AppLang.actionsUploadTemplate.tr(),
-      subtitle: AppLang.messagesUploadTemplate.tr(),
+    return Column(
+      children: [
+        Text(
+          AppLang.actionsUploadTemplate.tr(),
+          style: context.textTheme.displaySmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            color: context.colorScheme.onSurface,
+          ),
+        ),
+        Dimens.spacing.vertical(Dimens.size8),
+        Text(
+          AppLang.messagesUploadTemplate.tr(),
+          style: context.textTheme.bodyLarge?.copyWith(
+            color: context.colorScheme.onSurfaceVariant,
+          ),
+        ),
+      ],
     );
   }
 
   Widget bottomLabel(BuildContext context) {
-    return Center(
-      child: Text.rich(
-        TextSpan(
-          children: [
-            TextSpan(
-              text: AppLang.messagesDragAndDropDocx.tr(),
-              style: context.textTheme.bodySmall?.copyWith(
-                color: context.appColors?.bodyTextColor,
-              ),
+    return Text.rich(
+      TextSpan(
+        children: [
+          TextSpan(
+            text: "${AppLang.messagesDragAndDropDocx.tr()} ",
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: context.colorScheme.onSurfaceVariant,
             ),
-            TextSpan(
-              text: " ",
-              style: context.textTheme.bodySmall?.copyWith(
-                color: context.appColors?.bodyTextColor,
-              ),
+          ),
+          TextSpan(
+            text: AppLang.messagesImportSetting.tr(),
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: context.colorScheme.primary,
+              fontWeight: FontWeight.bold,
+              decoration: TextDecoration.underline,
             ),
-            TextSpan(
-              text: AppLang.messagesImportSetting.tr(),
-              style: context.textTheme.bodySmall?.copyWith(
-                color: context.colorScheme.primary,
-              ),
-              recognizer:
-                  TapGestureRecognizer()
-                    ..onTap =
-                        () => getViewModel<UploadViewModel>().importSetting(),
-            ),
-          ],
-        ),
+            recognizer:
+                TapGestureRecognizer()
+                  ..onTap =
+                      () => getViewModel<UploadViewModel>().importSetting(),
+          ),
+        ],
       ),
     );
   }
@@ -144,10 +177,10 @@ class UploadLayoutDesktop extends StatelessWidget {
       streamData: getViewModel<UploadViewModel>().filePicked,
       builder: (context, data) {
         return AnimatedSize(
-          duration: Duration(milliseconds: 200),
+          duration: const Duration(milliseconds: 200),
           child:
               data.path == null
-                  ? SizedBox.shrink()
+                  ? const SizedBox.shrink()
                   : Padding(
                     padding: EdgeInsets.only(bottom: Dimens.size34),
                     child: Row(
@@ -160,7 +193,7 @@ class UploadLayoutDesktop extends StatelessWidget {
                         Text(
                           "${data.name} (${data.size.toHumanReadableSize()})",
                           style: context.textTheme.bodySmall?.copyWith(
-                            color: context.appColors?.bodyTextColor,
+                            color: context.colorScheme.onSurface,
                           ),
                         ),
                       ],

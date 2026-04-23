@@ -8,9 +8,21 @@ import 'app_get_it.dart';
 
 void setupViewModelModule() {
   registerViewModel(() => MainViewModel());
-  registerViewModel(() => HomeViewModel(templateRepository: inject()));
-  registerViewModel(() => SettingViewModel());
+  registerViewModel(
+    () =>
+        HomeViewModel(templateRepository: inject(), templateService: inject()),
+  );
+  registerViewModel(() => SettingViewModel(settingsRepository: inject()));
   registerViewModel(() => UploadViewModel());
   registerViewModel(() => ConfigureViewModel(templateRepository: inject()));
-  registerViewModel(() => FieldsInputViewModel(templateRepository: inject()));
+  registerViewModel(
+    () => FieldsInputViewModel(
+      templateRepository: inject(),
+      templateService: inject(),
+      dataExtractionService: inject(),
+      geminiService: inject(),
+    ),
+  );
+  registerViewModel(() => LogHistoryViewModel());
+  registerViewModel(() => LogDetailViewModel());
 }

@@ -1,20 +1,15 @@
-import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:archive/archive.dart';
-import 'package:docu_fill/const/const.dart';
+import 'package:docu_fill/const/enum/template_item_menu.dart';
+import 'package:docu_fill/const/src/app_const.dart';
+import 'package:docu_fill/const/src/app_lang.dart';
 import 'package:docu_fill/core/core.dart';
-import 'package:docu_fill/data/src/repositories/template/template_repository.dart';
-import 'package:docu_fill/data/src/template_config.dart';
+import 'package:docu_fill/data/data.dart';
 import 'package:docu_fill/presenter/src/configure/configure_page.dart';
 import 'package:docu_fill/presenter/src/configure/view_model/configure_view_model.dart';
-import 'package:docu_fill/presenter/src/home/widgets/desktop/input_page.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
@@ -25,9 +20,13 @@ typedef TemplateComposed = (List<int>, List<TemplateConfig>);
 @BindableViewModel()
 class HomeViewModel extends BaseViewModel {
   final TemplateRepository _templateRepository;
+  final TemplateService _templateService;
 
-  HomeViewModel({required TemplateRepository templateRepository})
-    : _templateRepository = templateRepository;
+  HomeViewModel({
+    required TemplateRepository templateRepository,
+    required TemplateService templateService,
+  }) : _templateRepository = templateRepository,
+       _templateService = templateService;
 
   @Bind()
   late final _templates = <TemplateConfig>[].mtd(this);
@@ -99,16 +98,16 @@ class HomeViewModel extends BaseViewModel {
     }
   }
 
-  void onTemplateSelected({
-    required BuildContext context,
-    required TemplateConfig data,
-  }) {
+  void onTemplateSelected({required TemplateConfig data}) {
     if (_enableMultipleChoice.data) {
       _onMultipleTemplatesSelected(data);
     } else {
       _onSingleTemplateSelected(data);
     }
-    context.go(InputPage.pathCompose(_selectedTemplateIds.data));
+    navigatePage(
+      RoutesPath.home,
+      queryParameters: {"ids": _selectedTemplateIds.data.join(",")},
+    );
   }
 
   void _onSingleTemplateSelected(TemplateConfig data) {
@@ -132,52 +131,39 @@ class HomeViewModel extends BaseViewModel {
     return _selectedTemplateIds.data.contains(data.id);
   }
 
-  FutureOr<dynamic> doneExported() {
-    //_selectedTemplateIds.postValue([]);
-  }
-
   void onItemMenuSelected({
-    required BuildContext context,
     required TemplateMenuItem itemMenu,
     required TemplateConfig item,
   }) {
     switch (itemMenu) {
       case TemplateMenuItem.edit:
-        editTemplate(context: context, item: item);
+        editTemplate(item: item);
         break;
       case TemplateMenuItem.delete:
         deleteTemplate(item);
         break;
       case TemplateMenuItem.exportSetting:
-        exportSetting(context, item);
+        exportSetting(item);
         break;
     }
   }
 
   Future<void> deleteTemplate(TemplateConfig item) async {
-    await _templateRepository.deleteTemplate(item.id);
-    final file = File(item.pathTemplate);
-    if (file.existsSync()) {
-      await file.delete();
-    }
+    await _templateService.deleteTemplate(item);
     await loadTemplates();
   }
 
-  void setOnEnableMultipleChoice(BuildContext context, bool value) {
+  void setOnEnableMultipleChoice(bool value) {
     _enableMultipleChoice.postValue(value);
     if (value || _selectedTemplateIds.data.isEmpty) return;
     final singleSelectedItem = _selectedTemplateIds.data.first;
     _selectedTemplateIds.postValue([]);
-    onTemplateSelected(
-      context: context,
-      data: _templates.data.firstWhere((t) => t.id == singleSelectedItem),
-    );
+
+    final data = _templates.data.firstWhere((t) => t.id == singleSelectedItem);
+    onTemplateSelected(data: data);
   }
 
-  void editTemplate({
-    required BuildContext context,
-    required TemplateConfig item,
-  }) {
+  void editTemplate({required TemplateConfig item}) {
     navigatePage(
       RoutesPath.homeConfigure,
       queryParameters: ConfigurePage.paramsQuery(
@@ -188,43 +174,20 @@ class HomeViewModel extends BaseViewModel {
     );
   }
 
-  Future<void> exportSetting(BuildContext context, TemplateConfig item) async {
+  Future<void> exportSetting(TemplateConfig item) async {
     final result = await FilePicker.platform.getDirectoryPath();
     if (result == null) return;
-    // 1. Create the Archive object
-    final archive = Archive();
-    final safeName = (item.templateName).replaceAll(RegExp(r'[^\w\s]+'), '_');
-    // 2. Add the .docx file to the archive
-    final docxFile = File(item.pathTemplate);
-    final docxBytes = await docxFile.readAsBytes();
-    archive.addFile(
-      ArchiveFile(AppConst.settingDocFileName, docxBytes.length, docxBytes),
-    );
 
-    // 3. Add the .json config to the archive
-    final configMap = item.toJson();
-    // IMPORTANT: Update the path in the config to match the relative path inside the zip
-    // When importing, we will read this 'pathTemplate' to know which file in the zip is the template.
-
-    final jsonString = jsonEncode(configMap);
-    final jsonBytes = utf8.encode(jsonString);
-    archive.addFile(
-      ArchiveFile(AppConst.settingJsonFileName, jsonBytes.length, jsonBytes),
-    );
-
-    // 4. Encode the archive to Zip format
-    final zipEncoder = ZipEncoder();
-    final encodedArchive = zipEncoder.encode(archive);
-
+    final encodedArchive = await _templateService.createExportArchive(item);
     if (encodedArchive == null) return;
 
-    // 5. Save the zip file to temp directory
+    final safeName = _templateService.getSafeFileName(item.templateName);
     final exportPath = [
       result,
       "$safeName${AppConst.settingFileExtension}",
     ].join(Platform.pathSeparator);
-    final exportFile = File(exportPath);
-    await exportFile.writeAsBytes(encodedArchive);
+
+    await _templateService.saveExportedFile(encodedArchive, exportPath);
     showSnackbar(AppLang.messagesSettingExported.tr());
   }
 }

@@ -23,38 +23,60 @@ class ItemDocumentCollection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: Dimens.size2,
-      color:
-          isSelected
-              ? context.colorScheme.primaryFixedDim
-              : context.colorScheme.surface,
-      surfaceTintColor:
-          isSelected
-              ? context.colorScheme.primaryFixedDim
-              : context.colorScheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: Dimens.radii.borderSmall()),
-      clipBehavior: Clip.hardEdge,
+    final bgColor =
+        isSelected
+            ? context.colorScheme.primary.withOpacity(0.08)
+            : Colors.transparent;
+    final borderColor =
+        isSelected
+            ? context.colorScheme.primary.withOpacity(0.5)
+            : context.colorScheme.outlineVariant.withOpacity(0.5);
+    final textColor =
+        isSelected
+            ? context.colorScheme.primary
+            : context.colorScheme.onSurface;
+
+    return Container(
+      margin: EdgeInsets.symmetric(
+        horizontal: Dimens.size12,
+        vertical: Dimens.size4,
+      ),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: Dimens.radii.borderMedium(),
+        border: Border.all(color: borderColor, width: isSelected ? 1.5 : 1),
+      ),
       child: ListTile(
-        contentPadding: EdgeInsets.only(
-          left: Dimens.size12,
-          top: Dimens.size8,
-          bottom: Dimens.size8,
+        shape: RoundedRectangleBorder(
+          borderRadius: Dimens.radii.borderMedium(),
+        ),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: Dimens.size12,
+          vertical: Dimens.size4,
         ),
         leading: Icon(
-          Icons.file_copy_outlined,
-          color: isSelected ? context.colorScheme.surface : null,
+          Icons.insert_drive_file_outlined,
+          color:
+              isSelected
+                  ? context.colorScheme.primary
+                  : context.colorScheme.onSurfaceVariant,
         ),
         title: Text(
           title,
           style: context.textTheme.bodyMedium?.copyWith(
-            color: isSelected ? context.colorScheme.surface : null,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: textColor,
           ),
         ),
         subtitle:
             subtitle == null
                 ? null
-                : Text(subtitle!, style: context.textTheme.bodySmall),
+                : Text(
+                  subtitle!,
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
+                ),
         onTap: () => onItemPressed.call(),
         trailing: trailingMenu(),
       ),

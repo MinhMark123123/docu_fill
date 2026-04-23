@@ -1,0 +1,303 @@
+      --- GEMINI API LOG ---
+      TIMESTAMP: 2026-04-22 10:28:15.991200
+      
+      --- PROMPT ---
+      You are an expert data extraction assistant.
+You will be provided with "EXTRACTED TEXT" from a document and a list of "FIELD KEYS" from a template.
+Your goal is to map the information from the text into the field keys.
+
+RULES:
+1. Return ONLY a valid JSON object.
+2. The keys in the JSON must exactly match the "FIELD KEYS" provided.
+3. Values should be extracted from the "EXTRACTED TEXT".
+4. If a value represents a date, format it as "YYYY-MM-DD" if possible.
+5. If a value is not found in the text, return an empty string "" for that key.
+
+FIELD KEYS:
+%%ngaythangnam%%, %%TenKhachHang%%, %%DiaChiKhachHang%%, %%TenChiNhanh%%, %%DiaChiChiNhanhPGD%%, %%ThangNamTuVanGia%%, %%DiaChiTaiSan%%, %%NgayThangNamNhanHoSo%%, %%GiayChungNhanQuyenSuDungDat%%, %%CanCuPhapLyKhac1%%, %%CanCuPhapLyKhac2%%, %%CanCuPhapLyKhac3%%, %%NgayKhaoSat%%, %%DonGiaDatLuaChon%%, %%DienTichDatNgoaiLoGioi%%, %%GiaTriDatONgoaiLoGioi%%, %%DienTichDatTrongLoGioi%%, %%DonGiaDatNhaNuoc%%, %%GiaTriDatOTrongLoGioi%%, %%DienTichSuDungCongNhan%%, %%DonGiaCTXD%%, %%ChatLuongConLai%%, %%GiaTriCTXD%%, %%Huong1%%, %%Huong2%%, %%Huong3%%, %%TiepGiapDuong1%%, %%TiepGiapDuong2%%, %%TiepGiapDuong3%%, %%DienTichDat%%, %%DienTichDatKhongDuocCapGCN%%, %%HinhThucSuDung%%, %%HinhDangThuaDat%%, %%MatTienMatHau%%, %%ChieuSauTrungBinh%%, %%MucDichSuDungDat%%, %%ThoiHanSuDung%%, %%NguonGocSuDung%%, %%ToaDoGoogleMap%%, %%SoTang%%, %%Mong%%, %%KhungCot%%, %%San%%, %%Mai%%, %%DienTichXayDung%%, %%DienTichSuDungThucTe%%, %%NamXayDung%%, %%Nen%%, %%CauThang%%, %%HeThongCua%%, %%LoiThe1%%, %%LoiThe2%%, %%NhuocDiem1%%, %%NhuocDiem2%%, %%HinhAnh1%%, %%HinhAnh2%%, %%HinhAnh3%%, %%HinhAnh4%%, %%HinhAnh5%%, %%HinhAnh6%%, %%HinhAnh7%%, %%HinhAnh8%%, %%sothongbao%%
+
+EXTRACTED TEXT:
+--- Sheet: De nghi tham dinh ---
+ CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM |  |  | 
+Độc lập – Tự do – Hạnh phúc |  |  | 
+ |  |  | 
+GIẤY ĐỀ NGHỊ TÁI THẨM ĐỊNH GIÁ TÀI SẢN |  |  | 
+Số: 111-4/2026/CNBT |  |  | 
+Căn cứ vào nhu cầu tái thẩm định giá tài sản đảm bảo phục vụ vay vốn tại Ngân Hàng Thương mại Cổ phần Bắc Á. Nay đề nghị Công ty quản lý và khai thác tài sản – Chi nhánh Hồ Chí Minh (BACA AMC.HCM), tư vấn giá các tài sản theo thông tin chi tiết sau: |  |  | 
+1. Khách hàng:  | Ông Châu Thế Minh |  | 
+- Địa chỉ:  | KP12, Phường Phú Thuỷ, Thành Phố Phan Thiết, Bình Thuận (nay là Phường Phú Thuỷ, Tỉnh Lâm Đồng). |  | 
+- CCCD số:  | 020074000035 | do  CTCCSQLHCVTTXH cấp ngày 09/08/2021 | 
+- Điện thoại:  | 0902402222 |  | 
+- Người liên hệ: |  |  | 
+2. Đơn vị cho vay: Ngân hàng TMCP Bắc Á – Chi Nhánh Bình Thuận (Phòng kinh doanh) |  |  | 
+- Địa chỉ:  | 203 Tôn Đúc Thắng, Phường Phú Thuỷ, Thành Phố Phan Thiết, Bình Thuận |  | 
+- Người liên hệ:  | Lê Nguyên Vũ |  | 
+- Điện thoại: | 0252.368.6789 (EXT: 146)   |  | 
+- Di động:  | 0777.907.007 |  | 
+ |  |  | 
+3. Tài sản yêu cầu tư vấn giá: |  |  | 
+- Bất động sản: Thửa đất số 423 + 424, tờ bản đồ số 80. Địa chỉ thửa đất: Thôn Phú Hoà, Xã Hàm Trí, Huyện Hàm Thuận Bắc, Tỉnh Bình Thuận (nay là Xã Hàm Thuận Bắc, Tỉnh Lâm Đồng). Chủ sở hữu: ông Châu Thế Minh |  |  | 
+- Mục đích: Cấp hạn mức tín dụng. |  |  | 
+ |  |  | 
+4. Địa điểm tiến hành:  |  |  | 
+- Công ty quản lý nợ và khai thác tài sản – Chi Nhánh Hồ Chí Minh (BACA AMC.HCM) |  |  | 
+ |  |  | 
+5. Thời điểm tư vấn giá: |  |  | 
+- Tháng 03/2026 |  |  | 
+ |  |  | 
+ |  |  | Lâm Đồng, ngày 19 tháng 03 năm 2026
+BAC A AMC |  |  | BGĐ CHI NHÁNH
+Đã tiếp nhận giấy yêu cầu   |  |  | 
+ngày.......tháng....... năm …… |  |  | 
+--- Sheet: BC tham dinh ---
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+BÁO CÁO THẨM ĐỊNH GIÁ TRỊ TÀI SẢN  |  |  |  |  |  |  |  |  |  | 
+(Áp dụng cho TSBĐ là QSD đất và tài sản gắn liền trên đất) |  |  |  |  |  |  |  |  |  | 
+ Số:111-4/2026/BCĐG-CNBT |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+I. THÔNG TIN CHUNG |  |  |  |  |  |  |  |  |  | 
+- Chi nhánh/Mã Chi nhánh: Bình Thuận                           Mã tài sản: //. |  |  |  |  |  |  |  |  |  | 
+- Chủ sở hữu tài sản:  |  | Ông Châu Thế Minh |  |  |  |  |  |  |  | 
+- Khách hàng vay:   |  | Ông Châu Thế Minh & Bà Đỗ Thị Mừng |  |  |  |  |  |  |  | 
+- Mối quan hệ giữa chủ tài sản và khách hàng vay: khách hàng vay. |  |  |  |  |  |  |  |  |  | 
+- Thời gian phân hồ sơ:  |  | 19/03/2026 |  |  |  |  |  |  |  | 
+- Thời gian hoàn tất báo cáo thẩm định để ký:  |  |  | 19/03/2026 |  |  |  |  |  |  | 
+- Mục đích thẩm định: |  | Làm cơ sở cấp tín dụng: | X |  |  |  |  |  |  | 
+ |  | TSBĐ bổ sung/thay thế: |  |  |  |  |   |  |  | 
+ |  | Cơ cấu nợ/Xử lý nợ: |  |  |  |   |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+II. MÔ TẢ VỀ BẤT ĐỘNG SẢN |  |  |  |  |  |  |  |  |  | 
+1. Vị trí bất động sản |  |  |  |  |  |  |  |  |  | 
+Toạ độ tài sản: |  | 11.113639, 108.123278 |  |  |  |  |  |  |  | 
+- Địa chỉ tài sản: Thôn Phú Hoà, Xã Hàm Trí, Huyện Hàm Thuận Bắc, Tỉnh Bình Thuận (nay là Xã Hàm Thuận Bắc, Tỉnh Lâm Đồng). |  |  |  |  |  |  |  |  |  | 
+- BĐSTĐ là 2 thửa đất tiếp giáp nhau, tiếp giáp với mương nước rộng khoảng 1m, phía ngoài mương tiếp giáp đường đất và đường bê tông rộng khoảng 3m, cách đường nhựa An Lâm - Đông Giang khoảng 650m (ĐT22) khoảng 650m, cách Chợ Hàm Trí (km21) khoảng 1.7km, cách UBND xã Hàm Thuận Bắc khoảng 2.1km, , khu vực dân cư thưa thớt. |  |  |  |  |  |  |  |  |  | 
+2. Chứng từ pháp lý |  |  |  |  |  |  |  |  |  | 
+- Giấy chứng nhận Quyền sử dụng đất, Quyền sở hữu nhà ở và tài sản khác găn liền với đất số: DP 192518. Số vào sổ cấp GCN: VP06188 do VP.ĐKĐĐ tỉnh Bình Thuận cấp ngày 04/07/2024. Chủ sở hữu là ông Châu Thế Minh. |  |  |  |  |  |  |  |  |  | 
+- Giấy chứng nhận Quyền sử dụng đất, Quyền sở hữu nhà ở và tài sản khác găn liền với đất số: DP 192517. Số vào sổ cấp GCN: VP06187 do VP.ĐKĐĐ tỉnh Bình Thuận cấp ngày 04/07/2024. Chủ sở hữu là ông Châu Thế Minh. |  |  |  |  |  |  |  |  |  | 
+3. Đặc điểm về bất động sản |  |  |  |  |  |  |  |  |  | 
+a. Về đất: |  |  |  |  |  |  |  |  |  | 
+- Thửa đất số: 423 + 424 |  |  |  |  |  |  |  |  |  | 
+- Tờ bản đồ số: 80 |  |  |  |  |  |  |  |  |  | 
+- DTSD thực tế: 1.581,6m2  |  |  | Chiều rộng (mặt tiền): 47.26m |  |  |  |  |  |  | 
+ |  |  | Chiều dài: 17.88m - 35.25m |  | Mặt hậu: 45m |  |  |  |  | 
+- DTSD được công nhận: 1.581,6m2  |  |  | Chiều rộng (mặt tiền): 47.26m |  |  |  |  |  |  | 
+ |  |  | Chiều dài: 17.88m - 35.25m |  | Mặt hậu: 45m |  |  |  |  | 
+- Mục đích sử dụng đất: Đất ở tại nông thôn: 254.7m2; Đất chuyên trồng lúa nước: 1.326,9m2 |  |  |  |  |  |  |  |  |  | 
+- Thời hạn sử dụng đất: Đất ở tại nông thôn: Lâu dài; Đất chuyên trồng lúa nước: Đến tháng 11/2032 |  |  |  |  |  |  |  |  |  | 
+- Hình thức sử dụng đất: Sử dụng riêng |  |  |  |  |  |  |  |  |  | 
+- Nguồn gốc sử dụng đất:  |  |  |  |  |  |  |  |  |  | 
+ | Nhận chuyển nhượng được Công nhận QSDĐ như giao đất không thu tiền sử dụng đất. |  |  |  |  |  |  |  |  | 
+ | Nhà nước giao đất có thu tiền sử dụng đất. |  |  |  |  |  |  |  |  | 
+- Độ rộng mặt đường/ngõ trước thửa đất: Đường đất và đường bê tông rộng khoảng 3m |  |  |  |  |  |  |  |  |  | 
+- Hình dáng thửa đất: Không cân đối. |  |  |  |  |  |  |  |  |  | 
+- Hướng: Tây và Tây Bắc |  |  |  |  |  |  |  |  |  | 
+- Số lượng mặt tiền: 02 mặt tiền. |  |  |  |  |  |  |  |  |  | 
+'- Ghi chú:  |  |  |  |  |  |  |  |  |  | 
+b. Về tài sản gắn liền với đất: đất trống |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+III. KẾT QUẢ THẨM ĐỊNH: |  |  |  |  |  |  |  |  |  | 
+1. Quy hoạch sử dụng đất nơi bất động sản tọa lạc: Đất ở tại nông thôn (theo App VN-2000 Quy hoạch Bình Thuận). |  |  |  |  |  |  |  |  |  | 
+2. Mục đích sử dụng của bất động sản: Đất ở tại nông thôn, đất chuyên trồng lúa nước. |  |  |  |  |  |  |  |  |  | 
+3. Khả năng chuyển nhượng: Khá |  |  |  |  |  |  |  |  |  | 
+4. Khả năng tranh chấp: Chưa có dấu hiệu tranh chấp |  |  |  |  |  |  |  |  |  | 
+5. Định giá bất động sản: |  |  |  |  |  |  |  |  |  | 
+a. Giá trị bất động sản |  |  |  |  |  |  |  |  |  | 
+Đơn giá Nhà nước: |  |  |  |  |  |  |  |  |  | 
+- Căn cứ Nghị Quyết số: 82/2025/NQ-HĐND ngày 30/12/2025 Ban hành Quy định Bảng giá đất để công bố và áp dụng từ ngày 01/01/2026 trên địa bàn tỉnh Lâm Đồng. |  |  |  |  |  |  |  |  |  | 
+- Phụ Lục (ban hành kèm theo Quy định của Nghị Quyết 82/2025/NQ-HĐND ngày 30/12/2025 của Hội đồng nhân dân tỉnh Lâm Đồng). |  |  |  |  |  |  |  |  |  | 
+-BĐSTĐ có đơn giá đất ở tại nông thôn theo bảng giá nhà nước: 956.250 đồng/m2 (Vị trí 3 - phụ lục số 75 theo bảng giá đất). BĐSTĐ có đơn giá đất ở tại chuyên trồng lúa nước theo bảng giá nhà nước: 67.000 đồng/m2 (Vị trí 4 - phụ lục số 75 theo bảng giá đất). |  |  |  |  |  |  |  |  |  | 
+Đơn giá thẩm định: |  |  |  |  |  |  |  |  |  | 
+- Căn cứ theo Quyết định số: 520/2022/QĐ-TGĐ ngày 08/04/2022 Ban hành thẩm quyền phê duyệt kết quả định giá tài sản bảo đảm. |  |  |  |  |  |   |  |  |  | 
+- Đơn giá đất thẩm định đề xuất:  |  | 493000 | đồng/m2 |  |  |  |  |  |  | 
+ |  |  |  | ĐVT: đồng |  |  |  |  |  | 
+ | Khoản mục |  | Theo đơn giá nhà nước | Theo đơn giá thẩm định |  |  |  |  |  | 
+ | 1. Giá trị quyền sử dụng đất ở tại nông thôn |  | 243556875 | 125567100 |  |  |  |  |  | 
+ | Tổng diện tích (m2) |  | 254.7 | 254.7 |  |  |  |  |  | 
+ | Đơn giá (đồng/m2) |  | 956250 | 493000 |  |  |  |  |  | 
+ | 2. Giá trị quyền sử dụng đất chuyên trồng lúa nước |  | 88902300 | 654161700 |  |  |  |  |  | 
+ | Tổng diện tích (m2) |  | 1326.9 | 1326.9 |  |  |  |  |  | 
+ | Đơn giá (đồng/m2) |  | 67000 | 493000 |  |  |  |  |  | 
+ | 2. Giá trị quyền sử dụng đất trồng cây lâu năm thuộc lộ giới |  | 0 | 0 |  |  |  |  |  | 
+ |  Tổng diện tích (m2) |  | 0 | 0 |  |  |  |  |  | 
+ | Đơn giá (đồng/m2) |  | 0 | 0 |  |  |  |  |  | 
+ | 3.Giá trị LTTM |  |  |  |  |  |  |  |  | 
+ | 4. Tổng giá trị = (1) + (2) + (3) |  | 332459175 | 779728800 |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ | Tổng trị giá tài sản (làm tròn): | 779000000 | đồng |  |  | 506350000 |  |  |  | 
+ | Bằng chữ: | Bảy trăm bảy mươi chín triệu đồng. |  |  |  |  |  |  |  | 
+b. Giải thích phương pháp định giá: |  |  |  |  |  |  |  |  |  | 
+TT | Nội dung | Tài sản thẩm định | Tài sản so sánh 1 | Tài sản so sánh 2 | Tài sản so sánh 3 |  |  |  |  | 
+ | Mô tả chi tiết tài sản | DT: 254.7m2 đất ở tại nông thôn + 1326.9m2 đất chuyên trồng lúa nước, tiếp giáp với mương nước rộng khoảng 1m, phía ngoài mương tiếp giáp đường đất và đường bê tông rộng khoảng 3m, cách đường nhựa An Lâm - Đông Giang (ĐT22) khoảng 650m, cách Chợ Hàm Trí (km21) khoảng 1.7km, khu vực dân cư thưa thớt. Địa chỉ: Thôn Phú Hoà, Xã Hàm Trí, Huyện Hàm Thuận Bắc, Tỉnh Bình Thuận (nay là Xã Hàm Thuận Bắc, Tỉnh Lâm Đồng).
+Diện tích:
+1.581,6m2 (ngang 17.88m - 35.25m x dài 45m - 47.26m), mặt tiền tiếp giáp với đất khoảng 65.14m
+Toạ độ: (11.113639, 108.123278) | DT: 100m2 đất ONT + 1326.9m2 đất nông nghiệp, toạ lạc tại đường đất rộng khoảng 3.5m, cách đường nhựa An Lâm - Đông Giang (ĐT22) khoảng 1.6km, cách Chợ Phú Lập khoảng 1.9km, khu vực dân cư thưa thớt. Địa chỉ: Thôn Phú Lập, Xã Hàm Phú, Huyện Hàm Thuận Bắc, Tỉnh Bình Thuận (nay là Xã Hàm Thuận Bắc, Tỉnh Lâm Đồng).
+Diện tích: 1.100m2 (ngang 43.9m-37.8m x dài 19.3m-35.4)
+Toạ độ: (11.137377, 108.118970) Cách TSTĐ khoảng 3.7km
+Liên hệ:
+Chị Tình -0985989420
+
+
+ | DT: 300m2 đất ở tại nông thôn + 1.377,1m2 đất nông nghiệp, toạ lạc tại mặt tiền đường đất rộng khoảng 5m, cách Chợ Phú Lập khoảng 1,2km, cách đường nhựa ĐT22 khoảng 240m, khu vực dân cư thưa thớt. Địa chỉ:  Thôn Phú Lập, Xã Hàm Phú, Huyện Hàm Thuận Bắc, Tỉnh Bình Thuận (nay là Xã Hàm Thuận Bắc, Tỉnh Lâm Đồng).
+Diện tích: 1.677,1m2 (ngang 18,92m -18,6m x dài 94m)
+Toạ độ: (11.129444, 108.106429), cách TSTĐ khoảng 3km
+Liên hệ: Anh Thịnh – 0779.900.066 | DT: 100m2 đất ở tại nông thôn + 2000m2 đất nông nghiệp, toạ lạc tại mặt tiền đường đất rộng khoảng 3m, cách đường nhựa An Lâm - Đông Giang khoảng 120m, cách Chợ Hàm Trí khoảng 550m, khu vực dân cư thưa thớt. Địa chỉ: Thôn Phú Hoà, Xã Hàm Trí, Huyện Hàm Thuận Bắc, Tỉnh Bình Thuận.
+Diện tích: 2100m2 (ngang 51.1m-32m x dài 44m-48.8m), mặt tiền tiếp giáp với đường khoảng 10m.
+Toạ độ: (11.113978, 108.127454), cách TSTĐ khoảng 1.4km
+Liên hệ:
+Anh Trường – 0965.588.686 |  |  |  |  | 
+ | Thời điểm giao dịch |  | Đang rao bán | Đang rao bán | Đang rao bán |  |  |  |  | 
+ |  |  | Liên hệ trực tiếp | https://www.facebook.com/share/p/1B9J58Wo8t/?mibextid=wwXIfr | Liên hệ trực tiếp |  |  |  |  | 
+A | Giá tham khảo (đồng) |  | 750000000 | 920000000 | 1000000000 |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+1 | Giá ước tính giao dịch thành công (đồng) |  | 600000000 | 828000000 | 900000000 |  |  |  |  | 
+ |  |  | (Ước lượng 80% Giá tham khảo) | (Ước lượng 90% Giá tham khảo) | (Ước lượng 90% Giá tham khảo) |  |  |  |  | 
+2 | Giá trị ts trên đất (đồng) |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+3 | Giá trị QSDĐ (đồng) |  | 600000000 | 828000000 | 900000000 |  |  |  |  | 
+4 | Tổng diện tích đất (m2) | 1581.6 | 1100 | 1677.1 | 2100 |  |  |  |  | 
+B | Đơn giá đất (đồng/m2) |  | 545454.5454545454 | 493709.37928567175 | 428571.4285714286 |  |  |  |  | 
+C | Điều chỉnh theo các yếu tố |  |  |  |  |  |  |  |  | 
+1 | Diện tích đất (m2)
+(chỉ tính diện tích đất cùng mục đích sử dụng với đất so sánh) | 1581.6 | 1100 | 1677.1 | 2100 |  |  |  |  | 
+ | Tỷ lệ điều chỉnh |  | -0.02 | 0 | 0.04 |  |  |  |  | 
+2 | Tình trạng pháp lý
+(Đã có Giấy chứng nhận/chưa có giấy chứng nhận) | Có GCN | Có GCN | Có GCN | Có GCN |  |  |  |  | 
+ | Tỷ lệ điều chỉnh |  | 0 | 0 | 0 |  |  |  |  | 
+3 | Hình dạng
+(Cân đối/không cân đôi) | Không cân đối | Không cân đối | Không cân đối | Không cân đối |  |  |  |  | 
+ | Tỷ lệ điều chỉnh |  | 0 | 0 | 0 |  |  |  |  | 
+4 | Độ rộng mặt tiền: (m) | 65.14 | 43.9 | 18.92 | 51.1 | 0.04118614061709661 | 0.03990909090909091 | 0.011281378570150857 | 0.024333333333333335 | 
+ | Tỷ lệ điều chỉnh |  | 0 | 0.05 | 0.03 |  |  |  |  | 
+5 | Độ rộng mặt cắt ngõ | Đường đất và đường bê tông rộng khoảng 3m  | Đường đất rộng khoảng 3.5m | Đường đất rộng khoảng 5m | Đường đất rộng khoảng 3m |  |  |  |  | 
+ | Tỷ lệ điều chỉnh |  | -0.03 | -0.05 | 0.02 |  |  |  |  | 
+6 | Khoảng cách ra đường phố chính.
+(nêu rõ tên đường phố chính tham chiếu nếu có) | Khoảng 650m ra đường nhựa An Lâm -Đông Giang (ĐT22)  | Khoảng 1.6km ra đường nhựa An Lâm -Đông Giang (ĐT22)  | Khoảng 240m ra đường nhựa ĐT22 | Khoảng 120m ra đường nhựa An Lâm -Đông Giang (ĐT22)  |  |  |  |  | 
+ | Tỷ lệ điều chỉnh |  | 0 | 0 | 0 |  |  |  |  | 
+7 | Khả năng kinh doanh 
+(có/không khả năng sử dụng làm cửa hàng, văn phòng) | Kém | Kém | Kém | Kém |  |  |  |  | 
+ | Tỷ lệ điều chỉnh |  | 0 | 0 | 0 |  |  |  |  | 
+8 | Môi trường kinh tế xã hội
+(thuận lợi giao thông/hạ tầng kỹ thuật/gần trung tâm/trình độ dân trí/an ninh trật tự...) | Khu vực dân cư thưa thớt | Khu vực dân cư thưa thớt | Khu vực dân cư thưa thớt | Khu vực dân cư thưa thớt |  |  |  |   | 
+ | Tỷ lệ điều chỉnh |  | 0 | 0 | 0 |  |  |  |  | 
+9 | Yếu tố khác |  |  |  |  |  |  |  |  | 
+ | Tỷ lệ điều chỉnh |  |  |  |  |  |  |  |  | 
+E | Tổng tỷ lệ điều chỉnh |  | -0.05 | 0 | 0.09000000000000001 |  |  |  |  | 
+F | Đơn giá sau điều chỉnh (đồng/m2) |  | 518181.8181818181 | 493709.37928567175 | 467142.85714285716 |  |  |  |  | 
+G | Đơn giá bình quân (đồng/m2) | 493011.3515367823 |  |  |  |  |  |  |  | 
+H | Đơn giá lựa chọn (đồng/m2) | 493000 |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+c. Định giá tài sản gắn liền trên đất: |  |  |  |  |  |  |  |  |  | 
+STT | Hạng mục CTXD | Diện tích (m2) | Đơn giá (VNĐ) | Chất lượng còn lại (%) | Giá trị thẩm định (VNĐ) |  |  |  |  | 
+ |  | (1) | (2) | (3) | (4 = 1x2x3) |  |  |  |  | 
+1 |  |  |  |  | 0 |  |  |  |  | 
+Giá trị tài sản trên đất (làm tròn) |  | 0 | đồng |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+IV. Ý KIẾN PHÒNG THẨM ĐỊNH |  |  |  |  |  |  |  |  |  | 
+- Phòng Thẩm định - Chi nhánh Bình Thuận đề xuất Giá trị Quyền sử dụng đất, quyền sở hữu nhà ở và tài sản gắn liền với đất nêu trên là: 779.000.000 đồng. |  |  |  |  |  |  |  |  |  | 
+(Bằng chữ: Bảy trăm bảy mươi chín triệu đồng.) |  |  |  |  |  |  |  |  |  | 
+- Khi cho vay Phòng kinh doanh/ Phòng giao dịch chịu trách nhiệm thực hiện đầy đủ thủ tục bảo đảm tiền vay theo quy định của BAC A BANK và theo quy định của pháp luật. |  |  |  |  |  |  |  |  |  | 
+- Tỷ lệ nhận tài sản bảo đảm theo quy định hiện hành của BAC A BANK và theo quy định của pháp luật. |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+V. HÌNH ẢNH |  |  |  |  |  |  |  |  |  | 
+Toạ độ: 11.113639, 108.123278 |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+Tài sản thẩm định:   |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+Tài sản so sánh 1: |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+Tài sản so sánh 2: |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |   |  |  
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+Tài sản so sánh 3: |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ |  |  |  |  |  |  |  |  |  | 
+ | Trân trọng kính trình./. |  |  |  |  |  |  |  |  | 
+ |  |  |  | Lâm Đồng, ngày 19 háng 03 năm 2026 |  |  |  |  |  | 
+ | NGƯỜI THẨM ĐỊNH |  | TRƯỞNG PHÒNG | NGƯỜI PHÊ DUYỆT |  |  |  |  |  | 
+--- Sheet: Hinh anh TS ---
+
+
+JSON OUTPUT:
+
+      
+      --- RESPONSE ---
+      ```json
+{
+  "%%ngaythangnam%%": "2026-03-19",
+  "%%TenKhachHang%%": "Ông Châu Thế Minh",
+  "%%DiaChiKhachHang%%": "KP12, Phường Phú Thuỷ, Thành Phố Phan Thiết, Bình Thuận (nay là Phường Phú Thuỷ, Tỉnh Lâm Đồng).",
+  "%%TenChiNhanh%%": "Bình Thuận",
+  "%%DiaChiChiNhanhPGD%%": "203 Tôn Đúc Thắng, Phường Phú Thuỷ, Thành Phố Phan Thiết, Bình Thuận",
+  "%%ThangNamTuVanGia%%": "Tháng 03/2026",
+  "%%DiaChiTaiSan%%": "Thôn Phú Hoà, Xã Hàm Trí, Huyện Hàm Thuận Bắc, Tỉnh Bình Thuận (nay là Xã Hàm Thuận Bắc, Tỉnh Lâm Đồng).",
+  "%%NgayThangNamNhanHoSo%%": "2026-03-19",
+  "%%GiayChungNhanQuyenSuDungDat%%": "DP 192518 (vào sổ VP06188) và DP 192517 (vào sổ VP06187) do VP.ĐKĐĐ tỉnh Bình Thuận cấp ngày 04/07/2024",
+  "%%CanCuPhapLyKhac1%%": "Nghị Quyết số: 82/2025/NQ-HĐND ngày 30/12/2025 của HĐND tỉnh Lâm Đồng",
+  "%%CanCuPhapLyKhac2%%": "Quyết định số: 520/2022/QĐ-TGĐ ngày 08/04/2022",
+  "%%CanCuPhapLyKhac3%%": "App VN-2000 Quy hoạch Bình Thuận",
+  "%%NgayKhaoSat%%": "2026-03-19",
+  "%%DonGiaDatLuaChon%%": "493000",
+  "%%DienTichDatNgoaiLoGioi%%": "1581.6",
+  "%%GiaTriDatONgoaiLoGioi%%": "779728800",
+  "%%DienTichDatTrongLoGioi%%": "0",
+  "%%DonGiaDatNhaNuoc%%": "956250",
+  "%%GiaTriDatOTrongLoGioi%%": "0",
+  "%%DienTichSuDungCongNhan%%": "1581.6",
+  "%%DonGiaCTXD%%": "",
+  "%%ChatLuongConLai%%": "",
+  "%%GiaTriCTXD%%": "0",
+  "%%Huong1%%": "Tây",
+  "%%Huong2%%": "Tây Bắc",
+  "%%Huong3%%": "",
+  "%%TiepGiapDuong1%%": "Đường đất và đường bê tông rộng khoảng 3m",
+  "%%TiepGiapDuong2%%": "Mương nước rộng khoảng 1m",
+  "%%TiepGiapDuong3%%": "",
+  "%%DienTichDat%%": "1581.6",
+  "%%DienTichDatKhongDuocCapGCN%%": "0",
+  "%%HinhThucSuDung%%": "Sử dụng riêng",
+  "%%HinhDangThuaDat%%": "Không cân đối",
+  "%%MatTienMatHau%%": "Mặt tiền: 47.26m, Mặt hậu: 45m",
+  "%%ChieuSauTrungBinh%%": "17.88m - 35.25m",
+  "%%MucDichSuDungDat%%": "Đất ở tại nông thôn: 254.7m2; Đất chuyên trồng lúa nước: 1.326,9m2",
+  "%%ThoiHanSuDung%%": "Đất ở: Lâu dài; Đất lúa: Đến tháng 11/2032",
+  "%%NguonGocSuDung%%": "Nhận chuyển nhượng được Công nhận QSDĐ như giao đất không thu tiền sử dụng đất.",
+  "%%ToaDoGoogleMap%%": "11.113639, 108.123278",
+  "%%SoTang%%": "",
+  "%%Mong%%": "",
+  "%%KhungCot%%": "",
+  "%%San%%": "",
+  "%%Mai%%": "",
+  "%%DienTichXayDung%%": "",
+  "%%DienTichSuDungThucTe%%": "1581.6",
+  "%%NamXayDung%%": "",
+  "%%Nen%%": "",
+  "%%CauThang%%": "",
+  "%%HeThongCua%%": "",
+  "%%LoiThe1%%": "02 mặt tiền",
+  "%%LoiThe2%%": "Tiếp giáp với mương nước rộng khoảng 1m",
+  "%%NhuocDiem1%%": "Khu vực dân cư thưa thớt",
+  "%%NhuocDiem2%%": "Hình dáng thửa đất không cân đối",
+  "%%HinhAnh1%%": "",
+  "%%HinhAnh2%%": "",
+  "%%HinhAnh3%%": "",
+  "%%HinhAnh4%%": "",
+  "%%HinhAnh5%%": "",
+  "%%HinhAnh6%%": "",
+  "%%HinhAnh7%%": "",
+  "%%HinhAnh8%%": "",
+  "%%sothongbao%%": "111-4/2026/BCĐG-CNBT"
+}
+```
+      ----------------------
+      

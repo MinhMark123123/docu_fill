@@ -25,7 +25,7 @@ extension $FieldsInputViewModel on FieldsInputViewModel {
 
   /// This getter is used to access the stream of data
   /// associated with the private field _composedTemplateUI.
-  StreamData<Map<int, List<TemplateField>>> get composedTemplateUI =>
+  StreamData<Map<String, List<TemplateField>>> get composedTemplateUI =>
       _composedTemplateUI.streamData;
 
   /// This getter is used to access the stream of data
@@ -35,4 +35,12 @@ extension $FieldsInputViewModel on FieldsInputViewModel {
   /// This getter is used to access the stream of data
   /// associated with the private field _missingKeys.
   StreamData<List<String>> get missingKeys => _missingKeys.streamData;
+
+  /// This getter is used to access the stream of data
+  /// associated with the private field _currentSectionIndex.
+  StreamData<int> get currentSectionIndex => _currentSectionIndex.streamData;
+
+  /// This getter is used to access the stream of data
+  /// associated with the private field _showSummary.
+  StreamData<bool> get showSummary => _showSummary.streamData;
 }

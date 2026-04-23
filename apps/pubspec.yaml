@@ -19,7 +19,7 @@ dependencies:
   go_router: ^16.0.0
   flutter_screenutil: ^5.9.3
   two_dimensional_scrollables: ^0.3.7
-  adaptive_layout: ^0.1.7
+  window_manager: ^0.4.3
   cached_network_image: ^3.4.1
   flutter_svg: ^2.2.0
   simple_loading_dialog: ^1.0.0
@@ -31,6 +31,9 @@ dependencies:
   xml: ^6.5.0
   archive: ^3.3.6
   image_picker: ^1.2.0
+  google_generative_ai: ^0.4.5
+  spreadsheet_decoder: ^2.3.0
+  syncfusion_flutter_pdf: ^28.2.3
   #architec
   maac_mvvm_with_get_it: ^0.2.1+2
 

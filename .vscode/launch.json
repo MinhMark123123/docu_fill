@@ -1,0 +1,39 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "docu_fill",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "apps (explicit)",
+            "request": "launch",
+            "type": "dart",
+            "program": "apps/lib/main.dart"
+        },
+        {
+            "name": "apps",
+            "cwd": "apps",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "apps (profile mode)",
+            "cwd": "apps",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "apps (release mode)",
+            "cwd": "apps",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

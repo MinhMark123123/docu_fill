@@ -19,6 +19,7 @@ class TemplateFieldModel {
   List<String>? options;
 
   String? additionalInfo;
+  String? section;
 
   // Default constructor for Isar
   TemplateFieldModel({
@@ -29,6 +30,7 @@ class TemplateFieldModel {
     this.defaultValue,
     this.options,
     this.additionalInfo,
+    this.section,
   });
 
   // It's good practice to have a way to create this from your domain/JSON model
@@ -41,6 +43,7 @@ class TemplateFieldModel {
       defaultValue: domainField.defaultValue,
       options: domainField.options,
       additionalInfo: domainField.additionalInfo,
+      section: domainField.section,
     );
   }
 
@@ -54,6 +57,7 @@ class TemplateFieldModel {
       defaultValue: defaultValue,
       options: options,
       additionalInfo: additionalInfo,
+      section: section,
     );
   }
 }

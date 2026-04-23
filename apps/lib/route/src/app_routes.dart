@@ -63,6 +63,21 @@ final GoRouter router = GoRouter(
                 return const SettingPage();
               },
             ),
+            GoRoute(
+              path: RoutesPath.logHistory,
+              builder: (BuildContext context, GoRouterState state) {
+                return const LogHistoryPage();
+              },
+              routes: [
+                GoRoute(
+                  path: RoutesPath.logDetail,
+                  builder: (BuildContext context, GoRouterState state) {
+                    final fileName = state.uri.queryParameters['fileName'] ?? "";
+                    return LogDetailPage(fileName: fileName);
+                  },
+                ),
+              ],
+            ),
           ],
         ),
       ],

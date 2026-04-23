@@ -15,24 +15,50 @@ class MainViewModel extends BaseViewModel {
   late final _currentMenu = MainDesktopMenu.template.mtd(this);
 
   void selectMenu(BuildContext context, MainDesktopMenu menu) {
-    bool isSamePath = GoRouter.of(context).state.path == menu.pathRoute;
-    if (!isSamePath || menu == _currentMenu.data) {
-      navigatePage(menu.pathRoute);
-      _currentMenu.postValue(menu);
+    if (menu == _currentMenu.data &&
+        GoRouter.of(context).state.fullPath == menu.pathRoute) {
+      return;
     }
+    _currentMenu.postValue(menu);
+    navigatePage(menu.pathRoute);
   }
 }
 
 enum MainDesktopMenu {
   template,
+  upload,
   setting;
 
   String label() {
     switch (this) {
       case MainDesktopMenu.template:
         return AppLang.labelsTemplates.tr();
+      case MainDesktopMenu.upload:
+        return AppLang.actionsUpload.tr();
       case MainDesktopMenu.setting:
         return AppLang.labelsSettings.tr();
+    }
+  }
+
+  IconData icon() {
+    switch (this) {
+      case MainDesktopMenu.template:
+        return Icons.description_outlined;
+      case MainDesktopMenu.upload:
+        return Icons.upload_file_outlined;
+      case MainDesktopMenu.setting:
+        return Icons.settings_outlined;
+    }
+  }
+
+  IconData selectedIcon() {
+    switch (this) {
+      case MainDesktopMenu.template:
+        return Icons.description;
+      case MainDesktopMenu.upload:
+        return Icons.upload_file;
+      case MainDesktopMenu.setting:
+        return Icons.settings;
     }
   }
 
@@ -40,6 +66,8 @@ enum MainDesktopMenu {
     switch (this) {
       case MainDesktopMenu.template:
         return RoutesPath.home;
+      case MainDesktopMenu.upload:
+        return RoutesPath.homeUpload;
       case MainDesktopMenu.setting:
         return RoutesPath.setting;
     }

@@ -16,6 +16,7 @@ TemplateField _$TemplateFieldFromJson(Map<String, dynamic> json) =>
       options:
           (json['options'] as List<dynamic>?)?.map((e) => e as String).toList(),
       additionalInfo: json['additionalInfo'] as String?,
+      section: json['section'] as String?,
     );
 
 Map<String, dynamic> _$TemplateFieldToJson(TemplateField instance) =>
@@ -27,6 +28,7 @@ Map<String, dynamic> _$TemplateFieldToJson(TemplateField instance) =>
       'default': instance.defaultValue,
       'options': instance.options,
       'additionalInfo': instance.additionalInfo,
+      'section': instance.section,
     };
 
 const _$FieldTypeEnumMap = {

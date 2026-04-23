@@ -107,6 +107,7 @@ class ConfigureViewModel extends BaseViewModel {
         isRequired: e.required,
         defaultValue: e.defaultValue,
         additionalInfo: e.additionalInfo,
+        section: e.section,
       ),
     );
     _fieldsData.postValue(fields.toList());
@@ -123,6 +124,7 @@ class ConfigureViewModel extends BaseViewModel {
         isRequired: e.required,
         defaultValue: e.defaultValue,
         additionalInfo: e.additionalInfo,
+        section: e.section,
       ),
     );
     final fieldsClone = List<TableRowData>.from(_fieldsData.data);
@@ -199,6 +201,7 @@ class ConfigureViewModel extends BaseViewModel {
             isRequired: e.required,
             defaultValue: e.defaultValue,
             additionalInfo: e.additionalInfo,
+            section: e.section,
           ),
         );
         _fieldsData.postValue(fields.toList());
@@ -212,7 +215,7 @@ class ConfigureViewModel extends BaseViewModel {
         await checkEnableConfirm();
       } else {
         // Handle error: Missing files inside the package
-        debugPrint("Error: Invalid package format. Missing config or docx.");
+        debugPrint("${AppLang.labelsError.tr()}: Invalid package format. Missing config or docx.");
       }
     } catch (e) {
       debugPrint("Error importing settings: $e");
@@ -245,10 +248,11 @@ class ConfigureViewModel extends BaseViewModel {
     if (index == AppConst.commonUnknow) return;
     final newData = removeUselessInput(newData: data);
     _fieldsData.data[index] = newData;
+    await notifyDataChanged();
   }
 
   Future<void> updateFieldName(String key, {required String fieldName}) async {
-    updateFieldData(key, fieldOfKey(key).copyWith(fieldName: fieldName));
+    await updateFieldData(key, fieldOfKey(key).copyWith(fieldName: fieldName));
     await checkEnableConfirm();
   }
 
@@ -256,7 +260,7 @@ class ConfigureViewModel extends BaseViewModel {
     String key, {
     required String defaultValue,
   }) async {
-    updateFieldData(key, fieldOfKey(key).copyWith(defaultValue: defaultValue));
+    await updateFieldData(key, fieldOfKey(key).copyWith(defaultValue: defaultValue));
     await checkEnableConfirm();
   }
 
@@ -275,19 +279,22 @@ class ConfigureViewModel extends BaseViewModel {
     String key, {
     required List<String> options,
   }) async {
-    updateFieldData(key, fieldOfKey(key).copyWith(options: options));
+    await updateFieldData(key, fieldOfKey(key).copyWith(options: options));
     await checkEnableConfirm();
   }
 
   Future<void> updateIsRequired(String key, {bool? isRequired}) async {
-    updateFieldData(key, fieldOfKey(key).copyWith(isRequired: isRequired));
+    await updateFieldData(key, fieldOfKey(key).copyWith(isRequired: isRequired));
     await checkEnableConfirm();
-    notifyDataChanged();
   }
 
   Future<void> updateInputType(String key, {FieldType? inputType}) async {
-    updateFieldData(key, fieldOfKey(key).copyWith(inputType: inputType));
-    notifyDataChanged();
+    await updateFieldData(key, fieldOfKey(key).copyWith(inputType: inputType));
+    await checkEnableConfirm();
+  }
+
+  Future<void> updateSection(String key, {String? section}) async {
+    await updateFieldData(key, fieldOfKey(key).copyWith(section: section));
     await checkEnableConfirm();
   }
 
@@ -434,7 +441,7 @@ class ConfigureViewModel extends BaseViewModel {
     }
     await Future.delayed(Duration.zero);
     if (result) {
-      showSnackbar(AppLang.documentSuccessFullyCreate.tr());
+      showSnackbar(AppLang.messagesDocumentSuccessfullyCreate.tr());
       navigatePage(RoutesPath.home);
     }
   }
@@ -461,7 +468,7 @@ class ConfigureViewModel extends BaseViewModel {
     );
     await Future.delayed(Duration.zero);
     if (result) {
-      showSnackbar(AppLang.documentSuccessFullyCreate.tr());
+      showSnackbar(AppLang.messagesDocumentSuccessfullyCreate.tr());
       navigatePage(RoutesPath.home);
     }
   }
@@ -522,7 +529,7 @@ class ShowUseSettingDialogEvent extends ShowDialogEvent<void> {
     String? content,
     List<DialogAction>? actions,
     List<TemplateConfig>? listTemplate,
-    Function(void completeData)? onCompleted,
+    Function(void)? onCompleted,
   }) {
     return ShowUseSettingDialogEvent(
       listTemplate: listTemplate ?? this.listTemplate,
@@ -532,4 +539,5 @@ class ShowUseSettingDialogEvent extends ShowDialogEvent<void> {
       onCompleted: onCompleted ?? this.onCompleted,
     );
   }
+
 }

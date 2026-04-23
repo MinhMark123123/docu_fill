@@ -1,9 +1,7 @@
-import 'package:adaptive_layout/adaptive_layout.dart';
 import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/core/src/events.dart' show ShowDialogEvent;
 import 'package:docu_fill/presenter/src/configure/view/desktop/configure_desktop_layout.dart';
-import 'package:docu_fill/presenter/src/configure/view/mobile/configure_mobile_layout.dart';
 import 'package:docu_fill/presenter/src/configure/view_model/configure_view_model.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -56,10 +54,7 @@ class ConfigurePage extends BaseView<ConfigureViewModel> {
 
   @override
   Widget build(BuildContext context, viewModel) {
-    return AdaptiveLayout(
-      smallLayout: ConfigureMobileLayout(),
-      largeLayout: ConfigureDesktopLayout(),
-    );
+    return const ConfigureDesktopLayout();
   }
 
   @override

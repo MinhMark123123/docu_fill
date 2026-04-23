@@ -95,7 +95,19 @@
     "height": "chiều cao",
     "unit": "đơn vị",
     "cm": "cm",
-    "inches": "inches"
+    "inches": "inches",
+    "error": "Lỗi",
+    "common": "Chung",
+    "general": "Tổng quan",
+    "section": "Phần",
+    "input_summary": "Tóm tắt nhập liệu",
+    "quick_actions": "Thao tác nhanh:",
+    "template_fill": "Điền mẫu",
+    "log_history": "Nhật ký lịch sử API",
+    "log_details": "Chi tiết nhật ký",
+    "timestamp": "Dấu mốc thời gian",
+    "prompt": "Câu lệnh (Prompt)",
+    "response": "Kết quả trả về"
   },
   "messages": {
     "review_and_configure_fields": "Xem lại và cấu hình các trường được phát hiện trong mẫu của bạn. Đảm bảo tất cả các trường được xác định chính xác và gán loại đầu vào phù hợp để thu thập dữ liệu chính xác.",
@@ -115,6 +127,35 @@
     "enter_date_format": "Nhập định dạng ngày. Ví dụ: dd/MM/yyyy",
     "single_line_text_hint": "Dòng này sẽ tự động bị xóa nếu để trống.",
     "setting_exported": "Xuất cài đặt thành công",
-    "import_setting": "Nhập cài đặt"
+    "import_setting": "Nhập cài đặt",
+    "settings_save_success": "Cài đặt đã được lưu thành công!",
+    "gemini_api_key_required": "Vui lòng nhập Gemini API Key.",
+    "gemini_config_desc": "Để sử dụng tính năng 'Nhập từ tệp', bạn cần cung cấp Gemini API Key.",
+    "gemini_api_key_hint": "Nhập API key của bạn tại đây",
+    "excel_unsupported_format": "Lỗi định dạng Excel: Tệp này sử dụng định dạng số hiện không được hỗ trợ. Vui lòng thử mở tệp trong Microsoft Excel và 'Lưu dưới dạng' (Save As) một tệp .xlsx mới để khắc phục lỗi này.",
+    "extract_no_text": "Không thể trích xuất văn bản từ tệp đã chọn.",
+    "import_from_file_success": "Đã tự động điền dữ liệu từ tệp thành công!",
+    "gemini_model_desc": "Chọn phiên bản Gemini model để sử dụng trích xuất dữ liệu.",
+    "fill_info_below": "Vui lòng điền thông tin bên dưới.",
+    "review_before_export": "Vui lòng kiểm tra lại tất cả thông tin trước khi xuất.",
+    "no_logs_found": "Không tìm thấy nhật ký API nào.",
+    "confirm_delete_all_logs": "Bạn có chắc chắn muốn xóa tất cả các tệp nhật ký? Hành động này không thể hoàn tác."
+  },
+  "settings": {
+    "general": {
+      "title": "Cài đặt chung",
+      "language": "Ngôn ngữ",
+      "english": "Tiếng Anh",
+      "vietnamese": "Tiếng Việt"
+    },
+    "gemini": {
+      "title": "Cấu hình Gemini AI",
+      "api_key": "Gemini API Key",
+      "model": "Gemini Model",
+      "enable_logging": "Bật ghi nhật ký API",
+      "open_logs": "Mở thư mục nhật ký",
+      "save_btn": "Lưu cài đặt Gemini"
+    }
   }
 }
+

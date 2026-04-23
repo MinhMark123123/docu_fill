@@ -49,11 +49,11 @@ class Radii {
     bottomRight: Radius.circular(value.w),
   );
 
-  BorderRadius borderSmall() => borderAll(4.0);
+  BorderRadius borderSmall() => borderAll(6.0);
 
-  BorderRadius borderMedium() => borderAll(8.0);
+  BorderRadius borderMedium() => borderAll(10.0);
 
-  BorderRadius borderLarge() => borderAll(12.0);
+  BorderRadius borderLarge() => borderAll(16.0);
 
-  BorderRadius borderExtraLarge() => borderAll(16.0);
+  BorderRadius borderExtraLarge() => borderAll(24.0);
 }

@@ -1,0 +1,1189 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'app_settings_model.dart';
+
+// **************************************************************************
+// IsarCollectionGenerator
+// **************************************************************************
+
+// coverage:ignore-file
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
+
+extension GetAppSettingsModelCollection on Isar {
+  IsarCollection<AppSettingsModel> get appSettingsModels => this.collection();
+}
+
+const AppSettingsModelSchema = CollectionSchema(
+  name: r'AppSettingsModel',
+  id: -638838212012723081,
+  properties: {
+    r'countryCode': PropertySchema(
+      id: 0,
+      name: r'countryCode',
+      type: IsarType.string,
+    ),
+    r'enableApiLogging': PropertySchema(
+      id: 1,
+      name: r'enableApiLogging',
+      type: IsarType.bool,
+    ),
+    r'geminiApiKey': PropertySchema(
+      id: 2,
+      name: r'geminiApiKey',
+      type: IsarType.string,
+    ),
+    r'geminiModel': PropertySchema(
+      id: 3,
+      name: r'geminiModel',
+      type: IsarType.string,
+    ),
+    r'languageCode': PropertySchema(
+      id: 4,
+      name: r'languageCode',
+      type: IsarType.string,
+    ),
+  },
+
+  estimateSize: _appSettingsModelEstimateSize,
+  serialize: _appSettingsModelSerialize,
+  deserialize: _appSettingsModelDeserialize,
+  deserializeProp: _appSettingsModelDeserializeProp,
+  idName: r'id',
+  indexes: {},
+  links: {},
+  embeddedSchemas: {},
+
+  getId: _appSettingsModelGetId,
+  getLinks: _appSettingsModelGetLinks,
+  attach: _appSettingsModelAttach,
+  version: '3.3.0-dev.3',
+);
+
+int _appSettingsModelEstimateSize(
+  AppSettingsModel object,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  var bytesCount = offsets.last;
+  {
+    final value = object.countryCode;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.geminiApiKey;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.geminiModel;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.languageCode;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  return bytesCount;
+}
+
+void _appSettingsModelSerialize(
+  AppSettingsModel object,
+  IsarWriter writer,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  writer.writeString(offsets[0], object.countryCode);
+  writer.writeBool(offsets[1], object.enableApiLogging);
+  writer.writeString(offsets[2], object.geminiApiKey);
+  writer.writeString(offsets[3], object.geminiModel);
+  writer.writeString(offsets[4], object.languageCode);
+}
+
+AppSettingsModel _appSettingsModelDeserialize(
+  Id id,
+  IsarReader reader,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  final object = AppSettingsModel();
+  object.countryCode = reader.readStringOrNull(offsets[0]);
+  object.enableApiLogging = reader.readBool(offsets[1]);
+  object.geminiApiKey = reader.readStringOrNull(offsets[2]);
+  object.geminiModel = reader.readStringOrNull(offsets[3]);
+  object.id = id;
+  object.languageCode = reader.readStringOrNull(offsets[4]);
+  return object;
+}
+
+P _appSettingsModelDeserializeProp<P>(
+  IsarReader reader,
+  int propertyId,
+  int offset,
+  Map<Type, List<int>> allOffsets,
+) {
+  switch (propertyId) {
+    case 0:
+      return (reader.readStringOrNull(offset)) as P;
+    case 1:
+      return (reader.readBool(offset)) as P;
+    case 2:
+      return (reader.readStringOrNull(offset)) as P;
+    case 3:
+      return (reader.readStringOrNull(offset)) as P;
+    case 4:
+      return (reader.readStringOrNull(offset)) as P;
+    default:
+      throw IsarError('Unknown property with id $propertyId');
+  }
+}
+
+Id _appSettingsModelGetId(AppSettingsModel object) {
+  return object.id;
+}
+
+List<IsarLinkBase<dynamic>> _appSettingsModelGetLinks(AppSettingsModel object) {
+  return [];
+}
+
+void _appSettingsModelAttach(
+  IsarCollection<dynamic> col,
+  Id id,
+  AppSettingsModel object,
+) {
+  object.id = id;
+}
+
+extension AppSettingsModelQueryWhereSort
+    on QueryBuilder<AppSettingsModel, AppSettingsModel, QWhere> {
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterWhere> anyId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+}
+
+extension AppSettingsModelQueryWhere
+    on QueryBuilder<AppSettingsModel, AppSettingsModel, QWhereClause> {
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterWhereClause> idEqualTo(
+    Id id,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IdWhereClause.between(lower: id, upper: id));
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterWhereClause>
+  idNotEqualTo(Id id) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(
+              IdWhereClause.lessThan(upper: id, includeUpper: false),
+            )
+            .addWhereClause(
+              IdWhereClause.greaterThan(lower: id, includeLower: false),
+            );
+      } else {
+        return query
+            .addWhereClause(
+              IdWhereClause.greaterThan(lower: id, includeLower: false),
+            )
+            .addWhereClause(
+              IdWhereClause.lessThan(upper: id, includeUpper: false),
+            );
+      }
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterWhereClause>
+  idGreaterThan(Id id, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IdWhereClause.greaterThan(lower: id, includeLower: include),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterWhereClause>
+  idLessThan(Id id, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IdWhereClause.lessThan(upper: id, includeUpper: include),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterWhereClause> idBetween(
+    Id lowerId,
+    Id upperId, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IdWhereClause.between(
+          lower: lowerId,
+          includeLower: includeLower,
+          upper: upperId,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+}
+
+extension AppSettingsModelQueryFilter
+    on QueryBuilder<AppSettingsModel, AppSettingsModel, QFilterCondition> {
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'countryCode'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'countryCode'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'countryCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'countryCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'countryCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'countryCode',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'countryCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'countryCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'countryCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'countryCode',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'countryCode', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  countryCodeIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'countryCode', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  enableApiLoggingEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'enableApiLogging', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'geminiApiKey'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'geminiApiKey'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'geminiApiKey',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'geminiApiKey',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'geminiApiKey',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'geminiApiKey',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'geminiApiKey',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'geminiApiKey',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'geminiApiKey',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'geminiApiKey',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'geminiApiKey', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiApiKeyIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'geminiApiKey', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'geminiModel'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'geminiModel'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'geminiModel',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'geminiModel',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'geminiModel',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'geminiModel',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'geminiModel',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'geminiModel',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'geminiModel',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'geminiModel',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'geminiModel', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiModelIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'geminiModel', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  idEqualTo(Id value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'id', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  idGreaterThan(Id value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'id',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  idLessThan(Id value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'id',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  idBetween(
+    Id lower,
+    Id upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'id',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'languageCode'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'languageCode'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'languageCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'languageCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'languageCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'languageCode',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'languageCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'languageCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'languageCode',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'languageCode',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'languageCode', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  languageCodeIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'languageCode', value: ''),
+      );
+    });
+  }
+}
+
+extension AppSettingsModelQueryObject
+    on QueryBuilder<AppSettingsModel, AppSettingsModel, QFilterCondition> {}
+
+extension AppSettingsModelQueryLinks
+    on QueryBuilder<AppSettingsModel, AppSettingsModel, QFilterCondition> {}
+
+extension AppSettingsModelQuerySortBy
+    on QueryBuilder<AppSettingsModel, AppSettingsModel, QSortBy> {
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByCountryCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'countryCode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByCountryCodeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'countryCode', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByEnableApiLogging() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableApiLogging', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByEnableApiLoggingDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableApiLogging', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByGeminiApiKey() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiApiKey', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByGeminiApiKeyDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiApiKey', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByGeminiModel() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiModel', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByGeminiModelDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiModel', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByLanguageCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'languageCode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByLanguageCodeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'languageCode', Sort.desc);
+    });
+  }
+}
+
+extension AppSettingsModelQuerySortThenBy
+    on QueryBuilder<AppSettingsModel, AppSettingsModel, QSortThenBy> {
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByCountryCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'countryCode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByCountryCodeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'countryCode', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByEnableApiLogging() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableApiLogging', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByEnableApiLoggingDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableApiLogging', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByGeminiApiKey() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiApiKey', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByGeminiApiKeyDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiApiKey', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByGeminiModel() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiModel', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByGeminiModelDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiModel', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy> thenById() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByLanguageCode() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'languageCode', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByLanguageCodeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'languageCode', Sort.desc);
+    });
+  }
+}
+
+extension AppSettingsModelQueryWhereDistinct
+    on QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct> {
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
+  distinctByCountryCode({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'countryCode', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
+  distinctByEnableApiLogging() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'enableApiLogging');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
+  distinctByGeminiApiKey({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'geminiApiKey', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
+  distinctByGeminiModel({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'geminiModel', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
+  distinctByLanguageCode({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'languageCode', caseSensitive: caseSensitive);
+    });
+  }
+}
+
+extension AppSettingsModelQueryProperty
+    on QueryBuilder<AppSettingsModel, AppSettingsModel, QQueryProperty> {
+  QueryBuilder<AppSettingsModel, int, QQueryOperations> idProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, String?, QQueryOperations>
+  countryCodeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'countryCode');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, bool, QQueryOperations>
+  enableApiLoggingProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'enableApiLogging');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, String?, QQueryOperations>
+  geminiApiKeyProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'geminiApiKey');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, String?, QQueryOperations>
+  geminiModelProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'geminiModel');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, String?, QQueryOperations>
+  languageCodeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'languageCode');
+    });
+  }
+}

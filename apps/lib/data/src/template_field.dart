@@ -17,6 +17,7 @@ class TemplateField {
   final List<String>? options;
 
   final String? additionalInfo;
+  final String? section;
 
   TemplateField({
     required this.key,
@@ -26,6 +27,7 @@ class TemplateField {
     this.defaultValue,
     this.options,
     this.additionalInfo,
+    this.section,
   });
 
   factory TemplateField.fromJson(Map<String, dynamic> json) =>
@@ -41,6 +43,7 @@ class TemplateField {
     String? defaultValue,
     List<String>? options,
     String? additionalInfo,
+    String? section,
   }) {
     return TemplateField(
       key: key ?? this.key,
@@ -50,6 +53,7 @@ class TemplateField {
       defaultValue: defaultValue ?? this.defaultValue,
       options: options ?? this.options,
       additionalInfo: additionalInfo ?? this.additionalInfo,
+      section: section ?? this.section,
     );
   }
 }

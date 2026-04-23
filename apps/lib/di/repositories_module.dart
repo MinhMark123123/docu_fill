@@ -12,4 +12,14 @@ void setupRepositoriesModule() {
   sl.registerLazySingleton<TemplateRepository>(
     () => TemplateRepositoryImpl(localDataSource: inject()),
   );
+  sl.registerLazySingleton<TemplateService>(
+    () => TemplateService(templateRepository: inject()),
+  );
+  sl.registerLazySingleton<SettingsRepository>(
+    () => SettingsRepositoryImpl(inject()),
+  );
+  sl.registerLazySingleton<DataExtractionService>(
+    () => DataExtractionService(),
+  );
+  sl.registerLazySingleton<GeminiService>(() => GeminiService(inject()));
 }

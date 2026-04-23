@@ -1,13 +1,12 @@
-import 'package:adaptive_layout/adaptive_layout.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/presenter/src/home/view_model/fields_input_view_model.dart';
-import 'package:docu_fill/presenter/src/home/widgets/mobile/field_input_mobile.dart';
 import 'package:docu_fill/route/routers.dart';
+import 'package:docu_fill/const/const.dart';
 import 'package:docu_fill/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
-
+import '../mobile/field_input_mobile.dart';
 import 'field_input_desktop.dart';
 
 class InputPage extends BaseView<FieldsInputViewModel> {
@@ -36,12 +35,14 @@ class InputPage extends BaseView<FieldsInputViewModel> {
 
   @override
   Widget build(BuildContext context, FieldsInputViewModel viewModel) {
+    final isDesktop = MediaQuery.of(context).size.width > 900;
     return Scaffold(
       backgroundColor: context.appColors?.containerBackground,
-      body: AdaptiveLayout(
-        smallLayout: const FieldInputMobile(),
-        mediumLayout: const FieldInputDesktop(),
-      ),
+      appBar:
+          !isDesktop
+              ? AppBar(title: Text(AppLang.labelsTemplateFill.tr()))
+              : null,
+      body: isDesktop ? const FieldInputDesktop() : const FieldInputMobile(),
     );
   }
 }

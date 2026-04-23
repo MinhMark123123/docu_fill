@@ -112,7 +112,6 @@ abstract class BaseView<T extends BaseViewModel>
 
   StreamSubscription<bool> _handleLoading(BuildContext context, T viewModel) {
     final sub = viewModel.showLoading.asStream().listen((isLoading) {
-      print("cache event loading $isLoading ${context.mounted}");
       if (context.mounted && isLoading) {
         LoadingDialogManager().showLoadingDialog(context);
       } else if (!isLoading) {

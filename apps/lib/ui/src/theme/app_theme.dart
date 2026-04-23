@@ -2,29 +2,27 @@ import 'package:docu_fill/ui/src/methodology/tokens/colors.dart';
 import 'package:docu_fill/ui/src/methodology/tokens/dimens.dart';
 import 'package:docu_fill/ui/src/methodology/tokens/typography.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import 'custom_colors.dart';
 
 class AppTheme {
   AppTheme._(); // Private constructor
 
-  // --- LIGHT THEME (Predefined) ---
+  // --- LIGHT THEME ---
   static ThemeData get lightTheme {
     final textThemeLight = _buildTextTheme(
       AppTypography.appTextTheme,
-      Colors.black87,
-      Colors.black54,
+      AppColorsDefine.bodyTextColor.light.withOpacity(0.9),
+      AppColorsDefine.bodyTextColor.light,
     );
     final ColorScheme colorScheme = ColorScheme.fromSeed(
-      seedColor: Colors.white, // Your predefined light theme seed color
+      seedColor: AppColorsDefine.primaryIndigo,
       brightness: Brightness.light,
+      surface: AppColorsDefine.containerBackground.light,
     );
     return ThemeData(
       brightness: Brightness.light,
       colorScheme: colorScheme,
-      // You can still customize textTheme, buttonTheme etc. if the generated
-      // defaults from ColorScheme.fromSeed aren't exactly what you want.
       textTheme: textThemeLight,
       elevatedButtonTheme: _buildElevatedButtonTheme(
         colorScheme.primary,
@@ -32,15 +30,18 @@ class AppTheme {
         textThemeLight,
       ),
       filledButtonTheme: _buildFillButtonTheme(
-        AppColorsDefine.buttonBackground.light,
-        Colors.white,
+        colorScheme.secondaryContainer,
+        colorScheme.onSecondaryContainer,
         textThemeLight,
       ),
-      appBarTheme: _buildAppBarTheme(Colors.blue[700]!, Colors.white),
+      appBarTheme: _buildAppBarTheme(
+        colorScheme.surface,
+        colorScheme.onSurface,
+      ),
       cardTheme: _buildCardTheme(cardColor: Colors.white),
       inputDecorationTheme: _buildInputDecorationTheme(
-        Colors.grey[400]!,
-        Colors.blue[700]!,
+        colorScheme.outlineVariant,
+        colorScheme.primary,
       ),
       extensions: <ThemeExtension<dynamic>>[
         AppColors(
@@ -49,22 +50,22 @@ class AppTheme {
           bodyTextColor: AppColorsDefine.bodyTextColor.light,
           dashColor: AppColorsDefine.dashColor.light,
         ),
-        // Add other ThemeExtensions if you have them
       ],
       useMaterial3: true,
     );
   }
 
-  // --- DARK THEME (Predefined) ---
+  // --- DARK THEME ---
   static ThemeData get darkTheme {
     final textThemeDark = _buildTextTheme(
       AppTypography.appTextTheme,
-      Colors.white,
-      Colors.white70,
+      Colors.white.withOpacity(0.95),
+      AppColorsDefine.bodyTextColor.dark,
     );
     final colorScheme = ColorScheme.fromSeed(
-      seedColor: Colors.blueAccent, // Your predefined dark theme seed color
+      seedColor: AppColorsDefine.primaryIndigo,
       brightness: Brightness.dark,
+      surface: AppColorsDefine.containerBackground.dark,
     );
     return ThemeData(
       brightness: Brightness.dark,
@@ -72,19 +73,22 @@ class AppTheme {
       textTheme: textThemeDark,
       elevatedButtonTheme: _buildElevatedButtonTheme(
         colorScheme.primary,
-        Colors.black87,
+        colorScheme.onPrimary,
         textThemeDark,
       ),
       filledButtonTheme: _buildFillButtonTheme(
-        AppColorsDefine.buttonBackground.light,
-        Colors.black87,
+        colorScheme.secondaryContainer,
+        colorScheme.onSecondaryContainer,
         textThemeDark,
       ),
-      appBarTheme: _buildAppBarTheme(Colors.grey[900]!, Colors.white),
-      cardTheme: _buildCardTheme(cardColor: Colors.grey[800]),
+      appBarTheme: _buildAppBarTheme(
+        colorScheme.surface,
+        colorScheme.onSurface,
+      ),
+      cardTheme: _buildCardTheme(cardColor: colorScheme.surface),
       inputDecorationTheme: _buildInputDecorationTheme(
-        Colors.grey[700]!,
-        Colors.blue[300]!,
+        colorScheme.outlineVariant,
+        colorScheme.primary,
       ),
       extensions: <ThemeExtension<dynamic>>[
         AppColors(
@@ -93,7 +97,6 @@ class AppTheme {
           bodyTextColor: AppColorsDefine.bodyTextColor.dark,
           dashColor: AppColorsDefine.dashColor.dark,
         ),
-        // Add other ThemeExtensions if you have them
       ],
       useMaterial3: true,
     );
@@ -252,16 +255,12 @@ class AppTheme {
     Color foregroundColor,
   ) {
     return AppBarTheme(
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.transparent,
       foregroundColor: foregroundColor,
+      surfaceTintColor: Colors.transparent,
       elevation: 0,
-      // Common for M3 style
-      titleTextStyle: GoogleFonts.montserrat(
-        fontSize: Dimens.size20,
-        fontWeight: FontWeight.w600,
-        color: foregroundColor,
-      ),
-      iconTheme: IconThemeData(color: foregroundColor),
+      centerTitle: false,
+      iconTheme: IconThemeData(color: foregroundColor, size: Dimens.size24),
     );
   }
 
