@@ -99,6 +99,8 @@
     "error": "Lỗi",
     "common": "Chung",
     "general": "Tổng quan",
+    "general_info": "Thông tin chung",
+    "overview": "Tổng quan",
     "section": "Phần",
     "input_summary": "Tóm tắt nhập liệu",
     "quick_actions": "Thao tác nhanh:",

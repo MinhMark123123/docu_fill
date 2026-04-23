@@ -6,7 +6,6 @@ import 'package:archive/archive.dart';
 import 'package:core/const/const.dart';
 import 'package:data/data.dart';
 import 'package:core/utils/utils.dart';
-import 'package:localization/localization.dart';
 
 class TemplateService {
   final TemplateRepository _templateRepository;
@@ -77,10 +76,21 @@ class TemplateService {
     return jsonDecode(content);
   }
 
-  Map<String, List<TemplateField>> groupFields(List<TemplateConfig> templates) {
+  /// Sentinel key used to mark fields that are shared across all templates.
+  static const String commonSectionKey = '__common__';
+
+  /// Groups template fields by their [TemplateField.section] value.
+  ///
+  /// Returns a [Map] where:
+  /// - Key [commonSectionKey]: fields shared across ALL templates (multi-template only).
+  /// - Key `null`: fields that belong to no specific section.
+  /// - Any other key: fields belonging to a named section.
+  ///
+  /// Localization of section display names is the responsibility of the caller.
+  Map<String?, List<TemplateField>> groupFields(List<TemplateConfig> templates) {
     if (templates.isEmpty) return {};
 
-    final groupedData = <String, List<TemplateField>>{};
+    final groupedData = <String?, List<TemplateField>>{};
 
     // 1. Identify common fields (only if multiple templates)
     Set<String> commonKeys = {};
@@ -97,28 +107,30 @@ class TemplateService {
               .toSet();
 
       if (commonKeys.isNotEmpty) {
-        groupedData[AppLang.labelsCommon.tr()] = [];
+        groupedData[commonSectionKey] = [];
       }
     }
 
-    // 2. Group fields by section
+    // 2. Group fields by their raw section value (null = unsectioned)
     for (var template in templates) {
       for (var field in template.fields) {
         if (commonKeys.contains(field.key)) {
-          final commonList = groupedData[AppLang.labelsCommon.tr()]!;
+          final commonList = groupedData[commonSectionKey]!;
           if (!commonList.any((e) => e.key == field.key)) {
             commonList.add(field);
           }
           continue;
         }
 
-        final sectionName = field.section ?? AppLang.labelsGeneral.tr();
-        groupedData.putIfAbsent(sectionName, () => []).add(field);
+        // field.section is null when no section was configured
+        final sectionKey = field.section?.trim().isEmpty == true ? null : field.section;
+        groupedData.putIfAbsent(sectionKey, () => []).add(field);
       }
     }
 
     return groupedData;
   }
+
 
   List<String> validateFields(
     List<TemplateConfig> templates,
