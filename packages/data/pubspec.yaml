@@ -1,0 +1,35 @@
+name: data
+description: Data layer, repositories, entities, data sources.
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: ^3.7.2
+
+isar_version: &isar_version 3.3.0-dev.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  core:
+    path: ../core
+  isar_community:
+    version: *isar_version
+  isar_community_flutter_libs:
+    version: *isar_version
+  json_annotation: ^4.7.0
+  google_generative_ai: ^0.4.5
+  spreadsheet_decoder: ^2.3.0
+  syncfusion_flutter_pdf: ^28.2.3
+  xml: ^6.5.0
+  archive: ^3.3.6
+  easy_localization: ^3.0.7+1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.5.4
+  json_serializable: ^6.5.4
+  isar_community_generator:
+    version: *isar_version
