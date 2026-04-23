@@ -438,12 +438,11 @@ class FiledInputBox extends StatelessWidget {
     TemplateField e,
     FieldsInputViewModel viewModel,
   ) {
-    print("build ${DateTime.tryParse(viewModel.getInitValue(e: e) ?? "")}");
-
     return itemField(
       context: context,
       isRequired: e.required,
       title: e.label,
+      isRow: true,
       child: DateTimePickerButton(
         initialDateTime: DateTime.tryParse(viewModel.getInitValue(e: e) ?? ""),
         onDateTimeChanged: (time) {
@@ -488,28 +487,44 @@ class FiledInputBox extends StatelessWidget {
     required String title,
     required Widget child,
     bool isRequired = false,
+    bool isRow = false,
   }) {
+    final titleWidget = RichText(
+      text: TextSpan(
+        style: context.textTheme.titleSmall?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: context.colorScheme.onSurface,
+        ),
+        children: <TextSpan>[
+          TextSpan(text: title),
+          if (isRequired)
+            TextSpan(
+              text: ' *',
+              style: TextStyle(color: context.colorScheme.error),
+            ),
+        ],
+      ),
+    );
+
+    if (isRow) {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: Dimens.size4),
+        child: Row(
+          children: [
+            Expanded(flex: 1, child: titleWidget),
+            Dimens.spacing.horizontal(Dimens.size16),
+            Expanded(flex: 2, child: child),
+          ],
+        ),
+      );
+    }
+
     return Padding(
       padding: EdgeInsets.symmetric(vertical: Dimens.size4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          RichText(
-            text: TextSpan(
-              style: context.textTheme.titleSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: context.colorScheme.onSurface,
-              ),
-              children: <TextSpan>[
-                TextSpan(text: title),
-                if (isRequired)
-                  TextSpan(
-                    text: ' *',
-                    style: TextStyle(color: context.colorScheme.error),
-                  ),
-              ],
-            ),
-          ),
+          titleWidget,
           Dimens.spacing.vertical(Dimens.size8),
           child,
         ],
