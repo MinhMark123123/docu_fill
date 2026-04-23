@@ -147,9 +147,11 @@ class FieldsInputViewModel extends BaseViewModel {
     }
     // Unsectioned fields (null key)
     if (rawData.containsKey(null)) {
-      final label = hasNamedSections
-          ? AppLang.labelsGeneralInfo.tr() // coexists with named sections
-          : AppLang.labelsGeneral.tr();    // only group → keep it simple
+      final label =
+          hasNamedSections
+              ? AppLang.labelsGeneralInfo
+                  .tr() // coexists with named sections
+              : AppLang.labelsGeneral.tr(); // only group → keep it simple
       localized[label] = rawData[null]!;
     }
     // Named sections
@@ -246,61 +248,63 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   Future<void> useCopy() async {
-    await loadingGuard(Future(() async {
-      try {
-        FilePickerResult? result = await FilePicker.platform.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: ['json'],
-        );
-        if (result == null || result.files.single.path == null) return;
+    await loadingGuard(
+      Future(() async {
+        try {
+          FilePickerResult? result = await FilePicker.platform.pickFiles(
+            type: FileType.custom,
+            allowedExtensions: ['json'],
+          );
+          if (result == null || result.files.single.path == null) return;
 
-        final cloned = Map<String, List<TemplateField>>.from(
-          _composedTemplateUI.data,
-        );
-        _composedTemplateUI.postValue(<String, List<TemplateField>>{});
-        await Future.delayed(Duration.zero);
+          final cloned = Map<String, List<TemplateField>>.from(
+            _composedTemplateUI.data,
+          );
+          _composedTemplateUI.postValue(<String, List<TemplateField>>{});
+          await Future.delayed(Duration.zero);
 
-        final file = File(result.files.single.path!);
-        final String content = await file.readAsString();
-        final Map<String, dynamic> data =
-            _templateService.parseCopyData(content);
+          final file = File(result.files.single.path!);
+          final String content = await file.readAsString();
+          final Map<String, dynamic> data = _templateService.parseCopyData(
+            content,
+          );
 
-        final listTemplates = <TemplateField>[];
-        final currentKeys = cloned.values.fold(listTemplates, (a, b) {
-          a.addAll(b);
-          return a;
-        });
-        final keysCompare = currentKeys.asMap().map(
-          (key, e) => MapEntry(e.key, e),
-        );
-
-        if (data['fields'] != null) {
-          final fields = Map<String, dynamic>.from(data['fields']);
-          fields.forEach((key, value) {
-            if (value != null && keysCompare.containsKey(key)) {
-              _fieldKeys[key] = value.toString();
-            }
+          final listTemplates = <TemplateField>[];
+          final currentKeys = cloned.values.fold(listTemplates, (a, b) {
+            a.addAll(b);
+            return a;
           });
-        }
+          final keysCompare = currentKeys.asMap().map(
+            (key, e) => MapEntry(e.key, e),
+          );
 
-        if (data['singleLines'] != null) {
-          final singles = Map<String, dynamic>.from(data['singleLines']);
-          singles.forEach((key, value) {
-            if (value != null && keysCompare.containsKey(key)) {
-              _singleField[key] = value.toString();
-            }
-          });
+          if (data['fields'] != null) {
+            final fields = Map<String, dynamic>.from(data['fields']);
+            fields.forEach((key, value) {
+              if (value != null && keysCompare.containsKey(key)) {
+                _fieldKeys[key] = value.toString();
+              }
+            });
+          }
+
+          if (data['singleLines'] != null) {
+            final singles = Map<String, dynamic>.from(data['singleLines']);
+            singles.forEach((key, value) {
+              if (value != null && keysCompare.containsKey(key)) {
+                _singleField[key] = value.toString();
+              }
+            });
+          }
+          _composedTemplateUI.postValue(cloned);
+          await checkValidate();
+          showSnackbar(AppLang.actionsLoadCopySuccess.tr());
+        } catch (e) {
+          debugPrint("Error using copy: $e");
+          showSnackbar(AppLang.actionsLoadCopyError.tr());
         }
-        _composedTemplateUI.postValue(cloned);
-        await checkValidate();
-        showSnackbar(AppLang.actionsLoadCopySuccess.tr());
-      } catch (e) {
-        debugPrint("Error using copy: $e");
-        showSnackbar(AppLang.actionsLoadCopyError.tr());
-      }
-    }));
+      }),
+    );
   }
-
 
   Future<void> createCopy() async {
     try {
@@ -348,21 +352,36 @@ class FieldsInputViewModel extends BaseViewModel {
       await loadingGuard(
         Future(() async {
           final file = File(result.files.single.path!);
-          final extractedText = await _dataExtractionService.extractText(
-            file,
-          );
+          String extractedText = "";
+          bool pdfError = false;
+          try {
+            extractedText = await _dataExtractionService.extractText(file);
+          } catch (e) {
+            if (e.toString().contains("Unsupported file format: .pdf")) {
+              pdfError = true;
+            } else {
+              rethrow;
+            }
+          }
 
-          if (extractedText.isEmpty) {
+          if (extractedText.isEmpty && !pdfError) {
             throw Exception(AppLang.messagesExtractNoText.tr());
           }
 
           final allFields = _templates.data.expand((t) => t.fields).toList();
           final templateConfig = {for (var f in allFields) f.key: ""};
 
-          final mappedData = await _geminiService.mapTextToTemplate(
-            rawText: extractedText,
-            templateConfig: templateConfig,
-          );
+          final mappedData =
+              pdfError
+                  ? await _geminiService.mapFileToTemplate(
+                    fileBytes: await file.readAsBytes(),
+                    fileName: file.path.split(Platform.pathSeparator).last,
+                    templateConfig: templateConfig,
+                  )
+                  : await _geminiService.mapTextToTemplate(
+                    rawText: extractedText,
+                    templateConfig: templateConfig,
+                  );
 
           final cloned = Map<String, List<TemplateField>>.from(
             _composedTemplateUI.data,
@@ -391,7 +410,5 @@ class FieldsInputViewModel extends BaseViewModel {
       final errorMessage = e.toString().replaceFirst('Exception: ', '');
       showSnackbar("${AppLang.labelsError.tr()}: $errorMessage");
     }
-
   }
-
 }

@@ -16,7 +16,8 @@ class DataExtractionService {
       case 'ods':
         return _extractFromExcel(file);
       case 'pdf':
-        return _extractFromPdf(file);
+        throw Exception('Unsupported file format: $extension');
+      // return _extractFromPdf(file);
       default:
         throw Exception('Unsupported file format: $extension');
     }
@@ -56,8 +57,6 @@ class DataExtractionService {
       rethrow;
     }
   }
-
-
 
   Future<String> _extractFromPdf(File file) async {
     try {
