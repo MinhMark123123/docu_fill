@@ -1,6 +1,5 @@
 {
   "app_name": "DocuFill",
-
   "actions": {
     "save": "Save",
     "cancel": "Cancel",

@@ -28,9 +28,9 @@
     "send": "Gửi",
     "fill_document": "Điền tài liệu",
     "new_document": "Tài liệu mới",
-    "import_data": "Nhập",
-    "export_data": "Xuất",
-    "sign_document": "Ký",
+    "import_data": "Nhập dữ liệu",
+    "export_data": "Xuất dữ liệu",
+    "sign_document": "Ký tài liệu",
     "preview_document": "Xem trước",
     "start_process": "Bắt đầu",
     "finish_process": "Hoàn tất",
@@ -38,9 +38,9 @@
     "open_settings": "Cài đặt",
     "show_more": "Xem thêm",
     "show_less": "Thu gọn",
-    "accept_terms": "Chấp nhận",
+    "accept_terms": "Chấp nhận điều khoản",
     "decline_offer": "Từ chối",
-    "proceed_to_payment": "Tiến hành",
+    "proceed_to_payment": "Tiếp tục thanh toán",
     "learn_more_about": "Tìm hiểu thêm",
     "get_started_now": "Bắt đầu ngay",
     "go_to_app_settings": "Đi tới Cài đặt",
@@ -48,7 +48,7 @@
     "upload_template": "Tải mẫu lên",
     "browse_files": "Duyệt tệp",
     "open_document": "Mở tài liệu",
-    "return_to_templates": "Trở về danh sách mẫu",
+    "return_to_templates": "Quay lại danh sách mẫu",
     "download_document": "Tải tài liệu",
     "select_date_time": "Chọn Ngày & Giờ",
     "show_menu": "Hiện menu",
@@ -109,8 +109,11 @@
     "log_history": "Nhật ký lịch sử API",
     "log_details": "Chi tiết nhật ký",
     "timestamp": "Dấu mốc thời gian",
-    "prompt": "Câu lệnh (Prompt)",
-    "response": "Kết quả trả về"
+    "prompt": "Ghi chú đặc tả",
+    "response": "Kết quả trả về",
+    "select_all": "Chọn tất cả",
+    "key": "Mã",
+    "type": "Loại"
   },
   "messages": {
     "review_and_configure_fields": "Xem lại và cấu hình các trường được phát hiện trong mẫu của bạn. Đảm bảo tất cả các trường được xác định chính xác và gán loại đầu vào phù hợp để thu thập dữ liệu chính xác.",
@@ -143,7 +146,11 @@
     "review_before_export": "Vui lòng kiểm tra lại tất cả thông tin trước khi xuất.",
     "no_logs_found": "Không tìm thấy nhật ký API nào.",
     "confirm_delete_all_logs": "Bạn có chắc chắn muốn xóa tất cả các tệp nhật ký? Hành động này không thể hoàn tác.",
-    "export_summary_success": "Đã xuất tóm tắt thành công!"
+    "export_summary_success": "Đã xuất tóm tắt thành công!",
+    "no_matching_fields": "Không tìm thấy trường nào trùng khớp để sao chép cấu hình.",
+    "import_from_template": "Chọn từ mẫu có sẵn",
+    "import_from_file": "Chọn từ tệp (.dfpkg)",
+    "template_field_count": "{} trường"
   },
   "settings": {
     "general": {

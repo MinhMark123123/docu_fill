@@ -18,6 +18,9 @@ class TemplateField {
 
   final String? additionalInfo;
   final String? section;
+  
+  /// Description or example for the field to help AI understand the context
+  final String? description;
 
   TemplateField({
     required this.key,
@@ -28,6 +31,7 @@ class TemplateField {
     this.options,
     this.additionalInfo,
     this.section,
+    this.description,
   });
 
   factory TemplateField.fromJson(Map<String, dynamic> json) =>
@@ -44,6 +48,7 @@ class TemplateField {
     List<String>? options,
     String? additionalInfo,
     String? section,
+    String? description,
   }) {
     return TemplateField(
       key: key ?? this.key,
@@ -54,6 +59,7 @@ class TemplateField {
       options: options ?? this.options,
       additionalInfo: additionalInfo ?? this.additionalInfo,
       section: section ?? this.section,
+      description: description ?? this.description,
     );
   }
 }
