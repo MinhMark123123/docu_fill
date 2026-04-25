@@ -1,5 +1,4 @@
 import 'package:localization/localization.dart';
-import 'package:core/core.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/route/routers.dart';
 import 'package:flutter/material.dart';

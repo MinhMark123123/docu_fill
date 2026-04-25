@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:docu_fill/core/src/events.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
@@ -20,26 +20,26 @@ class BaseViewModel extends ViewModel {
 
   @override
   void onInitState() {
-    print("====> $runtimeType $hashCode onInitState");
+    debugPrint("====> $runtimeType $hashCode onInitState");
     super.onInitState();
   }
 
   @override
   void onResume() {
-    print("====> $runtimeType $hashCode onResume");
+    debugPrint("====> $runtimeType $hashCode onResume");
     super.onResume();
     //
   }
 
   @override
   void onPause() {
-    print("====> $runtimeType $hashCode onPause");
+    debugPrint("====> $runtimeType $hashCode onPause");
     super.onPause();
   }
 
   @override
   void onDispose() {
-    print("====> $runtimeType $hashCode onDispose");
+    debugPrint("====> $runtimeType $hashCode onDispose");
     super.onDispose();
   }
 

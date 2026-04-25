@@ -1,6 +1,5 @@
 {
   "app_name": "DocuFill",
-
   "actions": {
     "save": "Save",
     "cancel": "Cancel",
@@ -60,7 +59,8 @@
     "load_copy_success": "Data loaded from copy successfully!",
     "load_copy_error": "Error loading copy: {}",
     "create_copy_success": "Copy created successfully!",
-    "create_copy_error": "Error creating copy: {}"
+    "create_copy_error": "Error creating copy: {}",
+    "export_summary": "Export Summary (Text)"
   },
   "labels": {
     "templates": "Templates",
@@ -110,7 +110,10 @@
     "log_details": "Log Details",
     "timestamp": "Timestamp",
     "prompt": "Prompt",
-    "response": "Response"
+    "response": "Response",
+    "select_all": "Select All",
+    "key": "Key",
+    "type": "Type"
   },
   "messages": {
     "review_and_configure_fields": "Review and configure the fields detected in your template. Ensure all fields are correctly identified and assigned the appropriate input type for accurate data collection.",
@@ -142,7 +145,12 @@
     "fill_info_below": "Please fill in the information below.",
     "review_before_export": "Please review all information before exporting.",
     "no_logs_found": "No API logs found.",
-    "confirm_delete_all_logs": "Are you sure you want to delete all log files? This action cannot be undone."
+    "confirm_delete_all_logs": "Are you sure you want to delete all log files? This action cannot be undone.",
+    "export_summary_success": "Exported summary successfully!",
+    "no_matching_fields": "No matching field keys found to copy configuration.",
+    "import_from_template": "Import from Template",
+    "import_from_file": "Import from File (.dfpkg)",
+    "template_field_count": "{} fields"
   },
   "settings": {
     "general": {

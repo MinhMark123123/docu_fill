@@ -1,4 +1,3 @@
-import 'package:core/core.dart';
 import 'package:docu_fill/route/routers.dart';
 import 'package:design/ui.dart';
 import 'package:localization/localization.dart';

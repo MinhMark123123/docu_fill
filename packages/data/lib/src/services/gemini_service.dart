@@ -17,7 +17,7 @@ class GeminiService {
 
   Future<Map<String, String>> mapTextToTemplate({
     required String rawText,
-    required Map<String, dynamic> templateConfig,
+    required Map<String, String?> templateConfig, // Key: FieldKey, Value: Description (optional)
   }) async {
     final settings = await _settingsRepository.getSettings();
     final apiKey = settings?.geminiApiKey;
@@ -31,12 +31,15 @@ class GeminiService {
     final modelName = settings?.geminiModel ?? 'gemini-1.5-flash';
     final model = GenerativeModel(model: modelName, apiKey: apiKey);
 
-    final fieldKeys = templateConfig.keys.toList();
+    // Format fields description for prompt
+    final fieldDescriptions = templateConfig.entries.map((e) {
+      return "- Key: \"${e.key}\" ${e.value != null && e.value!.isNotEmpty ? "(Description: ${e.value})" : ""}";
+    }).join('\n');
 
     final prompt = '''
 You are an expert data extraction assistant.
-You will be provided with "EXTRACTED TEXT" from a document and a list of "FIELD KEYS" from a template.
-Your goal is to map the information from the text into the field keys.
+You will be provided with "EXTRACTED TEXT" from a document and a list of "FIELD KEYS" with optional descriptions.
+Your goal is to map the information from the text into the field keys accurately.
 
 RULES:
 1. Return ONLY a valid JSON object.
@@ -44,9 +47,10 @@ RULES:
 3. Values should be extracted from the "EXTRACTED TEXT".
 4. If a value represents a date, format it as "DD-MM-YYYY" if possible.
 5. If a value is not found in the text, return an empty string "" for that key.
+6. Use the descriptions provided for each key to better understand what to extract.
 
 FIELD KEYS:
-${fieldKeys.join(', ')}
+$fieldDescriptions
 
 EXTRACTED TEXT:
 $rawText
@@ -61,13 +65,11 @@ JSON OUTPUT:
     if (responseText == null) {
       throw Exception('Gemini response was empty');
     }
-    // const responseText = "{}"; // DEBUG: Dummy response for prompt verification
 
     if (settings?.enableApiLogging ?? false) {
       await _logToFile(prompt, responseText);
     }
 
-    // Attempt to parse JSON
     try {
       final startIndex = responseText.indexOf('{');
       final endIndex = responseText.lastIndexOf('}');
@@ -84,13 +86,11 @@ JSON OUTPUT:
     }
   }
 
-  /// Maps document file content to a structured JSON template using Gemini Multimodal API.
   Future<Map<String, String>> mapFileToTemplate({
     required Uint8List fileBytes,
     required String fileName,
-    required Map<String, dynamic> templateConfig,
+    required Map<String, String?> templateConfig, // Key: FieldKey, Value: Description (optional)
   }) async {
-    // 1. Retrieve configuration from repository
     final settings = await _settingsRepository.getSettings();
     final apiKey = settings?.geminiApiKey;
 
@@ -100,19 +100,19 @@ JSON OUTPUT:
       );
     }
 
-    // 2. Initialize the Generative Model (Recommend using gemini-1.5-flash for document processing)
     final modelName = settings?.geminiModel ?? 'gemini-1.5-flash';
     final model = GenerativeModel(model: modelName, apiKey: apiKey);
 
-    final fieldKeys = templateConfig.keys.toList();
+    // Format fields description for prompt
+    final fieldDescriptions = templateConfig.entries.map((e) {
+      return "- Key: \"${e.key}\" ${e.value != null && e.value!.isNotEmpty ? "(Description: ${e.value})" : ""}";
+    }).join('\n');
 
-    // 3. Determine the MIME type of the file (e.g., 'application/pdf', 'image/jpeg')
     final mimeType = lookupMimeType(fileName) ?? 'application/octet-stream';
 
-    // 4. Construct the multimodal prompt
     final prompt = '''
 You are an expert data extraction assistant.
-You are provided with a DOCUMENT FILE and a list of "FIELD KEYS".
+You are provided with a DOCUMENT FILE and a list of "FIELD KEYS" with optional descriptions.
 Your goal is to analyze the content of the file and map the information into the field keys.
 
 RULES:
@@ -121,20 +121,19 @@ RULES:
 3. If a value represents a date, format it as "DD-MM-YYYY".
 4. If a value is not found in the file, return an empty string "" for that key.
 5. Extract values in their original language found in the document.
+6. Use the descriptions provided for each key to better understand what to extract.
 
 FIELD KEYS:
-${fieldKeys.join(', ')}
+$fieldDescriptions
 
 JSON OUTPUT:
 ''';
 
-    // 5. Create multi-part content containing both text prompt and binary data
     final content = [
       Content.multi([TextPart(prompt), DataPart(mimeType, fileBytes)]),
     ];
 
     try {
-      // 6. Request content generation from Gemini
       final response = await model.generateContent(content);
       final responseText = response.text;
 
@@ -142,7 +141,6 @@ JSON OUTPUT:
         throw Exception('Gemini response was empty');
       }
 
-      // 7. Optional logging for debugging purposes
       if (settings?.enableApiLogging ?? false) {
         await _logToFile(
           'FILE_UPLOAD_PROMPT: $fileName\n$prompt',
@@ -150,15 +148,12 @@ JSON OUTPUT:
         );
       }
 
-      // 8. Parse and validate the JSON output
       final startIndex = responseText.indexOf('{');
       final endIndex = responseText.lastIndexOf('}');
 
       if (startIndex != -1 && endIndex != -1) {
         final jsonPart = responseText.substring(startIndex, endIndex + 1);
         final Map<String, dynamic> decoded = jsonDecode(jsonPart);
-
-        // Convert all values to String to match the expected return type
         return decoded.map((key, value) => MapEntry(key, value.toString()));
       }
 

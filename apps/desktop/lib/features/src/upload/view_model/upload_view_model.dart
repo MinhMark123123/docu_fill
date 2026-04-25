@@ -21,7 +21,7 @@ class UploadViewModel extends BaseViewModel {
       allowedExtensions:
           isSettingFile
               ? [AppConst.settingFileExtension.replaceAll(".", "")]
-              : ['docx', 'doc'],
+              : ['docx', 'doc', 'xlsx', 'xls'], // Added Excel extensions
     );
     if (result != null) {
       _filePicked.postValue(result.files.single);

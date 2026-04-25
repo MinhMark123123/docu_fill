@@ -10,6 +10,7 @@ class TableRowData {
   String? additionalInfo;
   String? defaultValue;
   String? section;
+  String? description;
 
   TableRowData({
     required this.fieldKey,
@@ -20,6 +21,7 @@ class TableRowData {
     this.additionalInfo,
     this.defaultValue,
     this.section,
+    this.description,
   });
 
   TableRowData copyWith({
@@ -31,6 +33,7 @@ class TableRowData {
     String? additionalInfo,
     String? defaultValue,
     String? section,
+    String? description,
   }) {
     return TableRowData(
       fieldKey: fieldKey ?? this.fieldKey,
@@ -41,6 +44,7 @@ class TableRowData {
       additionalInfo: additionalInfo ?? this.additionalInfo,
       defaultValue: defaultValue ?? this.defaultValue,
       section: section ?? this.section,
+      description: description ?? this.description,
     );
   }
 
@@ -53,6 +57,7 @@ class TableRowData {
       additionalInfo: additionalInfo,
       defaultValue: defaultValue,
       section: section,
+      description: description,
     );
   }
 
@@ -66,6 +71,7 @@ class TableRowData {
       additionalInfo: additionalInfo,
       defaultValue: defaultValue,
       section: section,
+      description: description,
     );
   }
 }

@@ -1,6 +1,5 @@
 import 'package:data/data.dart';
 import 'package:design/ui.dart';
-import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
 class EnumDropdownButton extends StatefulWidget {

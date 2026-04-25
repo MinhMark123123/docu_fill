@@ -2,7 +2,6 @@ import 'package:localization/localization.dart';
 import 'package:docu_fill/features/src/configure/view/widgets/configure_table_fields.dart';
 import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
 import 'package:design/ui.dart';
-import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 

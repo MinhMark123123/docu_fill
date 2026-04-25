@@ -1,9 +1,8 @@
-import 'package:docu_fill/features/page.dart';
 import 'package:design/ui.dart';
-import 'package:core/core.dart';
+import 'package:docu_fill/features/page.dart';
+import 'package:docu_fill/features/src/main/view_model/main_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
-import 'package:docu_fill/features/src/main/view_model/main_view_model.dart';
 
 class MainLayoutDesktop extends StatelessWidget {
   final Widget child;

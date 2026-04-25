@@ -261,6 +261,7 @@ class FiledInputBox extends StatelessWidget {
     return SingleChildScrollView(
       padding: EdgeInsets.all(Dimens.size32),
       child: Column(
+        spacing: Dimens.size16,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -277,26 +278,41 @@ class FiledInputBox extends StatelessWidget {
                 ),
               ),
               Dimens.spacing.horizontal(Dimens.size16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    AppLang.labelsInputSummary.tr(),
-                    style: context.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      AppLang.labelsInputSummary.tr(),
+                      style: context.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  Text(
-                    AppLang.messagesReviewBeforeExport.tr(),
-                    style: context.textTheme.bodySmall?.copyWith(
-                      color: context.colorScheme.onSurfaceVariant,
+                    Text(
+                      AppLang.messagesReviewBeforeExport.tr(),
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),
-          Dimens.spacing.vertical(Dimens.size32),
+          //
+          OutlinedButton.icon(
+            onPressed: () => viewModel.exportSummaryText(),
+            icon: Icon(Icons.text_snippet_outlined),
+            label: Text(AppLang.actionsExportSummary.tr()),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: context.colorScheme.tertiary,
+              side: BorderSide(color: context.colorScheme.tertiary),
+              padding: EdgeInsets.symmetric(
+                horizontal: Dimens.size16,
+                vertical: Dimens.size12,
+              ),
+            ),
+          ),
           ...data.entries.map((entry) {
             final sectionFields = entry.value.where(
               (f) =>
@@ -372,8 +388,9 @@ class FiledInputBox extends StatelessWidget {
   }
 
   IconData _getSectionIcon(String sectionKey) {
-    if (sectionKey == AppLang.labelsOverview.tr())
+    if (sectionKey == AppLang.labelsOverview.tr()) {
       return Icons.dashboard_outlined;
+    }
     if (sectionKey == AppLang.labelsCommon.tr()) return Icons.layers;
     if (sectionKey == AppLang.labelsGeneral.tr()) return Icons.info_outline;
     if (sectionKey == AppLang.labelsGeneralInfo.tr()) return Icons.info_outline;

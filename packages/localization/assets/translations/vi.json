@@ -28,9 +28,9 @@
     "send": "Gửi",
     "fill_document": "Điền tài liệu",
     "new_document": "Tài liệu mới",
-    "import_data": "Nhập",
-    "export_data": "Xuất",
-    "sign_document": "Ký",
+    "import_data": "Nhập dữ liệu",
+    "export_data": "Xuất dữ liệu",
+    "sign_document": "Ký tài liệu",
     "preview_document": "Xem trước",
     "start_process": "Bắt đầu",
     "finish_process": "Hoàn tất",
@@ -38,9 +38,9 @@
     "open_settings": "Cài đặt",
     "show_more": "Xem thêm",
     "show_less": "Thu gọn",
-    "accept_terms": "Chấp nhận",
+    "accept_terms": "Chấp nhận điều khoản",
     "decline_offer": "Từ chối",
-    "proceed_to_payment": "Tiến hành",
+    "proceed_to_payment": "Tiếp tục thanh toán",
     "learn_more_about": "Tìm hiểu thêm",
     "get_started_now": "Bắt đầu ngay",
     "go_to_app_settings": "Đi tới Cài đặt",
@@ -48,7 +48,7 @@
     "upload_template": "Tải mẫu lên",
     "browse_files": "Duyệt tệp",
     "open_document": "Mở tài liệu",
-    "return_to_templates": "Trở về danh sách mẫu",
+    "return_to_templates": "Quay lại danh sách mẫu",
     "download_document": "Tải tài liệu",
     "select_date_time": "Chọn Ngày & Giờ",
     "show_menu": "Hiện menu",
@@ -59,7 +59,8 @@
     "load_copy_success": "Đã tải dữ liệu từ bản sao thành công!",
     "load_copy_error": "Lỗi khi tải bản sao: {}",
     "create_copy_success": "Đã tạo bản sao thành công!",
-    "create_copy_error": "Lỗi khi tạo bản sao: {}"
+    "create_copy_error": "Lỗi khi tạo bản sao: {}",
+    "export_summary": "Xuất tóm tắt (Text)"
   },
   "labels": {
     "templates": "Mẫu",
@@ -95,7 +96,21 @@
     "height": "chiều cao",
     "unit": "đơn vị",
     "cm": "cm",
-    "inches": "inches"
+    "inches": "inches",
+    "error": "Lỗi",
+    "common": "Chung",
+    "general": "Tổng quan",
+    "general_info": "Thông tin chung",
+    "overview": "Tổng quan",
+    "section": "Phần",
+    "input_summary": "Tóm tắt nhập liệu",
+    "quick_actions": "Thao tác nhanh:",
+    "template_fill": "Điền mẫu",
+    "log_history": "Nhật ký lịch sử API",
+    "log_details": "Chi tiết nhật ký",
+    "timestamp": "Dấu mốc thời gian",
+    "prompt": "Ghi chú đặc tả",
+    "response": "Kết quả trả về"
   },
   "messages": {
     "review_and_configure_fields": "Xem lại và cấu hình các trường được phát hiện trong mẫu của bạn. Đảm bảo tất cả các trường được xác định chính xác và gán loại đầu vào phù hợp để thu thập dữ liệu chính xác.",
@@ -115,6 +130,35 @@
     "enter_date_format": "Nhập định dạng ngày. Ví dụ: dd/MM/yyyy",
     "single_line_text_hint": "Dòng này sẽ tự động bị xóa nếu để trống.",
     "setting_exported": "Xuất cài đặt thành công",
-    "import_setting": "Nhập cài đặt"
+    "import_setting": "Nhập cài đặt",
+    "settings_save_success": "Cài đặt đã được lưu thành công!",
+    "gemini_api_key_required": "Vui lòng nhập Gemini API Key.",
+    "gemini_config_desc": "Để sử dụng tính năng 'Nhập từ tệp', bạn cần cung cấp Gemini API Key.",
+    "gemini_api_key_hint": "Nhập API key của bạn tại đây",
+    "excel_unsupported_format": "Lỗi định dạng Excel: Tệp này sử dụng định dạng số hiện không được hỗ trợ. Vui lòng thử mở tệp trong Microsoft Excel và 'Lưu dưới dạng' (Save As) một tệp .xlsx mới để khắc phục lỗi này.",
+    "extract_no_text": "Không thể trích xuất văn bản từ tệp đã chọn.",
+    "import_from_file_success": "Đã tự động điền dữ liệu từ tệp thành công!",
+    "gemini_model_desc": "Chọn phiên bản Gemini model để sử dụng trích xuất dữ liệu.",
+    "fill_info_below": "Vui lòng điền thông tin bên dưới.",
+    "review_before_export": "Vui lòng kiểm tra lại tất cả thông tin trước khi xuất.",
+    "no_logs_found": "Không tìm thấy nhật ký API nào.",
+    "confirm_delete_all_logs": "Bạn có chắc chắn muốn xóa tất cả các tệp nhật ký? Hành động này không thể hoàn tác.",
+    "export_summary_success": "Đã xuất tóm tắt thành công!"
+  },
+  "settings": {
+    "general": {
+      "title": "Cài đặt chung",
+      "language": "Ngôn ngữ",
+      "english": "Tiếng Anh",
+      "vietnamese": "Tiếng Việt"
+    },
+    "gemini": {
+      "title": "Cấu hình Gemini AI",
+      "api_key": "Gemini API Key",
+      "model": "Gemini Model",
+      "enable_logging": "Bật ghi nhật ký API",
+      "open_logs": "Mở thư mục nhật ký",
+      "save_btn": "Lưu cài đặt Gemini"
+    }
   }
 }

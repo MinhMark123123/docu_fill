@@ -1,5 +1,4 @@
 import 'package:design/ui.dart';
-import 'package:design/ui.dart';
 import 'package:flutter/material.dart';
 
 class DesktopHeaderBar extends StatelessWidget {

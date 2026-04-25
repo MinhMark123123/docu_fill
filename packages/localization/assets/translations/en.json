@@ -1,6 +1,5 @@
 {
   "app_name": "DocuFill",
-
   "actions": {
     "save": "Save",
     "cancel": "Cancel",
@@ -60,7 +59,8 @@
     "load_copy_success": "Data loaded from copy successfully!",
     "load_copy_error": "Error loading copy: {}",
     "create_copy_success": "Copy created successfully!",
-    "create_copy_error": "Error creating copy: {}"
+    "create_copy_error": "Error creating copy: {}",
+    "export_summary": "Export Summary (Text)"
   },
   "labels": {
     "templates": "Templates",
@@ -96,7 +96,21 @@
     "height": "height",
     "unit": "unit",
     "cm": "cm",
-    "inches": "inches"
+    "inches": "inches",
+    "error": "Error",
+    "common": "Common",
+    "general": "General",
+    "general_info": "General Information",
+    "overview": "Overview",
+    "section": "Section",
+    "input_summary": "Input Summary",
+    "quick_actions": "Quick Actions:",
+    "template_fill": "Template Fill",
+    "log_history": "API History Logs",
+    "log_details": "Log Details",
+    "timestamp": "Timestamp",
+    "prompt": "Prompt",
+    "response": "Response"
   },
   "messages": {
     "review_and_configure_fields": "Review and configure the fields detected in your template. Ensure all fields are correctly identified and assigned the appropriate input type for accurate data collection.",
@@ -116,6 +130,35 @@
     "enter_date_format": "Enter date format. Example: dd/MM/yyyy",
     "single_line_text_hint": "This line will be removed automatically if empty.",
     "setting_exported": "Setting Exported Successfully",
-    "import_setting": "Import Setting"
+    "import_setting": "Import Setting",
+    "settings_save_success": "Settings saved successfully!",
+    "gemini_api_key_required": "Gemini API Key is required.",
+    "gemini_config_desc": "In order to use the 'Import from File' feature, you need to provide a Gemini API Key.",
+    "gemini_api_key_hint": "Enter your API key here",
+    "excel_unsupported_format": "Excel Format Error: This file uses a number format that is currently unsupported. Please try opening the file in Microsoft Excel and 'Saving As' a new .xlsx file to resolve this.",
+    "extract_no_text": "Could not extract any text from the selected file.",
+    "import_from_file_success": "Form auto-filled from file successfully!",
+    "gemini_model_desc": "Select the Gemini model version to use for data extraction.",
+    "fill_info_below": "Please fill in the information below.",
+    "review_before_export": "Please review all information before exporting.",
+    "no_logs_found": "No API logs found.",
+    "confirm_delete_all_logs": "Are you sure you want to delete all log files? This action cannot be undone.",
+    "export_summary_success": "Exported summary successfully!"
+  },
+  "settings": {
+    "general": {
+      "title": "General Settings",
+      "language": "Language",
+      "english": "English",
+      "vietnamese": "Vietnamese"
+    },
+    "gemini": {
+      "title": "Gemini AI Configuration",
+      "api_key": "Gemini API Key",
+      "model": "Gemini Model",
+      "enable_logging": "Enable API Logging",
+      "open_logs": "Open Logs Folder",
+      "save_btn": "Save Gemini Settings"
+    }
   }
 }
