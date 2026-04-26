@@ -1,13 +1,12 @@
+import 'package:data/data.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/core/src/events.dart' show ShowDialogEvent;
 import 'package:docu_fill/features/src/configure/view/desktop/configure_desktop_layout.dart';
 import 'package:docu_fill/features/src/configure/view/widgets/use_field_selection_dialog.dart';
 import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
-import 'package:data/data.dart';
 
 class ConfigurePage extends BaseView<ConfigureViewModel> {
   final String? path;
@@ -71,8 +70,8 @@ class ConfigurePage extends BaseView<ConfigureViewModel> {
           children: [
             ListTile(
               leading: const Icon(Icons.storage_outlined),
-              title: Text(AppLang.labelsAllTemplates.tr()),
-              subtitle: const Text("Chọn cấu hình từ các mẫu đã lưu"),
+              title: Text(AppLang.messagesImportFromTemplate.tr()),
+              subtitle: Text(AppLang.messagesSelectFromSavedTemplates.tr()),
               onTap: () {
                 Navigator.pop(dialogContext); // Close option dialog
                 _showTemplateListDialog(dialogContext, event.listTemplate);
@@ -81,12 +80,13 @@ class ConfigurePage extends BaseView<ConfigureViewModel> {
             const Divider(),
             ListTile(
               leading: const Icon(Icons.file_open_outlined),
-              title: Text(AppLang.labelsImportConfiguration.tr()),
-              subtitle: const Text("Chọn cấu hình từ tệp .dfpkg"),
+              title: Text(AppLang.messagesImportFromFile.tr()),
+              subtitle: Text(AppLang.messagesSelectFromConfigFile.tr()),
               onTap: () async {
                 Navigator.pop(dialogContext); // Close option dialog
-                final template = await getViewModel<ConfigureViewModel>()
-                    .pickAndParseTemplateFile();
+                final template =
+                    await getViewModel<ConfigureViewModel>()
+                        .pickAndParseTemplateFile();
                 if (template != null && dialogContext.mounted) {
                   _showFieldSelectionDialog(dialogContext, template);
                 }
@@ -130,7 +130,11 @@ class ConfigurePage extends BaseView<ConfigureViewModel> {
                     },
                     leading: const Icon(Icons.description_outlined),
                     title: Text(selectedOldTemplate.templateName),
-                    subtitle: Text("${selectedOldTemplate.fields.length} trường"),
+                    subtitle: Text(
+                      AppLang.messagesTemplateFieldCount.tr(
+                        args: [selectedOldTemplate.fields.length.toString()],
+                      ),
+                    ),
                     trailing: const Icon(Icons.chevron_right, size: 18),
                   );
                 },

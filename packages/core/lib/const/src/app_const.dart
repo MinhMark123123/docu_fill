@@ -8,8 +8,8 @@ class AppConst {
   static const String commonKey = "commonKey";
   static const String empty = "";
   static const String settingFileExtension = ".dfconf";
-  static const String settingJsonFileName = "setting.json";
-  static const String settingDocFileName = "settingDoc.docx";
+  static const String settingJsonFileName = "config.json"; // Changed to config.json for clarity if needed
+  static const String settingDocFileName = "template_file";
 
   static String composeKey({required String key}) => '''%%$key%%''';
 }
