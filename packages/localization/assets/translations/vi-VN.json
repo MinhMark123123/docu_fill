@@ -149,8 +149,11 @@
     "export_summary_success": "Đã xuất tóm tắt thành công!",
     "no_matching_fields": "Không tìm thấy trường nào trùng khớp để sao chép cấu hình.",
     "import_from_template": "Chọn từ mẫu có sẵn",
-    "import_from_file": "Chọn từ tệp (.dfpkg)",
-    "template_field_count": "{} trường"
+    "import_from_file": "Chọn từ tệp (.dfconf)",
+    "template_field_count": "{} trường",
+    "select_from_saved_templates": "Chọn cấu hình từ các mẫu đã lưu",
+    "select_from_config_file": "Chọn cấu hình từ tệp .dfconf",
+    "import_config_error": "Lỗi khi nhập tệp cấu hình."
   },
   "settings": {
     "general": {

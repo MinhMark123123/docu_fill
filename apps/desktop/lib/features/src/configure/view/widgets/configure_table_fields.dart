@@ -75,7 +75,6 @@ enum TableColumn {
     required TableRowData? data,
   }) {
     if (vicinity.row == 0) {
-      //build Header
       return cellBox(child: Text(labels(), style: context.textTheme.bodySmall));
     }
     if (data == null) return const SizedBox();
@@ -129,10 +128,18 @@ enum TableColumn {
   }
 }
 
-class CustomScrollableTable extends StatelessWidget {
-  final List<TableRowData> data; // Your table data
+class CustomScrollableTable extends StatefulWidget {
+  final List<TableRowData> data;
 
-  // Define column widths - you can adjust these as needed
+  const CustomScrollableTable({super.key, required this.data});
+
+  @override
+  State<CustomScrollableTable> createState() => _CustomScrollableTableState();
+}
+
+class _CustomScrollableTableState extends State<CustomScrollableTable> {
+  final ScrollController _horizontalController = ScrollController();
+
   final List<TableSpanExtent> columnWidths = [
     FixedSpanExtent(200), // fieldKey
     FixedSpanExtent(100), // isRequired
@@ -144,24 +151,36 @@ class CustomScrollableTable extends StatelessWidget {
     FixedSpanExtent(300), // options
   ];
 
-  CustomScrollableTable({super.key, required this.data});
+  @override
+  void dispose() {
+    _horizontalController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return TableView.builder(
-      verticalDetails: ScrollableDetails.vertical(
-        physics: ClampingScrollPhysics(),
+    return Scrollbar(
+      controller: _horizontalController,
+      thumbVisibility: true,
+      trackVisibility: true,
+      scrollbarOrientation: ScrollbarOrientation.bottom,
+      notificationPredicate:
+          (notification) => notification.metrics.axis == Axis.horizontal,
+      child: TableView.builder(
+        verticalDetails: const ScrollableDetails.vertical(
+          physics: ClampingScrollPhysics(),
+        ),
+        horizontalDetails: ScrollableDetails.horizontal(
+          controller: _horizontalController,
+          physics: const ClampingScrollPhysics(),
+        ),
+        columnCount: TableColumn.values.length,
+        rowCount: widget.data.length + 1,
+        pinnedRowCount: 1,
+        cellBuilder: (context, vicinity) => _buildCell(context, vicinity),
+        columnBuilder: (index) => _buildColumnSpan(context, index),
+        rowBuilder: (index) => _buildRowSpan(context, index),
       ),
-      horizontalDetails: ScrollableDetails.horizontal(
-        physics: ClampingScrollPhysics(),
-      ),
-      columnCount: TableColumn.values.length,
-      rowCount: data.length + 1,
-      // Pin the header row
-      pinnedRowCount: 1,
-      cellBuilder: (context, vicinity) => _buildCell(context, vicinity),
-      columnBuilder: (index) => _buildColumnSpan(context, index),
-      rowBuilder: (index) => _buildRowSpan(context, index),
     );
   }
 
@@ -171,7 +190,10 @@ class CustomScrollableTable extends StatelessWidget {
       child: TableColumn.from(vicinity).buildChild(
         context,
         vicinity: vicinity,
-        data: (data.isEmpty || isHeader) ? null : data[vicinity.row - 1],
+        data:
+            (widget.data.isEmpty || isHeader)
+                ? null
+                : widget.data[vicinity.row - 1],
       ),
     );
   }
@@ -180,7 +202,6 @@ class CustomScrollableTable extends StatelessWidget {
     return TableSpan(
       foregroundDecoration: TableSpanDecoration(
         border: TableSpanBorder(
-          // For the outer vertical lines
           leading: index == 0 ? borderSideDecoration(context) : BorderSide.none,
           trailing:
               index == TableColumn.values.length - 1
@@ -196,11 +217,10 @@ class CustomScrollableTable extends StatelessWidget {
     final isHeader = index == 0;
     double extent = isHeader ? Dimens.size46 : Dimens.size72;
 
-    if (!isHeader && data.isNotEmpty) {
-      final rowData = data[index - 1];
+    if (!isHeader && widget.data.isNotEmpty) {
+      final rowData = widget.data[index - 1];
       if (rowData.inputType == FieldType.selection) {
         final optionsCount = rowData.options?.length ?? 1;
-        // Increased safety margin from Dimens.size24 to Dimens.size40
         final calculatedHeight =
             (optionsCount * (Dimens.size40 + Dimens.size12)) +
             Dimens.size48 +
@@ -216,7 +236,7 @@ class CustomScrollableTable extends StatelessWidget {
         border: TableSpanBorder(
           leading: isHeader ? borderSideDecoration(context) : BorderSide.none,
           trailing:
-              (index == data.length || isHeader)
+              (index == widget.data.length || isHeader)
                   ? borderSideDecoration(context)
                   : BorderSide.none,
         ),

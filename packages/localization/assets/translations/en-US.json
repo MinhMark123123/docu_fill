@@ -149,8 +149,11 @@
     "export_summary_success": "Exported summary successfully!",
     "no_matching_fields": "No matching field keys found to copy configuration.",
     "import_from_template": "Import from Template",
-    "import_from_file": "Import from File (.dfpkg)",
-    "template_field_count": "{} fields"
+    "import_from_file": "Import from File (.dfconf)",
+    "template_field_count": "{} fields",
+    "select_from_saved_templates": "Choose configuration from saved templates",
+    "select_from_config_file": "Choose configuration from .dfconf file",
+    "import_config_error": "Failed to import configuration file."
   },
   "settings": {
     "general": {

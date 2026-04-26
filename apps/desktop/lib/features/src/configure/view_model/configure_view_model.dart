@@ -115,6 +115,7 @@ class ConfigureViewModel extends BaseViewModel {
     );
     _fieldsData.postValue(fields.toList());
     _nameController.text = template.templateName;
+    checkEnableConfirm();
   }
 
   void useSetting(BuildContext context, TemplateConfig template) {
@@ -144,7 +145,6 @@ class ConfigureViewModel extends BaseViewModel {
     checkEnableConfirm();
   }
 
-  /// Applies selected field settings from another template to the current configuration
   void applySelectedSettings(
     List<TemplateField> selectedFields,
     String oldTemplateName,
@@ -177,7 +177,6 @@ class ConfigureViewModel extends BaseViewModel {
     checkEnableConfirm();
   }
 
-  /// Handles picking a .dfpkg file and returns its TemplateConfig
   Future<TemplateConfig?> pickAndParseTemplateFile() async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -197,8 +196,12 @@ class ConfigureViewModel extends BaseViewModel {
           return TemplateConfig.fromJson(jsonMap);
         }
       }
+      showSnackbar(AppLang.messagesImportConfigError.tr());
     } catch (e) {
       debugPrint("Error picking template file: $e");
+      showSnackbar(
+        "${AppLang.messagesImportConfigError.tr()}: ${e.toString()}",
+      );
     }
     return null;
   }
@@ -542,6 +545,39 @@ class ConfigureViewModel extends BaseViewModel {
     if (_mode.data.isImportMode) {
       await _extractDir?.delete(recursive: true);
     }
+    await Future.delayed(Duration.zero);
+    if (result) {
+      showSnackbar(AppLang.messagesDocumentSuccessfullyCreate.tr());
+      navigatePage(RoutesPath.home);
+    }
+  }
+
+  Future<void> saveAsCopy(BuildContext context) async {
+    final userAccepted = await showConfirmDialog(context);
+    if (!userAccepted || !context.mounted) return;
+    await Future.delayed(Duration.zero);
+    final current = await _templateRepository.getTemplateById(_idEdit);
+    if (!context.mounted && current == null) return;
+    final result = await showSimpleLoadingDialog(
+      context: context,
+      future: () async {
+        final uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+        final extension = current!.pathTemplate.split('.').last.toLowerCase();
+        final newFileName = "$uniqueName.$extension";
+
+        final path = await DocxUtils.saveDocxToAppDirectory(
+          originalDocxPath: current.pathTemplate,
+          newFileName: newFileName,
+          customDirectoryName: "templates",
+        );
+
+        if (path == null) return false;
+        await _templateRepository.saveTemplate(
+          generateTemplateConfig(name: _nameController.text, path: path),
+        );
+        return true;
+      },
+    );
     await Future.delayed(Duration.zero);
     if (result) {
       showSnackbar(AppLang.messagesDocumentSuccessfullyCreate.tr());

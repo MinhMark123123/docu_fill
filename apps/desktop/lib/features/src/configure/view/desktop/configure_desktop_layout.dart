@@ -1,8 +1,8 @@
-import 'package:localization/localization.dart';
+import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/configure/view/widgets/configure_table_fields.dart';
 import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
-import 'package:design/ui.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
 class ConfigureDesktopLayout extends StatelessWidget {
@@ -159,8 +159,8 @@ class ConfigureDesktopLayout extends StatelessWidget {
         SizedBox(
           width: Dimens.size300,
           child: TextField(
-            enabled: false,
             controller: configureViewModel.nameController,
+            onChanged: (_) => configureViewModel.checkEnableConfirm(),
             decoration: InputDecoration(
               labelText: AppLang.labelsTemplateName.tr(),
               isDense: true,
@@ -168,16 +168,40 @@ class ConfigureDesktopLayout extends StatelessWidget {
           ),
         ),
         Dimens.spacing.horizontal(Dimens.size16),
-        ElevatedButton(
-          onPressed: () => configureViewModel.edit(context),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: context.colorScheme.primary,
-            foregroundColor: context.colorScheme.onPrimary,
-            shape: RoundedRectangleBorder(
-              borderRadius: Dimens.radii.borderMedium(),
-            ),
-          ),
-          child: Text(AppLang.actionsConfirm.tr()),
+        StreamDataConsumer(
+          streamData: configureViewModel.enableConfirm,
+          builder: (context, data) {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OutlinedButton(
+                  onPressed:
+                      data
+                          ? () => configureViewModel.saveAsCopy(context)
+                          : null,
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: Dimens.radii.borderMedium(),
+                    ),
+                  ),
+                  child: Text(AppLang.actionsCreateCopy.tr()),
+                ),
+                Dimens.spacing.horizontal(Dimens.size12),
+                ElevatedButton(
+                  onPressed:
+                      data ? () => configureViewModel.edit(context) : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: context.colorScheme.primary,
+                    foregroundColor: context.colorScheme.onPrimary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: Dimens.radii.borderMedium(),
+                    ),
+                  ),
+                  child: Text(AppLang.actionsConfirm.tr()),
+                ),
+              ],
+            );
+          },
         ),
       ],
     );
