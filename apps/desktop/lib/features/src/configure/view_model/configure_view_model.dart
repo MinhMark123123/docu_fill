@@ -196,7 +196,6 @@ class ConfigureViewModel extends BaseViewModel {
           return TemplateConfig.fromJson(jsonMap);
         }
       }
-      showSnackbar(AppLang.messagesImportConfigError.tr());
     } catch (e) {
       debugPrint("Error picking template file: $e");
       showSnackbar(

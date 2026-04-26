@@ -1,12 +1,13 @@
-import 'package:data/data.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/core/src/events.dart' show ShowDialogEvent;
 import 'package:docu_fill/features/src/configure/view/desktop/configure_desktop_layout.dart';
 import 'package:docu_fill/features/src/configure/view/widgets/use_field_selection_dialog.dart';
 import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
+import 'package:data/data.dart';
 
 class ConfigurePage extends BaseView<ConfigureViewModel> {
   final String? path;
@@ -63,86 +64,45 @@ class ConfigurePage extends BaseView<ConfigureViewModel> {
     BuildContext dialogContext,
   ) {
     if (event is ShowUseSettingDialogEvent) {
+      final itemList = event.listTemplate;
       return AlertDialog(
-        title: Text(AppLang.labelsImportExportConfiguration.tr()),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            ListTile(
-              leading: const Icon(Icons.storage_outlined),
-              title: Text(AppLang.messagesImportFromTemplate.tr()),
-              subtitle: Text(AppLang.messagesSelectFromSavedTemplates.tr()),
-              onTap: () {
-                Navigator.pop(dialogContext); // Close option dialog
-                _showTemplateListDialog(dialogContext, event.listTemplate);
-              },
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.file_open_outlined),
-              title: Text(AppLang.messagesImportFromFile.tr()),
-              subtitle: Text(AppLang.messagesSelectFromConfigFile.tr()),
-              onTap: () async {
-                Navigator.pop(dialogContext); // Close option dialog
-                final template =
-                    await getViewModel<ConfigureViewModel>()
-                        .pickAndParseTemplateFile();
-                if (template != null && dialogContext.mounted) {
-                  _showFieldSelectionDialog(dialogContext, template);
-                }
-              },
+            Text(AppLang.labelsAllTemplates.tr()),
+            IconButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              icon: const Icon(Icons.close),
             ),
           ],
+        ),
+        content: SizedBox(
+          width: 400,
+          height: 300,
+          child: ListView.builder(
+            itemBuilder: (context, index) {
+              final selectedOldTemplate = itemList[index];
+              return ListTile(
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  _showFieldSelectionDialog(dialogContext, selectedOldTemplate);
+                },
+                leading: const Icon(Icons.description_outlined),
+                title: Text(selectedOldTemplate.templateName),
+                subtitle: Text(
+                  AppLang.messagesTemplateFieldCount.tr(
+                    args: [selectedOldTemplate.fields.length.toString()],
+                  ),
+                ),
+                trailing: const Icon(Icons.chevron_right, size: 18),
+              );
+            },
+            itemCount: itemList.length,
+          ),
         ),
       );
     }
     return super.alertDialogBuilder(event, dialogContext);
-  }
-
-  void _showTemplateListDialog(
-    BuildContext context,
-    List<TemplateConfig> itemList,
-  ) {
-    showDialog(
-      context: context,
-      builder:
-          (dialogContext) => AlertDialog(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(AppLang.labelsAllTemplates.tr()),
-                IconButton(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  icon: const Icon(Icons.close),
-                ),
-              ],
-            ),
-            content: SizedBox(
-              width: 400,
-              height: 300,
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  final selectedOldTemplate = itemList[index];
-                  return ListTile(
-                    onTap: () {
-                      Navigator.pop(dialogContext);
-                      _showFieldSelectionDialog(context, selectedOldTemplate);
-                    },
-                    leading: const Icon(Icons.description_outlined),
-                    title: Text(selectedOldTemplate.templateName),
-                    subtitle: Text(
-                      AppLang.messagesTemplateFieldCount.tr(
-                        args: [selectedOldTemplate.fields.length.toString()],
-                      ),
-                    ),
-                    trailing: const Icon(Icons.chevron_right, size: 18),
-                  );
-                },
-                itemCount: itemList.length,
-              ),
-            ),
-          ),
-    );
   }
 
   void _showFieldSelectionDialog(
