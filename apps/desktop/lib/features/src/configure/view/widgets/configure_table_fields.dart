@@ -164,8 +164,6 @@ class _CustomScrollableTableState extends State<CustomScrollableTable> {
       thumbVisibility: true,
       trackVisibility: true,
       scrollbarOrientation: ScrollbarOrientation.bottom,
-      notificationPredicate:
-          (notification) => notification.metrics.axis == Axis.horizontal,
       child: TableView.builder(
         verticalDetails: const ScrollableDetails.vertical(
           physics: ClampingScrollPhysics(),
