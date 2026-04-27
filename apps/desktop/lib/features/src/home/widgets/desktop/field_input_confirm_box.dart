@@ -1,7 +1,7 @@
-import 'package:localization/localization.dart';
-import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:design/ui.dart';
+import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
 class FieldInputConfirmBox extends StatelessWidget {
@@ -102,6 +102,21 @@ class FieldInputConfirmBox extends StatelessWidget {
           icon: const Icon(Icons.content_copy, size: 16),
           label: Text(AppLang.actionsCreateCopy.tr()),
           style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: Dimens.radii.borderMedium(),
+            ),
+          ),
+        ),
+        // --- NEW: Import AI Result Button ---
+        OutlinedButton.icon(
+          onPressed: () => viewModel.importAiResult(),
+          icon: const Icon(Icons.psychology_outlined, size: 16),
+          label: Text(AppLang.actionsImportAiResult.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: context.colorScheme.tertiary,
+            side: BorderSide(
+              color: context.colorScheme.tertiary.withOpacity(0.5),
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: Dimens.radii.borderMedium(),
             ),

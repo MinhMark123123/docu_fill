@@ -34,6 +34,7 @@ abstract class AppLang {
   static const String actionsFinishProcess = "actions.finish_process";
   static const String actionsGetStartedNow = "actions.get_started_now";
   static const String actionsGoToAppSettings = "actions.go_to_app_settings";
+  static const String actionsImportAiResult = "actions.import_ai_result";
   static const String actionsImportData = "actions.import_data";
   static const String actionsLearnMoreAbout = "actions.learn_more_about";
   static const String actionsLoadCopyError = "actions.load_copy_error";
@@ -51,6 +52,7 @@ abstract class AppLang {
   static const String actionsRetryAction = "actions.retry_action";
   static const String actionsReturnToTemplates = "actions.return_to_templates";
   static const String actionsSave = "actions.save";
+  static const String actionsSaveAiResult = "actions.save_ai_result";
   static const String actionsSaveCopyTitle = "actions.save_copy_title";
   static const String actionsSearch = "actions.search";
   static const String actionsSelectDateTime = "actions.select_date_time";
@@ -154,6 +156,8 @@ abstract class AppLang {
   static const String messagesPickFolderToExport = "messages.pick_folder_to_export";
   static const String messagesReviewAndConfigureFields = "messages.review_and_configure_fields";
   static const String messagesReviewBeforeExport = "messages.review_before_export";
+  static const String messagesSaveAiResultSuccess = "messages.save_ai_result_success";
+  static const String messagesSelectFromAiResults = "messages.select_from_ai_results";
   static const String messagesSelectFromConfigFile = "messages.select_from_config_file";
   static const String messagesSelectFromSavedTemplates = "messages.select_from_saved_templates";
   static const String messagesSettingExported = "messages.setting_exported";

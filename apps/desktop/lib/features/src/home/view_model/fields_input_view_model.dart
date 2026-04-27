@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:data/data.dart';
@@ -7,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 part 'fields_input_view_model.g.dart';
 
@@ -126,9 +129,6 @@ class FieldsInputViewModel extends BaseViewModel {
       }
     }
 
-    // Translate raw section keys → localized display names.
-    // null key = no section configured on field.
-    // TemplateService.commonSectionKey = shared across all templates.
     final hasNamedSections = rawData.keys.any(
       (k) => k != null && k != TemplateService.commonSectionKey,
     );
@@ -181,9 +181,7 @@ class FieldsInputViewModel extends BaseViewModel {
   }) {
     if (field.type == FieldType.singleLine) {
       _singleField[field.key] = value;
-      debugPrint("set value single line ${field.key}: $value");
     } else {
-      debugPrint("set value ${field.key}: $value");
       _fieldKeys[field.key] = value;
     }
     if (shouldCheckValidate) {
@@ -198,13 +196,15 @@ class FieldsInputViewModel extends BaseViewModel {
     );
 
     _missingKeys.postValue(missingKeys);
-    _enableEditNameDoc.postValue(missingKeys.isEmpty);
+    // Allow editing document name as long as templates are loaded
+    _enableEditNameDoc.postValue(_templates.data.isNotEmpty);
     _enableExported.postValue(exportedValid(missingKeys));
   }
 
   bool exportedValid(Iterable<String> missingKeys) {
-    return missingKeys.isEmpty &&
-        _nameDocExported.text.isNotEmpty &&
+    // Export is allowed regardless of missing required keys.
+    // The UI will still show the warning about missing keys.
+    return _nameDocExported.text.isNotEmpty &&
         _directoryExported.data.isNotEmpty;
   }
 
@@ -228,7 +228,8 @@ class FieldsInputViewModel extends BaseViewModel {
       showSnackbar(AppLang.messagesPickFolderToExport.tr());
       return;
     }
-    final fileName = _nameDocExported.text.isEmpty ? "export" : _nameDocExported.text;
+    final fileName =
+        _nameDocExported.text.isEmpty ? "export" : _nameDocExported.text;
     await loadingGuard(
       _templateService.exportSummaryText(
         exportDirectory: _directoryExported.data,
@@ -270,46 +271,11 @@ class FieldsInputViewModel extends BaseViewModel {
           );
           if (result == null || result.files.single.path == null) return;
 
-          final cloned = Map<String, List<TemplateField>>.from(
-            _composedTemplateUI.data,
-          );
-          _composedTemplateUI.postValue(<String, List<TemplateField>>{});
-          await Future.delayed(Duration.zero);
-
           final file = File(result.files.single.path!);
           final String content = await file.readAsString();
-          final Map<String, dynamic> data = _templateService.parseCopyData(
-            content,
-          );
+          final Map<String, dynamic> data = jsonDecode(content);
 
-          final listTemplates = <TemplateField>[];
-          final currentKeys = cloned.values.fold(listTemplates, (a, b) {
-            a.addAll(b);
-            return a;
-          });
-          final keysCompare = currentKeys.asMap().map(
-            (key, e) => MapEntry(e.key, e),
-          );
-
-          if (data['fields'] != null) {
-            final fields = Map<String, dynamic>.from(data['fields']);
-            fields.forEach((key, value) {
-              if (value != null && keysCompare.containsKey(key)) {
-                _fieldKeys[key] = value.toString();
-              }
-            });
-          }
-
-          if (data['singleLines'] != null) {
-            final singles = Map<String, dynamic>.from(data['singleLines']);
-            singles.forEach((key, value) {
-              if (value != null && keysCompare.containsKey(key)) {
-                _singleField[key] = value.toString();
-              }
-            });
-          }
-          _composedTemplateUI.postValue(cloned);
-          await checkValidate();
+          _applyDataToForm(data);
           showSnackbar(AppLang.actionsLoadCopySuccess.tr());
         } catch (e) {
           debugPrint("Error using copy: $e");
@@ -317,6 +283,172 @@ class FieldsInputViewModel extends BaseViewModel {
         }
       }),
     );
+  }
+
+  Future<void> importFromFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'docx', 'xlsx', 'xls'],
+      );
+      if (result == null || result.files.single.path == null) return;
+
+      await loadingGuard(
+        Future(() async {
+          final file = File(result.files.single.path!);
+          String extractedText = "";
+          bool pdfError = false;
+          try {
+            extractedText = await _dataExtractionService.extractText(file);
+          } catch (e) {
+            if (e.toString().toLowerCase().contains("pdf")) {
+              pdfError = true;
+            } else {
+              rethrow;
+            }
+          }
+
+          if (extractedText.isEmpty && !pdfError) {
+            throw Exception(AppLang.messagesExtractNoText.tr());
+          }
+
+          final allFields = _templates.data.expand((t) => t.fields).toList();
+          final templateConfig = {
+            for (var f in allFields) f.key: f.description,
+          };
+
+          final mappedData =
+              pdfError
+                  ? await _geminiService.mapFileToTemplate(
+                    fileBytes: await file.readAsBytes(),
+                    fileName: file.path.split(Platform.pathSeparator).last,
+                    templateConfig: templateConfig,
+                  )
+                  : await _geminiService.mapTextToTemplate(
+                    rawText: extractedText,
+                    templateConfig: templateConfig,
+                  );
+
+          // AUTO-SAVE AI RESULT for future use
+          await _autoSaveAiResult(
+            sourceFileName: file.path.split(Platform.pathSeparator).last,
+            resultData: mappedData,
+          );
+
+          _applyAiDataToForm(mappedData);
+          showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
+        }),
+      );
+    } catch (e) {
+      debugPrint("Error importing from file: $e");
+      final errorMessage = e.toString().replaceFirst('Exception: ', '');
+      showSnackbar("${AppLang.labelsError.tr()}: $errorMessage");
+    }
+  }
+
+  /// Automatically saves the AI analysis result to a local JSON file
+  Future<void> _autoSaveAiResult({
+    required String sourceFileName,
+    required Map<String, String> resultData,
+  }) async {
+    try {
+      final appDocDir = await getApplicationDocumentsDirectory();
+      // Use p.join for OS-native path separators
+      final aiResultsDirPath = p.join(appDocDir.path, "ai_results");
+      final aiResultsDir = Directory(aiResultsDirPath);
+      if (!await aiResultsDir.exists()) {
+        await aiResultsDir.create(recursive: true);
+      }
+
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final resultFileName = "ai_res_${sourceFileName}_$timestamp.json";
+      final resultFile = File(p.join(aiResultsDirPath, resultFileName));
+
+      await resultFile.writeAsString(jsonEncode(resultData));
+      debugPrint("AI Result auto-saved: ${resultFile.path}");
+    } catch (e) {
+      debugPrint("Error auto-saving AI result: $e");
+    }
+  }
+
+  /// Loads and applies a previously saved AI analysis result
+  Future<void> importAiResult() async {
+    try {
+      final appDocDir = await getApplicationDocumentsDirectory();
+      final aiResultsDirPath = p.join(appDocDir.path, "ai_results");
+      final aiResultsDir = Directory(aiResultsDirPath);
+      if (!await aiResultsDir.exists()) {
+        await aiResultsDir.create(recursive: true);
+      }
+
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        initialDirectory:
+            aiResultsDir.path, // PickFiles correctly uses native paths
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+
+      if (result == null || result.files.single.path == null) return;
+
+      final file = File(result.files.single.path!);
+      final String content = await file.readAsString();
+      final Map<String, dynamic> data = jsonDecode(content);
+      final mappedData = data.map(
+        (key, value) => MapEntry(key, value.toString()),
+      );
+
+      _applyAiDataToForm(mappedData);
+      showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
+    } catch (e) {
+      debugPrint("Error importing AI result: $e");
+      showSnackbar(AppLang.actionsLoadCopyError.tr());
+    }
+  }
+
+  void _applyAiDataToForm(Map<String, String> mappedData) {
+    final cloned = Map<String, List<TemplateField>>.from(
+      _composedTemplateUI.data,
+    );
+    _composedTemplateUI.postValue(<String, List<TemplateField>>{});
+
+    final allFields = _templates.data.expand((t) => t.fields).toList();
+    for (var field in allFields) {
+      final value = mappedData[field.key];
+      if (value != null && value.isNotEmpty) {
+        if (field.type == FieldType.singleLine) {
+          _singleField[field.key] = value;
+        } else {
+          _fieldKeys[field.key] = value;
+        }
+      }
+    }
+
+    _composedTemplateUI.postValue(cloned);
+    checkValidate();
+  }
+
+  void _applyDataToForm(Map<String, dynamic> data) {
+    final cloned = Map<String, List<TemplateField>>.from(
+      _composedTemplateUI.data,
+    );
+    _composedTemplateUI.postValue(<String, List<TemplateField>>{});
+
+    if (data['fields'] != null) {
+      final fields = Map<String, dynamic>.from(data['fields']);
+      fields.forEach((key, value) {
+        if (value != null) _fieldKeys[key] = value.toString();
+      });
+    }
+
+    if (data['singleLines'] != null) {
+      final singles = Map<String, dynamic>.from(data['singleLines']);
+      singles.forEach((key, value) {
+        if (value != null) _singleField[key] = value.toString();
+      });
+    }
+
+    _composedTemplateUI.postValue(cloned);
+    checkValidate();
   }
 
   Future<void> createCopy() async {
@@ -351,77 +483,6 @@ class FieldsInputViewModel extends BaseViewModel {
     } catch (e) {
       debugPrint("Error creating copy: $e");
       showSnackbar(AppLang.actionsCreateCopyError.tr(args: [e.toString()]));
-    }
-  }
-
-  Future<void> importFromFile() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf', 'docx', 'xlsx', 'xls'],
-      );
-      if (result == null || result.files.single.path == null) return;
-
-      await loadingGuard(
-        Future(() async {
-          final file = File(result.files.single.path!);
-          String extractedText = "";
-          bool pdfError = false;
-          try {
-            extractedText = await _dataExtractionService.extractText(file);
-          } catch (e) {
-            if (e.toString().toLowerCase().contains("pdf")) {
-              pdfError = true;
-            } else {
-              rethrow;
-            }
-          }
-
-          if (extractedText.isEmpty && !pdfError) {
-            throw Exception(AppLang.messagesExtractNoText.tr());
-          }
-
-          final allFields = _templates.data.expand((t) => t.fields).toList();
-          final templateConfig = {for (var f in allFields) f.key: ""};
-
-          final mappedData =
-              pdfError
-                  ? await _geminiService.mapFileToTemplate(
-                    fileBytes: await file.readAsBytes(),
-                    fileName: file.path.split(Platform.pathSeparator).last,
-                    templateConfig: templateConfig,
-                  )
-                  : await _geminiService.mapTextToTemplate(
-                    rawText: extractedText,
-                    templateConfig: templateConfig,
-                  );
-
-          final cloned = Map<String, List<TemplateField>>.from(
-            _composedTemplateUI.data,
-          );
-          _composedTemplateUI.postValue(<String, List<TemplateField>>{});
-          await Future.delayed(Duration.zero);
-
-          for (var field in allFields) {
-            final value = mappedData[field.key];
-            if (value != null && value.isNotEmpty) {
-              if (field.type == FieldType.singleLine) {
-                _singleField[field.key] = value;
-              } else {
-                _fieldKeys[field.key] = value;
-              }
-            }
-          }
-
-          _composedTemplateUI.postValue(cloned);
-          await checkValidate();
-          showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
-        }),
-      );
-    } catch (e) {
-      debugPrint("Error importing from file: $e");
-      final errorMessage = e.toString().replaceFirst('Exception: ', '');
-      showSnackbar("${AppLang.labelsError.tr()}: $errorMessage");
     }
   }
 }

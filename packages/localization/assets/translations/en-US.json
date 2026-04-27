@@ -60,7 +60,9 @@
     "load_copy_error": "Error loading copy: {}",
     "create_copy_success": "Copy created successfully!",
     "create_copy_error": "Error creating copy: {}",
-    "export_summary": "Export Summary (Text)"
+    "export_summary": "Export Summary (Text)",
+    "import_ai_result": "Import old AI result",
+    "save_ai_result": "Save AI result"
   },
   "labels": {
     "templates": "Templates",
@@ -153,7 +155,9 @@
     "template_field_count": "{} fields",
     "select_from_saved_templates": "Choose configuration from saved templates",
     "select_from_config_file": "Choose configuration from .dfconf file",
-    "import_config_error": "Failed to import configuration file."
+    "import_config_error": "Failed to import configuration file.",
+    "save_ai_result_success": "AI analysis result saved successfully!",
+    "select_from_ai_results": "Choose from saved AI analysis results"
   },
   "settings": {
     "general": {

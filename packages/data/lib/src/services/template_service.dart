@@ -176,14 +176,7 @@ class TemplateService {
     // 1. Prepare data (Date formatting, defaults)
     final processedFieldKeys = _processFields(templates, fieldKeys);
 
-    // 2. Extract image replacements
-    final Map<String, String> fieldKeysForImages = Map.from(processedFieldKeys);
-    final imageReplacements = getImageReplacements(
-      composedUI: composedUI,
-      fieldKeys: fieldKeysForImages,
-    );
-
-    // 3. Run individual template exports
+    // 2. Run individual template exports
     for (var template in templates) {
       final fileOrigin = File(template.pathTemplate);
       if (!fileOrigin.existsSync()) continue;
@@ -193,19 +186,28 @@ class TemplateService {
       Uint8List rawBytes;
 
       if (extension == 'docx') {
+        // Only DOCX supports image replacements for now
+        final Map<String, String> fieldKeysForImages = Map.from(
+          processedFieldKeys,
+        );
+        final imageReplacements = getImageReplacements(
+          composedUI: composedUI,
+          fieldKeys: fieldKeysForImages,
+        );
+
         rawBytes = await DocxUtils.composeModifiedDocxWithPlaceholders(
           originalBytes: originalBytes,
           replacements: processedFieldKeys,
           imageReplacements: imageReplacements,
           singleLines: singleLines,
         );
-      } else if (extension == 'xlsx') {
+      } else if (extension == 'xlsx' || extension == 'xls') {
+        // Excel uses a different logic without image replacements for now
         rawBytes = await ExcelUtils.composeModifiedExcel(
           originalBytes: originalBytes,
           replacements: processedFieldKeys,
         );
       } else {
-        // Skip unsupported formats
         continue;
       }
 

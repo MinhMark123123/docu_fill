@@ -191,12 +191,18 @@ class DocxUtils {
       }
     }
 
+    // ONLY call image insertion if there are actual image replacements
     if (imageReplacements != null && imageReplacements.isNotEmpty) {
       debugPrint("replace image start");
-      newArchive = await insertImagesIntoDocxArchived(
-        replacements: imageReplacements,
-        inputArchive: newArchive,
-      );
+      try {
+        newArchive = await insertImagesIntoDocxArchived(
+          replacements: imageReplacements,
+          inputArchive: newArchive,
+        );
+      } catch (e) {
+        debugPrint("Warning: Failed to insert images: $e");
+        // We continue anyway so at least text is replaced
+      }
       debugPrint("replace image end");
     }
     return Uint8List.fromList(ZipEncoder().encode(newArchive)!);
@@ -217,7 +223,9 @@ class DocxUtils {
     if (documentFileEntry == null ||
         relsFileEntry == null ||
         contentTypesFileEntry == null) {
-      throw Exception('A required DOCX part is missing from the archive.');
+      // INSTEAD OF THROW: Return original archive if it's not a valid Word file structure
+      debugPrint('Error: A required DOCX part is missing from the archive.');
+      return inputArchive;
     }
 
     // Parse the XML content.
