@@ -17,9 +17,7 @@ class LoadingDialogManager {
   Timer? _safetyTimer;
 
   void showLoading({String? taskId}) {
-    // Cancel any pending safety timer when a new task starts
     _safetyTimer?.cancel();
-
     final id = taskId ?? DateTime.now().microsecondsSinceEpoch.toString();
     _tasks.add(id);
     _updateState();
@@ -32,8 +30,12 @@ class LoadingDialogManager {
       _tasks.remove(_tasks.last);
     }
     _updateState();
+    _resetSafetyTimer();
+  }
 
-    // Start safety timer as a backup whenever a task ends
+  void clearTasksByPrefix(String prefix) {
+    _tasks.removeWhere((id) => id.startsWith(prefix));
+    _updateState();
     _resetSafetyTimer();
   }
 
@@ -44,21 +46,20 @@ class LoadingDialogManager {
   void _resetSafetyTimer() {
     _safetyTimer?.cancel();
 
-    // If there are still tasks, we wait 15s to force clear them (safety timeout).
-    // If there are NO tasks, we wait 1s and send 'false' again as a backup ping to the UI.
+    // Safety backup:
+    // If tasks are still present, wait 15s to force clear (emergency).
+    // If no tasks, wait 1s for a backup 'false' sync ping.
     final duration =
         _tasks.isNotEmpty
-            ? const Duration(seconds: 15)
+            ? const Duration(seconds: 30)
             : const Duration(seconds: 1);
 
     _safetyTimer = Timer(duration, () {
       if (_tasks.isNotEmpty) {
         debugPrint(
-          "LoadingDialogManager: Safety timeout reached after a hide action. Clearing remaining tasks.",
+          "LoadingDialogManager: Safety timeout reached. Clearing tasks.",
         );
         _tasks.clear();
-      } else {
-        debugPrint("LoadingDialogManager: Backup sync ping.");
       }
       _updateState();
     });
@@ -90,9 +91,11 @@ class _LoadingWrapperState extends State<LoadingWrapper> {
           initialData: false,
           builder: (context, snapshot) {
             if (snapshot.data == true) {
-              return Container(
-                color: Colors.black26,
-                child: const Center(child: CircularProgressIndicator()),
+              return AbsorbPointer(
+                child: Container(
+                  color: Colors.black26,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
               );
             }
             return const SizedBox.shrink();

@@ -10,7 +10,10 @@ part 'base_view_model.g.dart';
 @BindableViewModel()
 class BaseViewModel extends ViewModel {
   @Bind()
-  late final _showLoading = false.mtd(this);
+  late final _loadingEvent = LoadingEvent(id: '', show: false).mtd(this);
+
+  StreamData<LoadingEvent> get loadingEvent => _loadingEvent.streamData;
+
   @Bind()
   late final _navigatePageEvent = NavigatePageEvent().mtd(this);
   @Bind()
@@ -37,9 +40,15 @@ class BaseViewModel extends ViewModel {
     super.onPause();
   }
 
+  final Set<String> _disposeSensitiveTasks = {};
+
   @override
   void onDispose() {
     debugPrint("====> $runtimeType $hashCode onDispose");
+    for (final taskId in _disposeSensitiveTasks) {
+      _loadingEvent.postValue(LoadingEvent(id: taskId, show: false));
+    }
+    _disposeSensitiveTasks.clear();
     super.onDispose();
   }
 
@@ -99,12 +108,19 @@ class BaseViewModel extends ViewModel {
     return completer.future;
   }
 
-  Future<dynamic> loadingGuard(Future<dynamic> future) async {
-    _showLoading.postValue(true);
+  Future<T> loadingGuard<T>(
+    Future<T> future, {
+    bool hideOnDispose = true,
+  }) async {
+    final taskId = "task_${hashCode}_${DateTime.now().microsecondsSinceEpoch}";
+    if (hideOnDispose) _disposeSensitiveTasks.add(taskId);
+
+    _loadingEvent.postValue(LoadingEvent(id: taskId, show: true));
     try {
       return await future;
     } finally {
-      _showLoading.postValue(false);
+      if (hideOnDispose) _disposeSensitiveTasks.remove(taskId);
+      _loadingEvent.postValue(LoadingEvent(id: taskId, show: false));
     }
   }
 }

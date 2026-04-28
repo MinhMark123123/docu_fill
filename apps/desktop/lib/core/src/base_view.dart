@@ -111,13 +111,16 @@ abstract class BaseView<T extends BaseViewModel>
     return sub;
   }
 
-  StreamSubscription<bool> _handleLoading(BuildContext context, T viewModel) {
-    final sub = viewModel.showLoading.asStream().listen((isLoading) {
-      final taskId = "view_model_${viewModel.hashCode}";
-      if (isLoading) {
-        LoadingDialogManager().showLoading(taskId: taskId);
+  StreamSubscription<LoadingEvent> _handleLoading(
+    BuildContext context,
+    T viewModel,
+  ) {
+    final sub = viewModel.loadingEvent.asStream().listen((event) {
+      if (event.id.isEmpty) return;
+      if (event.show) {
+        LoadingDialogManager().showLoading(taskId: event.id);
       } else {
-        LoadingDialogManager().hideLoading(taskId: taskId);
+        LoadingDialogManager().hideLoading(taskId: event.id);
       }
     });
     return sub;

@@ -50,6 +50,13 @@ class ShowDialogEvent<T> extends UiActionEvent<T> {
   }
 }
 
+class LoadingEvent {
+  final String id;
+  final bool show;
+
+  LoadingEvent({required this.id, required this.show});
+}
+
 class DialogAction {
   final String title;
   final Function(BuildContext context) onPressed;
