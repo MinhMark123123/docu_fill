@@ -8,7 +8,7 @@ version: 1.0.0+1
 environment:
   sdk: ^3.7.2
 
-isar_version: &isar_version 3.3.0-dev.3 # define the version to be used
+isar_version: &isar_version 3.3.2 # define the version to be used
 
 dependencies:
   flutter:
@@ -74,8 +74,9 @@ dev_dependencies:
   flutter_launcher_icons: ^0.13.1
 
 dependency_overrides:
-#source_gen: any
-#analyzer: any
+  source_gen: any
+  analyzer: any
+  build: any
 
 flutter:
   uses-material-design: true
