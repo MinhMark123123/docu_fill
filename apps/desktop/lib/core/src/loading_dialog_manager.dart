@@ -1,52 +1,104 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class LoadingDialogManager {
-  factory LoadingDialogManager() {
-    return _singleton;
-  }
+  factory LoadingDialogManager() => _singleton;
 
   static final LoadingDialogManager _singleton =
       LoadingDialogManager._internal();
 
   LoadingDialogManager._internal();
 
-  BuildContext? _context;
-  bool _isShowing = false;
+  final _loadingController = StreamController<bool>.broadcast();
+  Stream<bool> get loadingStream => _loadingController.stream;
 
-  void showLoadingDialog(BuildContext context) {
-    if (_isShowing) return;
-    _isShowing = true;
+  final Set<String> _tasks = {};
+  Timer? _safetyTimer;
 
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: false,
-      pageBuilder: (dialogContext, _, _) {
-        _context = dialogContext;
-        // If closeLoadingDialog was already called while the dialog was opening,
-        // we should close it as soon as we have a context.
-        if (!_isShowing) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (_context != null && _context!.mounted) {
-              Navigator.of(_context!).pop();
-              _context = null;
-            }
-          });
-        }
-        return const Center(child: CircularProgressIndicator());
-      },
-    ).then((_) {
-      // Ensure state is reset when the dialog is dismissed for any reason.
-      _isShowing = false;
-      _context = null;
+  void showLoading({String? taskId}) {
+    // Cancel any pending safety timer when a new task starts
+    _safetyTimer?.cancel();
+
+    final id = taskId ?? DateTime.now().microsecondsSinceEpoch.toString();
+    _tasks.add(id);
+    _updateState();
+  }
+
+  void hideLoading({String? taskId}) {
+    if (taskId != null) {
+      _tasks.remove(taskId);
+    } else if (_tasks.isNotEmpty) {
+      _tasks.remove(_tasks.last);
+    }
+    _updateState();
+
+    // Start safety timer as a backup whenever a task ends
+    _resetSafetyTimer();
+  }
+
+  void _updateState() {
+    _loadingController.add(_tasks.isNotEmpty);
+  }
+
+  void _resetSafetyTimer() {
+    _safetyTimer?.cancel();
+
+    // If there are still tasks, we wait 15s to force clear them (safety timeout).
+    // If there are NO tasks, we wait 1s and send 'false' again as a backup ping to the UI.
+    final duration =
+        _tasks.isNotEmpty
+            ? const Duration(seconds: 15)
+            : const Duration(seconds: 1);
+
+    _safetyTimer = Timer(duration, () {
+      if (_tasks.isNotEmpty) {
+        debugPrint(
+          "LoadingDialogManager: Safety timeout reached after a hide action. Clearing remaining tasks.",
+        );
+        _tasks.clear();
+      } else {
+        debugPrint("LoadingDialogManager: Backup sync ping.");
+      }
+      _updateState();
     });
   }
 
-  void closeLoadingDialog() {
-    _isShowing = false;
-    if (_context != null && _context!.mounted) {
-      Navigator.of(_context!).pop();
-      _context = null;
-    }
+  void dispose() {
+    _loadingController.close();
+    _safetyTimer?.cancel();
   }
 }
 
+class LoadingWrapper extends StatefulWidget {
+  final Widget child;
+
+  const LoadingWrapper({super.key, required this.child});
+
+  @override
+  State<LoadingWrapper> createState() => _LoadingWrapperState();
+}
+
+class _LoadingWrapperState extends State<LoadingWrapper> {
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        widget.child,
+        StreamBuilder<bool>(
+          stream: LoadingDialogManager().loadingStream,
+          initialData: false,
+          builder: (context, snapshot) {
+            if (snapshot.data == true) {
+              return Container(
+                color: Colors.black26,
+                child: const Center(child: CircularProgressIndicator()),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
+      ],
+    );
+  }
+}

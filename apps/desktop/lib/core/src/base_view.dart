@@ -25,7 +25,8 @@ abstract class BaseView<T extends BaseViewModel>
       subSnackbar.cancel();
       subDialog.cancel();
       subLoading.cancel();
-      LoadingDialogManager().closeLoadingDialog();
+      // We don't need to call LoadingDialogManager().closeLoadingDialog() here
+      // because the viewModel will be disposed and handle its own tasks.
     });
   }
 
@@ -112,10 +113,11 @@ abstract class BaseView<T extends BaseViewModel>
 
   StreamSubscription<bool> _handleLoading(BuildContext context, T viewModel) {
     final sub = viewModel.showLoading.asStream().listen((isLoading) {
-      if (context.mounted && isLoading) {
-        LoadingDialogManager().showLoadingDialog(context);
-      } else if (!isLoading) {
-        LoadingDialogManager().closeLoadingDialog();
+      final taskId = "view_model_${viewModel.hashCode}";
+      if (isLoading) {
+        LoadingDialogManager().showLoading(taskId: taskId);
+      } else {
+        LoadingDialogManager().hideLoading(taskId: taskId);
       }
     });
     return sub;

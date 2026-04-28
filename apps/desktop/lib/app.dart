@@ -1,7 +1,9 @@
-import 'package:docu_fill/route/routers.dart';
 import 'package:design/ui.dart';
-import 'package:localization/localization.dart';
+import 'package:docu_fill/route/routers.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
+
+import 'core/src/loading_dialog_manager.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -20,6 +22,9 @@ class MyApp extends StatelessWidget {
             darkTheme: AppTheme.darkTheme,
             theme: AppTheme.lightTheme,
             themeMode: ThemeMode.light,
+            builder: (context, child) {
+              return LoadingWrapper(child: child!);
+            },
           );
         },
       ),

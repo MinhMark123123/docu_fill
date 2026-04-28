@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:archive/archive.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/foundation.dart';
@@ -54,8 +55,14 @@ class ExcelUtils {
             }
 
             if (changed) {
-              final updatedBytes = utf8.encode(document.toXmlString(pretty: false));
-              final newFile = ArchiveFile(file.name, updatedBytes.length, updatedBytes);
+              final updatedBytes = utf8.encode(
+                document.toXmlString(pretty: false),
+              );
+              final newFile = ArchiveFile(
+                file.name,
+                updatedBytes.length,
+                updatedBytes,
+              );
               _copyFileAttributes(file, newFile);
               newArchive.addFile(newFile);
               modified = true;
@@ -87,8 +94,6 @@ class ExcelUtils {
   static void _copyFileAttributes(ArchiveFile source, ArchiveFile target) {
     target.mode = source.mode;
     target.lastModTime = source.lastModTime;
-    target.lastModDate = source.lastModDate;
-    target.externalFileAttributes = source.externalFileAttributes;
   }
 
   static Future<Uint8List> _composeWithExcelPackage(
