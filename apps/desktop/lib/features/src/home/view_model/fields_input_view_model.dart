@@ -3,6 +3,9 @@ import 'dart:io';
 
 import 'package:data/data.dart';
 import 'package:docu_fill/core/core.dart';
+import 'package:docu_fill/core/src/events.dart';
+import 'package:docu_fill/features/src/home/view_model/home_view_model.dart';
+import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
@@ -48,6 +51,8 @@ class FieldsInputViewModel extends BaseViewModel {
   late final _currentSectionIndex = 0.mtd(this);
   @Bind()
   late final _showSummary = false.mtd(this);
+  @Bind()
+  late final _isExportSuccess = false.mtd(this);
 
   List<String> get sections => _composedTemplateUI.data.keys.toList();
 
@@ -95,6 +100,7 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   void performInit(List<int>? ids) {
+    _isExportSuccess.postValue(false);
     _idsSelected.postValue(ids ?? []);
     loadTemplates();
   }
@@ -220,6 +226,7 @@ class FieldsInputViewModel extends BaseViewModel {
       ),
     );
     await Future.delayed(Duration(milliseconds: 200));
+    _isExportSuccess.postValue(true);
     doneExported();
   }
 
@@ -255,6 +262,28 @@ class FieldsInputViewModel extends BaseViewModel {
     _directoryExported.postValue("");
     _enableExported.postValue(false);
     _enableEditNameDoc.postValue(false);
+  }
+
+  void resetAll() {
+    _fieldKeys.clear();
+    _singleField.clear();
+    _idsSelected.postValue([]);
+    _templates.postValue([]);
+    _composedTemplateUI.postValue({});
+    _nameDocExported.clear();
+    _directoryExported.postValue("");
+    _enableExported.postValue(false);
+    _enableEditNameDoc.postValue(false);
+    _currentSectionIndex.postValue(0);
+    _showSummary.postValue(false);
+    _missingKeys.postValue([]);
+    _isExportSuccess.postValue(false);
+
+    // Clear selection in HomeViewModel
+    getViewModel<HomeViewModel>().clearSelection();
+
+    // Navigate to home to clear the selection in UI
+    navigatePage(RoutesPath.home, type: NavigatePageType.replace);
   }
 
   String getSectionName(String sectionKey) {
