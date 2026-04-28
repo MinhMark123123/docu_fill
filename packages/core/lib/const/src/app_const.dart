@@ -9,7 +9,7 @@ class AppConst {
   static const String empty = "";
   static const String settingFileExtension = ".dfconf";
   static const String settingJsonFileName = "setting.json";
-  static const String settingDocFileName = "settingDoc.docx";
+  static const String settingDocFileName = "settingDoc"; // Base name without extension
 
   static String composeKey({required String key}) => '''%%$key%%''';
 }

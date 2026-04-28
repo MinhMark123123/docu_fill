@@ -25,13 +25,16 @@ class TemplateService {
 
   Future<List<int>?> createExportArchive(TemplateConfig item) async {
     final archive = Archive();
-    // Use docx path from item
-    final docxFile = File(item.pathTemplate);
-    if (!docxFile.existsSync()) return null;
+    // Get the actual extension of the template file
+    final templateFile = File(item.pathTemplate);
+    if (!templateFile.existsSync()) return null;
 
-    final docxBytes = await docxFile.readAsBytes();
+    final extension = p.extension(item.pathTemplate);
+    final docBytes = await templateFile.readAsBytes();
+
+    // Add the template file with its correct extension
     archive.addFile(
-      ArchiveFile(AppConst.settingDocFileName, docxBytes.length, docxBytes),
+      ArchiveFile("${AppConst.settingDocFileName}$extension", docBytes.length, docBytes),
     );
 
     final configMap = item.toJson();
@@ -186,10 +189,8 @@ class TemplateService {
       Uint8List rawBytes;
 
       if (extension == 'docx') {
-        // Only DOCX supports image replacements for now
-        final Map<String, String> fieldKeysForImages = Map.from(
-          processedFieldKeys,
-        );
+        // --- ONLY DOCX: Handle Images ---
+        final Map<String, String> fieldKeysForImages = Map.from(processedFieldKeys);
         final imageReplacements = getImageReplacements(
           composedUI: composedUI,
           fieldKeys: fieldKeysForImages,
@@ -202,12 +203,13 @@ class TemplateService {
           singleLines: singleLines,
         );
       } else if (extension == 'xlsx' || extension == 'xls') {
-        // Excel uses a different logic without image replacements for now
+        // --- EXCEL: Handle Text replacements only ---
         rawBytes = await ExcelUtils.composeModifiedExcel(
           originalBytes: originalBytes,
           replacements: processedFieldKeys,
         );
       } else {
+        // Skip unsupported formats
         continue;
       }
 
