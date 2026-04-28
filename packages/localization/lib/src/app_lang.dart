@@ -75,13 +75,11 @@ abstract class AppLang {
   static const String labelsAllTemplates = "labels.all_templates";
   static const String labelsCm = "labels.cm";
   static const String labelsCommon = "labels.common";
-  static const String labelsConfigureTemplateFields =
-      "labels.configure_template_fields";
+  static const String labelsConfigureTemplateFields = "labels.configure_template_fields";
   static const String labelsDefaultValue = "labels.default_value";
   static const String labelsDetectedFields = "labels.detected_fields";
   static const String labelsDocuments = "labels.documents";
-  static const String labelsEnableMultipleChoice =
-      "labels.enable_multiple_choice";
+  static const String labelsEnableMultipleChoice = "labels.enable_multiple_choice";
   static const String labelsEnterTemplateName = "labels.enter_template_name";
   static const String labelsError = "labels.error";
   static const String labelsExportConfiguration = "labels.export_configuration";
@@ -92,8 +90,7 @@ abstract class AppLang {
   static const String labelsGeneralInfo = "labels.general_info";
   static const String labelsHeight = "labels.height";
   static const String labelsImportConfiguration = "labels.import_configuration";
-  static const String labelsImportExportConfiguration =
-      "labels.import_export_configuration";
+  static const String labelsImportExportConfiguration = "labels.import_export_configuration";
   static const String labelsInches = "labels.inches";
   static const String labelsInputFieldName = "labels.input_field_name";
   static const String labelsInputOptions = "labels.input_options";
@@ -127,71 +124,54 @@ abstract class AppLang {
   static const String labelsWidth = "labels.width";
 
   // --- Messages ---
-  static const String messagesConfirmCreateDocument =
-      "messages.confirm_create_document";
-  static const String messagesConfirmDeleteAllLogs =
-      "messages.confirm_delete_all_logs";
-  static const String messagesConfirmEditDocument =
-      "messages.confirm_edit_document";
-  static const String messagesDateFormatInvalid =
-      "messages.date_format_invalid";
-  static const String messagesDocumentExportedReadyForDownload =
-      "messages.document_exported_ready_for_download";
-  static const String messagesDocumentExportedSuccessfully =
-      "messages.document_exported_successfully";
-  static const String messagesDocumentSuccessfullyCreate =
-      "messages.document_successfully_create";
+  static const String messagesConfirmCreateDocument = "messages.confirm_create_document";
+  static const String messagesConfirmDeleteAllLogs = "messages.confirm_delete_all_logs";
+  static const String messagesConfirmEditDocument = "messages.confirm_edit_document";
+  static const String messagesDateFormatInvalid = "messages.date_format_invalid";
+  static const String messagesDocumentExportedReadyForDownload = "messages.document_exported_ready_for_download";
+  static const String messagesDocumentExportedSuccessfully = "messages.document_exported_successfully";
+  static const String messagesDocumentSuccessfullyCreate = "messages.document_successfully_create";
   static const String messagesDragAndDropDocx = "messages.drag_and_drop_docx";
   static const String messagesEnterDateFormat = "messages.enter_date_format";
-  static const String messagesEnterTemplateNameHint =
-      "messages.enter_template_name_hint";
-  static const String messagesExcelUnsupportedFormat =
-      "messages.excel_unsupported_format";
-  static const String messagesExportSummarySuccess =
-      "messages.export_summary_success";
+  static const String messagesEnterTemplateNameHint = "messages.enter_template_name_hint";
+  static const String messagesExcelUnsupportedFormat = "messages.excel_unsupported_format";
+  static const String messagesExportSummarySuccess = "messages.export_summary_success";
   static const String messagesExtractNoText = "messages.extract_no_text";
   static const String messagesFieldIsRequired = "messages.field_is_required";
   static const String messagesFillInfoBelow = "messages.fill_info_below";
   static const String messagesGeminiApiKeyHint = "messages.gemini_api_key_hint";
-  static const String messagesGeminiApiKeyRequired =
-      "messages.gemini_api_key_required";
+  static const String messagesGeminiApiKeyRequired = "messages.gemini_api_key_required";
   static const String messagesGeminiConfigDesc = "messages.gemini_config_desc";
   static const String messagesGeminiModelDesc = "messages.gemini_model_desc";
   static const String messagesImportConfigError = "messages.import_config_error";
-  static const String messagesImportFromFileSuccess =
-      "messages.import_from_file_success";
+  static const String messagesImportFromFileSuccess = "messages.import_from_file_success";
   static const String messagesImportSetting = "messages.import_setting";
   static const String messagesInputTextHint = "messages.input_text_hint";
-  static const String messagesNameTheDocumentExported =
-      "messages.name_the_document_exported";
+  static const String messagesNameTheDocumentExported = "messages.name_the_document_exported";
   static const String messagesNoLogsFound = "messages.no_logs_found";
   static const String messagesNoMatchingFields = "messages.no_matching_fields";
-  static const String messagesPickFolderToExport =
-      "messages.pick_folder_to_export";
-  static const String messagesReviewAndConfigureFields =
-      "messages.review_and_configure_fields";
-  static const String messagesReviewBeforeExport =
-      "messages.review_before_export";
-  static const String messagesSelectFromAiResults =
-      "messages.select_from_ai_results";
+  static const String messagesPickFolderToExport = "messages.pick_folder_to_export";
+  static const String messagesReviewAndConfigureFields = "messages.review_and_configure_fields";
+  static const String messagesReviewBeforeExport = "messages.review_before_export";
+  static const String messagesSelectFromAiResults = "messages.select_from_ai_results";
   static const String messagesSettingExported = "messages.setting_exported";
-  static const String messagesSettingsSaveSuccess =
-      "messages.settings_save_success";
-  static const String messagesSingleLineTextHint =
-      "messages.single_line_text_hint";
+  static const String messagesSettingsSaveSuccess = "messages.settings_save_success";
+  static const String messagesSingleLineTextHint = "messages.single_line_text_hint";
   static const String messagesTemplateFieldCount = "messages.template_field_count";
   static const String messagesUploadTemplate = "messages.upload_template";
 
   // --- Settings ---
   static const String settingsGeminiApiKey = "settings.gemini.api_key";
-  static const String settingsGeminiEnableLogging =
-      "settings.gemini.enable_logging";
+  static const String settingsGeminiEnableLogging = "settings.gemini.enable_logging";
   static const String settingsGeminiModel = "settings.gemini.model";
   static const String settingsGeminiOpenLogs = "settings.gemini.open_logs";
+  static const String settingsGeminiSampleResult = "settings.gemini.sample_result";
   static const String settingsGeminiSaveBtn = "settings.gemini.save_btn";
+  static const String settingsGeminiStudyData = "settings.gemini.study_data";
   static const String settingsGeminiTitle = "settings.gemini.title";
   static const String settingsGeneralEnglish = "settings.general.english";
   static const String settingsGeneralLanguage = "settings.general.language";
   static const String settingsGeneralTitle = "settings.general.title";
   static const String settingsGeneralVietnamese = "settings.general.vietnamese";
+
 }

@@ -111,7 +111,10 @@
     "log_details": "Chi tiết nhật ký",
     "timestamp": "Dấu mốc thời gian",
     "prompt": "Ghi chú đặc tả",
-    "response": "Kết quả trả về"
+    "response": "Kết quả trả về",
+    "select_all": "Chọn tất cả",
+    "key": "Mã",
+    "type": "Loại"
   },
   "messages": {
     "review_and_configure_fields": "Xem lại và cấu hình các trường được phát hiện trong mẫu của bạn. Đảm bảo tất cả các trường được xác định chính xác và gán loại đầu vào phù hợp để thu thập dữ liệu chính xác.",
@@ -145,7 +148,10 @@
     "no_logs_found": "Không tìm thấy nhật ký API nào.",
     "confirm_delete_all_logs": "Bạn có chắc chắn muốn xóa tất cả các tệp nhật ký? Hành động này không thể hoàn tác.",
     "export_summary_success": "Đã xuất tóm tắt thành công!",
-    "select_from_ai_results": "Chọn từ các kết quả phân tích AI đã lưu"
+    "select_from_ai_results": "Chọn từ các kết quả phân tích AI đã lưu",
+    "template_field_count": "{} trường",
+    "no_matching_fields": "Không tìm thấy trường nào trùng khớp để sao chép cấu hình.",
+    "import_config_error": "Lỗi khi nhập tệp cấu hình."
   },
   "settings": {
     "general": {
@@ -158,6 +164,8 @@
       "title": "Cấu hình Gemini AI",
       "api_key": "Gemini API Key",
       "model": "Gemini Model",
+      "study_data": "Dữ liệu mẫu/Study",
+      "sample_result": "Kết quả mẫu JSON",
       "enable_logging": "Bật ghi nhật ký API",
       "open_logs": "Mở thư mục nhật ký",
       "save_btn": "Lưu cài đặt Gemini"
