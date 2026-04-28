@@ -60,7 +60,8 @@
     "load_copy_error": "Error loading copy: {}",
     "create_copy_success": "Copy created successfully!",
     "create_copy_error": "Error creating copy: {}",
-    "export_summary": "Export Summary (Text)"
+    "export_summary": "Export Summary (Text)",
+    "import_ai_result": "Import old AI result"
   },
   "labels": {
     "templates": "Templates",
@@ -143,7 +144,8 @@
     "review_before_export": "Please review all information before exporting.",
     "no_logs_found": "No API logs found.",
     "confirm_delete_all_logs": "Are you sure you want to delete all log files? This action cannot be undone.",
-    "export_summary_success": "Exported summary successfully!"
+    "export_summary_success": "Exported summary successfully!",
+    "select_from_ai_results": "Choose from saved AI analysis results"
   },
   "settings": {
     "general": {

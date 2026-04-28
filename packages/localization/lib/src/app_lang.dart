@@ -52,7 +52,6 @@ abstract class AppLang {
   static const String actionsRetryAction = "actions.retry_action";
   static const String actionsReturnToTemplates = "actions.return_to_templates";
   static const String actionsSave = "actions.save";
-  static const String actionsSaveAiResult = "actions.save_ai_result";
   static const String actionsSaveCopyTitle = "actions.save_copy_title";
   static const String actionsSearch = "actions.search";
   static const String actionsSelectDateTime = "actions.select_date_time";
@@ -144,26 +143,18 @@ abstract class AppLang {
   static const String messagesGeminiApiKeyRequired = "messages.gemini_api_key_required";
   static const String messagesGeminiConfigDesc = "messages.gemini_config_desc";
   static const String messagesGeminiModelDesc = "messages.gemini_model_desc";
-  static const String messagesImportConfigError = "messages.import_config_error";
-  static const String messagesImportFromFile = "messages.import_from_file";
   static const String messagesImportFromFileSuccess = "messages.import_from_file_success";
-  static const String messagesImportFromTemplate = "messages.import_from_template";
   static const String messagesImportSetting = "messages.import_setting";
   static const String messagesInputTextHint = "messages.input_text_hint";
   static const String messagesNameTheDocumentExported = "messages.name_the_document_exported";
   static const String messagesNoLogsFound = "messages.no_logs_found";
-  static const String messagesNoMatchingFields = "messages.no_matching_fields";
   static const String messagesPickFolderToExport = "messages.pick_folder_to_export";
   static const String messagesReviewAndConfigureFields = "messages.review_and_configure_fields";
   static const String messagesReviewBeforeExport = "messages.review_before_export";
-  static const String messagesSaveAiResultSuccess = "messages.save_ai_result_success";
   static const String messagesSelectFromAiResults = "messages.select_from_ai_results";
-  static const String messagesSelectFromConfigFile = "messages.select_from_config_file";
-  static const String messagesSelectFromSavedTemplates = "messages.select_from_saved_templates";
   static const String messagesSettingExported = "messages.setting_exported";
   static const String messagesSettingsSaveSuccess = "messages.settings_save_success";
   static const String messagesSingleLineTextHint = "messages.single_line_text_hint";
-  static const String messagesTemplateFieldCount = "messages.template_field_count";
   static const String messagesUploadTemplate = "messages.upload_template";
 
   // --- Settings ---

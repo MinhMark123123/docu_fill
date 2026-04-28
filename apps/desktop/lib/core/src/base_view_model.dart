@@ -108,6 +108,21 @@ class BaseViewModel extends ViewModel {
     return completer.future;
   }
 
+  Future<int?> showSelectionDialog({
+    String? title,
+    required List<String> options,
+  }) async {
+    Completer<int?> completer = Completer<int?>();
+    _showDialogEvent.postValue(
+      ShowDialogEvent<int>(
+        title: title,
+        options: options,
+        onCompleted: (data) => completer.complete(data),
+      ),
+    );
+    return completer.future;
+  }
+
   Future<T> loadingGuard<T>(
     Future<T> future, {
     bool hideOnDispose = true,

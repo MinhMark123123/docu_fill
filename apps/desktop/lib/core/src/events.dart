@@ -31,20 +31,28 @@ class ShowDialogEvent<T> extends UiActionEvent<T> {
   final String? title;
   final String? content;
   final List<DialogAction>? actions;
+  final List<String>? options;
 
-  // Add other dialog properties as needed (e.g., action buttons)
-  ShowDialogEvent({this.title, this.content, super.onCompleted, this.actions});
+  ShowDialogEvent({
+    this.title,
+    this.content,
+    super.onCompleted,
+    this.actions,
+    this.options,
+  });
 
   ShowDialogEvent<T> copyWith({
     String? title,
     String? content,
     List<DialogAction>? actions,
+    List<String>? options,
     Function(T? completeData)? onCompleted,
   }) {
     return ShowDialogEvent<T>(
       title: title ?? this.title,
       content: content ?? this.content,
       actions: actions ?? this.actions,
+      options: options ?? this.options,
       onCompleted: onCompleted ?? this.onCompleted,
     );
   }

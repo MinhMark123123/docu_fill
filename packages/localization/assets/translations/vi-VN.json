@@ -61,8 +61,7 @@
     "create_copy_success": "Đã tạo bản sao thành công!",
     "create_copy_error": "Lỗi khi tạo bản sao: {}",
     "export_summary": "Xuất tóm tắt (Text)",
-    "import_ai_result": "Nhập kết quả AI cũ",
-    "save_ai_result": "Lưu kết quả phân tích"
+    "import_ai_result": "Nhập kết quả AI cũ"
   },
   "labels": {
     "templates": "Mẫu",
@@ -149,14 +148,6 @@
     "no_logs_found": "Không tìm thấy nhật ký API nào.",
     "confirm_delete_all_logs": "Bạn có chắc chắn muốn xóa tất cả các tệp nhật ký? Hành động này không thể hoàn tác.",
     "export_summary_success": "Đã xuất tóm tắt thành công!",
-    "no_matching_fields": "Không tìm thấy trường nào trùng khớp để sao chép cấu hình.",
-    "import_from_template": "Chọn từ mẫu có sẵn",
-    "import_from_file": "Chọn từ tệp (.dfconf)",
-    "template_field_count": "{} trường",
-    "select_from_saved_templates": "Chọn cấu hình từ các mẫu đã lưu",
-    "select_from_config_file": "Chọn cấu hình từ tệp .dfconf",
-    "import_config_error": "Lỗi khi nhập tệp cấu hình.",
-    "save_ai_result_success": "Đã lưu kết quả phân tích AI thành công!",
     "select_from_ai_results": "Chọn từ các kết quả phân tích AI đã lưu"
   },
   "settings": {

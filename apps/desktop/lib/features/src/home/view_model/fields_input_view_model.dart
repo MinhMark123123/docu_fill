@@ -381,17 +381,35 @@ class FieldsInputViewModel extends BaseViewModel {
         await aiResultsDir.create(recursive: true);
       }
 
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        initialDirectory:
-            aiResultsDir.path, // PickFiles correctly uses native paths
-        type: FileType.custom,
-        allowedExtensions: ['json'],
+      final files =
+          await aiResultsDir
+              .list()
+              .where((e) => e is File && e.path.endsWith('.json'))
+              .cast<File>()
+              .toList();
+
+      if (files.isEmpty) {
+        showSnackbar(
+          AppLang.messagesExtractNoText.tr(),
+        ); // Or another appropriate message
+        return;
+      }
+
+      // Sort by last modified date (newest first)
+      files.sort(
+        (a, b) => b.lastModifiedSync().compareTo(a.lastModifiedSync()),
       );
 
-      if (result == null || result.files.single.path == null) return;
+      final fileNames = files.map((f) => p.basename(f.path)).toList();
+      final selectedIndex = await showSelectionDialog(
+        title: AppLang.messagesSelectFromAiResults.tr(),
+        options: fileNames,
+      );
 
-      final file = File(result.files.single.path!);
-      final String content = await file.readAsString();
+      if (selectedIndex == null) return;
+
+      final selectedFile = files[selectedIndex];
+      final String content = await selectedFile.readAsString();
       final Map<String, dynamic> data = jsonDecode(content);
       final mappedData = data.map(
         (key, value) => MapEntry(key, value.toString()),

@@ -60,11 +60,11 @@ abstract class BaseView<T extends BaseViewModel>
       if (!context.mounted) return;
       showDialog(
         context: context,
-        barrierDismissible: event.actions == null,
+        barrierDismissible: event.actions == null && event.options == null,
         builder: (dialogContext) {
           return alertDialogBuilder(event, dialogContext);
         },
-      );
+      ).then((value) => event.onCompleted?.call(value));
     });
     return sub;
   }
@@ -73,6 +73,24 @@ abstract class BaseView<T extends BaseViewModel>
     ShowDialogEvent<dynamic> event,
     BuildContext dialogContext,
   ) {
+    if (event.options != null) {
+      return AlertDialog(
+        title: event.title != null ? Text(event.title!) : null,
+        content: SizedBox(
+          width: 400,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: event.options!.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(event.options![index]),
+                onTap: () => Navigator.pop(dialogContext, index),
+              );
+            },
+          ),
+        ),
+      );
+    }
     return AlertDialog(
       title: event.title != null ? Text(event.title!) : null,
       content: Text(event.content ?? ""),

@@ -1,10 +1,10 @@
-import 'package:localization/localization.dart';
 import 'dart:io';
 
-import 'package:docu_fill/core/core.dart';
 import 'package:data/data.dart';
+import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 import 'package:path_provider/path_provider.dart';
@@ -80,7 +80,7 @@ class SettingViewModel extends BaseViewModel {
   Future<void> openLogsFolder() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final logsPath = "${directory.path}/api_logs";
+      final logsPath = "${directory.path}${Platform.pathSeparator}api_logs";
       final logsDir = Directory(logsPath);
       if (!await logsDir.exists()) {
         await logsDir.create(recursive: true);
