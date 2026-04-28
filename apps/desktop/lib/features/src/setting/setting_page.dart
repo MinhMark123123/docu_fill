@@ -1,7 +1,7 @@
-import 'package:localization/localization.dart';
-import 'package:docu_fill/core/core.dart';
 import 'package:design/ui.dart';
+import 'package:docu_fill/core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
 import 'view_model/setting_view_model.dart';
@@ -119,6 +119,32 @@ class SettingPage extends BaseView<SettingViewModel> {
                 prefixIcon: const Icon(Icons.key),
               ),
               obscureText: true,
+            ),
+            Dimens.spacing.vertical(Dimens.size24),
+            TextField(
+              controller: viewModel.studyDataController,
+              decoration: InputDecoration(
+                labelText: AppLang.settingsGeminiStudyData.tr(),
+                hintText:
+                    "Enter study data or rules to help Gemini understand the context",
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.menu_book),
+              ),
+              maxLines: 5,
+              minLines: 3,
+            ),
+            Dimens.spacing.vertical(Dimens.size24),
+            TextField(
+              controller: viewModel.sampleResultController,
+              decoration: InputDecoration(
+                labelText: AppLang.settingsGeminiSampleResult.tr(),
+                hintText:
+                    "Enter a sample JSON result to guide the output format",
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.data_object),
+              ),
+              maxLines: 5,
+              minLines: 3,
             ),
             Dimens.spacing.vertical(Dimens.size24),
             Text(

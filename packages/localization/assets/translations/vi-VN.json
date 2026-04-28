@@ -60,7 +60,8 @@
     "load_copy_error": "Lỗi khi tải bản sao: {}",
     "create_copy_success": "Đã tạo bản sao thành công!",
     "create_copy_error": "Lỗi khi tạo bản sao: {}",
-    "export_summary": "Xuất tóm tắt (Text)"
+    "export_summary": "Xuất tóm tắt (Text)",
+    "import_ai_result": "Nhập kết quả AI cũ"
   },
   "labels": {
     "templates": "Mẫu",
@@ -147,12 +148,9 @@
     "no_logs_found": "Không tìm thấy nhật ký API nào.",
     "confirm_delete_all_logs": "Bạn có chắc chắn muốn xóa tất cả các tệp nhật ký? Hành động này không thể hoàn tác.",
     "export_summary_success": "Đã xuất tóm tắt thành công!",
-    "no_matching_fields": "Không tìm thấy trường nào trùng khớp để sao chép cấu hình.",
-    "import_from_template": "Chọn từ mẫu có sẵn",
-    "import_from_file": "Chọn từ tệp (.dfconf)",
+    "select_from_ai_results": "Chọn từ các kết quả phân tích AI đã lưu",
     "template_field_count": "{} trường",
-    "select_from_saved_templates": "Chọn cấu hình từ các mẫu đã lưu",
-    "select_from_config_file": "Chọn cấu hình từ tệp .dfconf",
+    "no_matching_fields": "Không tìm thấy trường nào trùng khớp để sao chép cấu hình.",
     "import_config_error": "Lỗi khi nhập tệp cấu hình."
   },
   "settings": {
@@ -166,6 +164,8 @@
       "title": "Cấu hình Gemini AI",
       "api_key": "Gemini API Key",
       "model": "Gemini Model",
+      "study_data": "Dữ liệu mẫu/Study",
+      "sample_result": "Kết quả mẫu JSON",
       "enable_logging": "Bật ghi nhật ký API",
       "open_logs": "Mở thư mục nhật ký",
       "save_btn": "Lưu cài đặt Gemini"

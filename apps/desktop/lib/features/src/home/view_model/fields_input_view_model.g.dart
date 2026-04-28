@@ -43,4 +43,8 @@ extension $FieldsInputViewModel on FieldsInputViewModel {
   /// This getter is used to access the stream of data
   /// associated with the private field _showSummary.
   StreamData<bool> get showSummary => _showSummary.streamData;
+
+  /// This getter is used to access the stream of data
+  /// associated with the private field _isExportSuccess.
+  StreamData<bool> get isExportSuccess => _isExportSuccess.streamData;
 }

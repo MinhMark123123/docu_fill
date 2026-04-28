@@ -26,16 +26,22 @@ class FiledInputBox extends StatelessWidget {
               child: StreamDataConsumer(
                 streamData: viewModel.showSummary,
                 builder: (context, showSummary) {
-                  if (showSummary) {
-                    return _buildSummary(context, viewModel);
-                  }
-                  return StreamDataConsumer(
-                    streamData: viewModel.currentSectionIndex,
-                    builder: (context, index) {
-                      final sectionKey = viewModel.sections[index];
-                      final fields = data[sectionKey] ?? [];
-                      return _buildSectionContent(context, sectionKey, fields);
-                    },
+                  // Use IndexedStack to preserve state of input fields when switching to Summary
+                  return IndexedStack(
+                    index: showSummary ? 1 : 0,
+                    children: [
+                      // Index 0: Input Fields
+                      StreamDataConsumer(
+                        streamData: viewModel.currentSectionIndex,
+                        builder: (context, index) {
+                          final sectionKey = viewModel.sections[index];
+                          final fields = data[sectionKey] ?? [];
+                          return _buildSectionContent(context, sectionKey, fields);
+                        },
+                      ),
+                      // Index 1: Summary View
+                      _buildSummary(context, viewModel),
+                    ],
                   );
                 },
               ),
@@ -299,7 +305,6 @@ class FiledInputBox extends StatelessWidget {
               ),
             ],
           ),
-          //
           OutlinedButton.icon(
             onPressed: () => viewModel.exportSummaryText(),
             icon: Icon(Icons.text_snippet_outlined),

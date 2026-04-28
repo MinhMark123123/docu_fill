@@ -25,7 +25,6 @@ abstract class BaseView<T extends BaseViewModel>
       subSnackbar.cancel();
       subDialog.cancel();
       subLoading.cancel();
-      LoadingDialogManager().closeLoadingDialog();
     });
   }
 
@@ -51,7 +50,7 @@ abstract class BaseView<T extends BaseViewModel>
     return sub;
   }
 
-  StreamSubscription<ShowDialogEvent> _handleDialog(
+  StreamSubscription<ShowDialogEvent<dynamic>> _handleDialog(
     BuildContext context,
     T viewModel,
   ) {
@@ -59,11 +58,13 @@ abstract class BaseView<T extends BaseViewModel>
       if (!context.mounted) return;
       showDialog(
         context: context,
-        barrierDismissible: event.actions == null,
+        barrierDismissible: event.actions == null && event.options == null,
         builder: (dialogContext) {
           return alertDialogBuilder(event, dialogContext);
         },
-      );
+      ).then((value) {
+        event.onCompleted?.call(value);
+      });
     });
     return sub;
   }
@@ -72,6 +73,24 @@ abstract class BaseView<T extends BaseViewModel>
     ShowDialogEvent<dynamic> event,
     BuildContext dialogContext,
   ) {
+    if (event.options != null) {
+      return AlertDialog(
+        title: event.title != null ? Text(event.title!) : null,
+        content: SizedBox(
+          width: 400,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: event.options!.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(event.options![index]),
+                onTap: () => Navigator.pop(dialogContext, index),
+              );
+            },
+          ),
+        ),
+      );
+    }
     return AlertDialog(
       title: event.title != null ? Text(event.title!) : null,
       content: Text(event.content ?? ""),
@@ -110,12 +129,16 @@ abstract class BaseView<T extends BaseViewModel>
     return sub;
   }
 
-  StreamSubscription<bool> _handleLoading(BuildContext context, T viewModel) {
-    final sub = viewModel.showLoading.asStream().listen((isLoading) {
-      if (context.mounted && isLoading) {
-        LoadingDialogManager().showLoadingDialog(context);
-      } else if (!isLoading) {
-        LoadingDialogManager().closeLoadingDialog();
+  StreamSubscription<LoadingEvent> _handleLoading(
+    BuildContext context,
+    T viewModel,
+  ) {
+    final sub = viewModel.loadingEvent.asStream().listen((event) {
+      if (event.id.isEmpty) return;
+      if (event.show) {
+        LoadingDialogManager().showLoading(taskId: event.id);
+      } else {
+        LoadingDialogManager().hideLoading(taskId: event.id);
       }
     });
     return sub;

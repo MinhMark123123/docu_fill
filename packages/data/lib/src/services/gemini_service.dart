@@ -17,7 +17,8 @@ class GeminiService {
 
   Future<Map<String, String>> mapTextToTemplate({
     required String rawText,
-    required Map<String, String?> templateConfig, // Key: FieldKey, Value: Description (optional)
+    required Map<String, String?>
+    templateConfig, // Key: FieldKey, Value: Description (optional)
   }) async {
     final settings = await _settingsRepository.getSettings();
     final apiKey = settings?.geminiApiKey;
@@ -32,12 +33,18 @@ class GeminiService {
     final model = GenerativeModel(model: modelName, apiKey: apiKey);
 
     // Format fields description for prompt
-    final fieldDescriptions = templateConfig.entries.map((e) {
-      return "- Key: \"${e.key}\" ${e.value != null && e.value!.isNotEmpty ? "(Description: ${e.value})" : ""}";
-    }).join('\n');
+    final fieldDescriptions = templateConfig.entries
+        .map((e) {
+          return "- Key: \"${e.key}\" ${e.value != null && e.value!.isNotEmpty ? "(Description: ${e.value})" : ""}";
+        })
+        .join('\n');
+
+    final studyData = settings?.geminiStudyData;
+    final sampleResult = settings?.geminiSampleResult;
 
     final prompt = '''
 You are an expert data extraction assistant.
+${studyData != null && studyData.isNotEmpty ? "CONTEXT/STUDY DATA:\n$studyData\n" : ""}
 You will be provided with "EXTRACTED TEXT" from a document and a list of "FIELD KEYS" with optional descriptions.
 Your goal is to map the information from the text into the field keys accurately.
 
@@ -48,6 +55,7 @@ RULES:
 4. If a value represents a date, format it as "DD-MM-YYYY" if possible.
 5. If a value is not found in the text, return an empty string "" for that key.
 6. Use the descriptions provided for each key to better understand what to extract.
+${sampleResult != null && sampleResult.isNotEmpty ? "7. Follow the format of this SAMPLE RESULT:\n$sampleResult\n" : ""}
 
 FIELD KEYS:
 $fieldDescriptions
@@ -89,7 +97,8 @@ JSON OUTPUT:
   Future<Map<String, String>> mapFileToTemplate({
     required Uint8List fileBytes,
     required String fileName,
-    required Map<String, String?> templateConfig, // Key: FieldKey, Value: Description (optional)
+    required Map<String, String?>
+    templateConfig, // Key: FieldKey, Value: Description (optional)
   }) async {
     final settings = await _settingsRepository.getSettings();
     final apiKey = settings?.geminiApiKey;
@@ -104,14 +113,20 @@ JSON OUTPUT:
     final model = GenerativeModel(model: modelName, apiKey: apiKey);
 
     // Format fields description for prompt
-    final fieldDescriptions = templateConfig.entries.map((e) {
-      return "- Key: \"${e.key}\" ${e.value != null && e.value!.isNotEmpty ? "(Description: ${e.value})" : ""}";
-    }).join('\n');
+    final fieldDescriptions = templateConfig.entries
+        .map((e) {
+          return "- Key: \"${e.key}\" ${e.value != null && e.value!.isNotEmpty ? "(Description: ${e.value})" : ""}";
+        })
+        .join('\n');
+
+    final studyData = settings?.geminiStudyData;
+    final sampleResult = settings?.geminiSampleResult;
 
     final mimeType = lookupMimeType(fileName) ?? 'application/octet-stream';
 
     final prompt = '''
 You are an expert data extraction assistant.
+${studyData != null && studyData.isNotEmpty ? "CONTEXT/STUDY DATA:\n$studyData\n" : ""}
 You are provided with a DOCUMENT FILE and a list of "FIELD KEYS" with optional descriptions.
 Your goal is to analyze the content of the file and map the information into the field keys.
 
@@ -122,6 +137,7 @@ RULES:
 4. If a value is not found in the file, return an empty string "" for that key.
 5. Extract values in their original language found in the document.
 6. Use the descriptions provided for each key to better understand what to extract.
+${sampleResult != null && sampleResult.isNotEmpty ? "7. Follow the format of this SAMPLE RESULT:\n$sampleResult\n" : ""}
 
 FIELD KEYS:
 $fieldDescriptions

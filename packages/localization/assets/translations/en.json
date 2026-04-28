@@ -60,7 +60,8 @@
     "load_copy_error": "Error loading copy: {}",
     "create_copy_success": "Copy created successfully!",
     "create_copy_error": "Error creating copy: {}",
-    "export_summary": "Export Summary (Text)"
+    "export_summary": "Export Summary (Text)",
+    "import_ai_result": "Import old AI result"
   },
   "labels": {
     "templates": "Templates",
@@ -110,7 +111,10 @@
     "log_details": "Log Details",
     "timestamp": "Timestamp",
     "prompt": "Prompt",
-    "response": "Response"
+    "response": "Response",
+    "select_all": "Select All",
+    "key": "Key",
+    "type": "Type"
   },
   "messages": {
     "review_and_configure_fields": "Review and configure the fields detected in your template. Ensure all fields are correctly identified and assigned the appropriate input type for accurate data collection.",
@@ -143,7 +147,11 @@
     "review_before_export": "Please review all information before exporting.",
     "no_logs_found": "No API logs found.",
     "confirm_delete_all_logs": "Are you sure you want to delete all log files? This action cannot be undone.",
-    "export_summary_success": "Exported summary successfully!"
+    "export_summary_success": "Exported summary successfully!",
+    "select_from_ai_results": "Choose from saved AI analysis results",
+    "template_field_count": "{} fields",
+    "no_matching_fields": "No matching field keys found to copy configuration.",
+    "import_config_error": "Failed to import configuration file."
   },
   "settings": {
     "general": {
@@ -156,6 +164,8 @@
       "title": "Gemini AI Configuration",
       "api_key": "Gemini API Key",
       "model": "Gemini Model",
+      "study_data": "Training/Study Data",
+      "sample_result": "Sample Result JSON",
       "enable_logging": "Enable API Logging",
       "open_logs": "Open Logs Folder",
       "save_btn": "Save Gemini Settings"

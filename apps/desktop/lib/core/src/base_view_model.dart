@@ -10,7 +10,10 @@ part 'base_view_model.g.dart';
 @BindableViewModel()
 class BaseViewModel extends ViewModel {
   @Bind()
-  late final _showLoading = false.mtd(this);
+  late final _loadingEvent = LoadingEvent(id: '', show: false).mtd(this);
+
+  StreamData<LoadingEvent> get loadingEvent => _loadingEvent.streamData;
+
   @Bind()
   late final _navigatePageEvent = NavigatePageEvent().mtd(this);
   @Bind()
@@ -37,9 +40,15 @@ class BaseViewModel extends ViewModel {
     super.onPause();
   }
 
+  final Set<String> _disposeSensitiveTasks = {};
+
   @override
   void onDispose() {
     debugPrint("====> $runtimeType $hashCode onDispose");
+    for (final taskId in _disposeSensitiveTasks) {
+      _loadingEvent.postValue(LoadingEvent(id: taskId, show: false));
+    }
+    _disposeSensitiveTasks.clear();
     super.onDispose();
   }
 
@@ -50,10 +59,10 @@ class BaseViewModel extends ViewModel {
   }) async {
     Completer<T?> completer = Completer<T?>();
     _navigatePageEvent.postValue(
-      NavigatePageEvent<T>(
+      NavigatePageEvent<dynamic>(
         routeName: routeName,
         queryParameters: queryParameters,
-        onCompleted: (data) => completer.complete(data),
+        onCompleted: (data) => completer.complete(data as T?),
         type: type,
       ),
     );
@@ -79,11 +88,11 @@ class BaseViewModel extends ViewModel {
   }) async {
     Completer<T?> completer = Completer<T?>();
     _showDialogEvent.postValue(
-      ShowDialogEvent<T>(
+      ShowDialogEvent<dynamic>(
         title: title,
         content: content,
         actions: actions,
-        onCompleted: (data) => completer.complete(data),
+        onCompleted: (data) => completer.complete(data as T?),
       ),
     );
     return completer.future;
@@ -94,17 +103,39 @@ class BaseViewModel extends ViewModel {
   }) async {
     Completer<T?> completer = Completer<T?>();
     _showDialogEvent.postValue(
-      event.copyWith(onCompleted: (data) => completer.complete(data)),
+      event.copyWith(onCompleted: (data) => completer.complete(data as T?)),
     );
     return completer.future;
   }
 
-  Future<dynamic> loadingGuard(Future<dynamic> future) async {
-    _showLoading.postValue(true);
+  Future<int?> showSelectionDialog({
+    String? title,
+    required List<String> options,
+  }) async {
+    Completer<int?> completer = Completer<int?>();
+    _showDialogEvent.postValue(
+      ShowDialogEvent<dynamic>(
+        title: title,
+        options: options,
+        onCompleted: (data) => completer.complete(data as int?),
+      ),
+    );
+    return completer.future;
+  }
+
+  Future<T> loadingGuard<T>(
+    Future<T> future, {
+    bool hideOnDispose = true,
+  }) async {
+    final taskId = "task_${hashCode}_${DateTime.now().microsecondsSinceEpoch}";
+    if (hideOnDispose) _disposeSensitiveTasks.add(taskId);
+
+    _loadingEvent.postValue(LoadingEvent(id: taskId, show: true));
     try {
       return await future;
     } finally {
-      _showLoading.postValue(false);
+      if (hideOnDispose) _disposeSensitiveTasks.remove(taskId);
+      _loadingEvent.postValue(LoadingEvent(id: taskId, show: false));
     }
   }
 }

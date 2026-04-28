@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 abstract class UiActionEvent<T> {
-  final Function(T? completeData)? onCompleted;
+  final void Function(T? completeData)? onCompleted;
 
   UiActionEvent({this.onCompleted});
 } // Base class for all UI actions
@@ -31,23 +31,38 @@ class ShowDialogEvent<T> extends UiActionEvent<T> {
   final String? title;
   final String? content;
   final List<DialogAction>? actions;
+  final List<String>? options;
 
-  // Add other dialog properties as needed (e.g., action buttons)
-  ShowDialogEvent({this.title, this.content, super.onCompleted, this.actions});
+  ShowDialogEvent({
+    this.title,
+    this.content,
+    super.onCompleted,
+    this.actions,
+    this.options,
+  });
 
   ShowDialogEvent<T> copyWith({
     String? title,
     String? content,
     List<DialogAction>? actions,
-    Function(T? completeData)? onCompleted,
+    List<String>? options,
+    void Function(T? completeData)? onCompleted,
   }) {
     return ShowDialogEvent<T>(
       title: title ?? this.title,
       content: content ?? this.content,
       actions: actions ?? this.actions,
+      options: options ?? this.options,
       onCompleted: onCompleted ?? this.onCompleted,
     );
   }
+}
+
+class LoadingEvent {
+  final String id;
+  final bool show;
+
+  LoadingEvent({required this.id, required this.show});
 }
 
 class DialogAction {

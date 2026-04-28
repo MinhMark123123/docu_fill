@@ -1,10 +1,10 @@
-import 'package:localization/localization.dart';
 import 'dart:io';
 
-import 'package:docu_fill/core/core.dart';
 import 'package:data/data.dart';
+import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 import 'package:path_provider/path_provider.dart';
@@ -25,6 +25,12 @@ class SettingViewModel extends BaseViewModel {
   late final _selectedModel = "gemini-1.5-flash".mtd(this);
 
   @Bind()
+  late final _geminiStudyData = "".mtd(this);
+
+  @Bind()
+  late final _geminiSampleResult = "".mtd(this);
+
+  @Bind()
   late final _enableApiLogging = false.mtd(this);
 
   List<String> get availableModels => [
@@ -40,6 +46,8 @@ class SettingViewModel extends BaseViewModel {
   ];
 
   final TextEditingController apiKeyController = TextEditingController();
+  final TextEditingController studyDataController = TextEditingController();
+  final TextEditingController sampleResultController = TextEditingController();
 
   @override
   void onInitState() {
@@ -52,10 +60,18 @@ class SettingViewModel extends BaseViewModel {
     final key = settings?.geminiApiKey ?? "";
     final model = settings?.geminiModel ?? "gemini-1.5-flash";
     final isLogging = settings?.enableApiLogging ?? false;
+    final studyData = settings?.geminiStudyData ?? "";
+    final sampleResult = settings?.geminiSampleResult ?? "";
+
     _geminiApiKey.postValue(key);
     _selectedModel.postValue(model);
     _enableApiLogging.postValue(isLogging);
+    _geminiStudyData.postValue(studyData);
+    _geminiSampleResult.postValue(sampleResult);
+
     apiKeyController.text = key;
+    studyDataController.text = studyData;
+    sampleResultController.text = sampleResult;
   }
 
   Future<void> changeLocale(BuildContext context, Locale locale) async {
@@ -80,7 +96,7 @@ class SettingViewModel extends BaseViewModel {
   Future<void> openLogsFolder() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final logsPath = "${directory.path}/api_logs";
+      final logsPath = "${directory.path}${Platform.pathSeparator}api_logs";
       final logsDir = Directory(logsPath);
       if (!await logsDir.exists()) {
         await logsDir.create(recursive: true);
@@ -104,12 +120,23 @@ class SettingViewModel extends BaseViewModel {
     }
     await _settingsRepository.saveGeminiApiKey(apiKeyController.text);
     _geminiApiKey.postValue(apiKeyController.text);
+
+    // Also save study data and sample result
+    await _settingsRepository.saveGeminiTrainingData(
+      studyData: studyDataController.text,
+      sampleResult: sampleResultController.text,
+    );
+    _geminiStudyData.postValue(studyDataController.text);
+    _geminiSampleResult.postValue(sampleResultController.text);
+
     showSnackbar(AppLang.messagesSettingsSaveSuccess.tr());
   }
 
   @override
   void onDispose() {
     apiKeyController.dispose();
+    studyDataController.dispose();
+    sampleResultController.dispose();
     super.onDispose();
   }
 }

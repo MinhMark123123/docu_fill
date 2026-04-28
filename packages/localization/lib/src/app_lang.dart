@@ -34,6 +34,7 @@ abstract class AppLang {
   static const String actionsFinishProcess = "actions.finish_process";
   static const String actionsGetStartedNow = "actions.get_started_now";
   static const String actionsGoToAppSettings = "actions.go_to_app_settings";
+  static const String actionsImportAiResult = "actions.import_ai_result";
   static const String actionsImportData = "actions.import_data";
   static const String actionsLearnMoreAbout = "actions.learn_more_about";
   static const String actionsLoadCopyError = "actions.load_copy_error";
@@ -143,9 +144,7 @@ abstract class AppLang {
   static const String messagesGeminiConfigDesc = "messages.gemini_config_desc";
   static const String messagesGeminiModelDesc = "messages.gemini_model_desc";
   static const String messagesImportConfigError = "messages.import_config_error";
-  static const String messagesImportFromFile = "messages.import_from_file";
   static const String messagesImportFromFileSuccess = "messages.import_from_file_success";
-  static const String messagesImportFromTemplate = "messages.import_from_template";
   static const String messagesImportSetting = "messages.import_setting";
   static const String messagesInputTextHint = "messages.input_text_hint";
   static const String messagesNameTheDocumentExported = "messages.name_the_document_exported";
@@ -154,8 +153,7 @@ abstract class AppLang {
   static const String messagesPickFolderToExport = "messages.pick_folder_to_export";
   static const String messagesReviewAndConfigureFields = "messages.review_and_configure_fields";
   static const String messagesReviewBeforeExport = "messages.review_before_export";
-  static const String messagesSelectFromConfigFile = "messages.select_from_config_file";
-  static const String messagesSelectFromSavedTemplates = "messages.select_from_saved_templates";
+  static const String messagesSelectFromAiResults = "messages.select_from_ai_results";
   static const String messagesSettingExported = "messages.setting_exported";
   static const String messagesSettingsSaveSuccess = "messages.settings_save_success";
   static const String messagesSingleLineTextHint = "messages.single_line_text_hint";
@@ -167,7 +165,9 @@ abstract class AppLang {
   static const String settingsGeminiEnableLogging = "settings.gemini.enable_logging";
   static const String settingsGeminiModel = "settings.gemini.model";
   static const String settingsGeminiOpenLogs = "settings.gemini.open_logs";
+  static const String settingsGeminiSampleResult = "settings.gemini.sample_result";
   static const String settingsGeminiSaveBtn = "settings.gemini.save_btn";
+  static const String settingsGeminiStudyData = "settings.gemini.study_data";
   static const String settingsGeminiTitle = "settings.gemini.title";
   static const String settingsGeneralEnglish = "settings.general.english";
   static const String settingsGeneralLanguage = "settings.general.language";

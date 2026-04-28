@@ -25,13 +25,16 @@ class TemplateService {
 
   Future<List<int>?> createExportArchive(TemplateConfig item) async {
     final archive = Archive();
-    // Use docx path from item
-    final docxFile = File(item.pathTemplate);
-    if (!docxFile.existsSync()) return null;
+    // Get the actual extension of the template file
+    final templateFile = File(item.pathTemplate);
+    if (!templateFile.existsSync()) return null;
 
-    final docxBytes = await docxFile.readAsBytes();
+    final extension = p.extension(item.pathTemplate);
+    final docBytes = await templateFile.readAsBytes();
+
+    // Add the template file with its correct extension
     archive.addFile(
-      ArchiveFile(AppConst.settingDocFileName, docxBytes.length, docxBytes),
+      ArchiveFile("${AppConst.settingDocFileName}$extension", docBytes.length, docBytes),
     );
 
     final configMap = item.toJson();
@@ -176,14 +179,7 @@ class TemplateService {
     // 1. Prepare data (Date formatting, defaults)
     final processedFieldKeys = _processFields(templates, fieldKeys);
 
-    // 2. Extract image replacements
-    final Map<String, String> fieldKeysForImages = Map.from(processedFieldKeys);
-    final imageReplacements = getImageReplacements(
-      composedUI: composedUI,
-      fieldKeys: fieldKeysForImages,
-    );
-
-    // 3. Run individual template exports
+    // 2. Run individual template exports
     for (var template in templates) {
       final fileOrigin = File(template.pathTemplate);
       if (!fileOrigin.existsSync()) continue;
@@ -193,13 +189,21 @@ class TemplateService {
       Uint8List rawBytes;
 
       if (extension == 'docx') {
+        // --- ONLY DOCX: Handle Images ---
+        final Map<String, String> fieldKeysForImages = Map.from(processedFieldKeys);
+        final imageReplacements = getImageReplacements(
+          composedUI: composedUI,
+          fieldKeys: fieldKeysForImages,
+        );
+
         rawBytes = await DocxUtils.composeModifiedDocxWithPlaceholders(
           originalBytes: originalBytes,
           replacements: processedFieldKeys,
           imageReplacements: imageReplacements,
           singleLines: singleLines,
         );
-      } else if (extension == 'xlsx') {
+      } else if (extension == 'xlsx' || extension == 'xls') {
+        // --- EXCEL: Handle Text replacements only ---
         rawBytes = await ExcelUtils.composeModifiedExcel(
           originalBytes: originalBytes,
           replacements: processedFieldKeys,

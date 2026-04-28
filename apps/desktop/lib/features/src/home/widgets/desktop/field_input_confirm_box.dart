@@ -1,7 +1,7 @@
-import 'package:localization/localization.dart';
-import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:design/ui.dart';
+import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
 class FieldInputConfirmBox extends StatelessWidget {
@@ -55,6 +55,16 @@ class FieldInputConfirmBox extends StatelessWidget {
                     ],
                   ),
                   StreamDataConsumer(
+                    streamData: viewModel.isExportSuccess,
+                    builder: (context, isSuccess) {
+                      if (!isSuccess) return const SizedBox.shrink();
+                      return Padding(
+                        padding: EdgeInsets.only(top: Dimens.size16),
+                        child: _buildExportSuccess(context),
+                      );
+                    },
+                  ),
+                  StreamDataConsumer(
                     streamData: viewModel.missingKeys,
                     builder: (context, data) {
                       if (data.isEmpty) return const SizedBox.shrink();
@@ -102,6 +112,21 @@ class FieldInputConfirmBox extends StatelessWidget {
           icon: const Icon(Icons.content_copy, size: 16),
           label: Text(AppLang.actionsCreateCopy.tr()),
           style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: Dimens.radii.borderMedium(),
+            ),
+          ),
+        ),
+        // --- NEW: Import AI Result Button ---
+        OutlinedButton.icon(
+          onPressed: () => viewModel.importAiResult(),
+          icon: const Icon(Icons.psychology_outlined, size: 16),
+          label: Text(AppLang.actionsImportAiResult.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: context.colorScheme.tertiary,
+            side: BorderSide(
+              color: context.colorScheme.tertiary.withOpacity(0.5),
+            ),
             shape: RoundedRectangleBorder(
               borderRadius: Dimens.radii.borderMedium(),
             ),
@@ -216,6 +241,55 @@ class FieldInputConfirmBox extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildExportSuccess(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: Dimens.size16,
+        vertical: Dimens.size12,
+      ),
+      decoration: BoxDecoration(
+        color: context.colorScheme.primaryContainer.withOpacity(0.5),
+        borderRadius: Dimens.radii.borderMedium(),
+        border: Border.all(color: context.colorScheme.primary.withOpacity(0.5)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle, color: context.colorScheme.primary),
+          Dimens.spacing.horizontal(Dimens.size12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppLang.messagesDocumentExportedSuccessfully.tr(),
+                  style: context.textTheme.titleSmall?.copyWith(
+                    color: context.colorScheme.onPrimaryContainer,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  AppLang.messagesDocumentExportedReadyForDownload.tr(),
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: context.colorScheme.onPrimaryContainer,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: () => viewModel.resetAll(),
+            icon: const Icon(Icons.add_circle_outline),
+            label: Text(AppLang.labelsNewTemplate.tr()),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: context.colorScheme.primary,
+              foregroundColor: context.colorScheme.onPrimary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
