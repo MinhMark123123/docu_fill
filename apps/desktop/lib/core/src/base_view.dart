@@ -25,8 +25,6 @@ abstract class BaseView<T extends BaseViewModel>
       subSnackbar.cancel();
       subDialog.cancel();
       subLoading.cancel();
-      // We don't need to call LoadingDialogManager().closeLoadingDialog() here
-      // because the viewModel will be disposed and handle its own tasks.
     });
   }
 
@@ -52,7 +50,7 @@ abstract class BaseView<T extends BaseViewModel>
     return sub;
   }
 
-  StreamSubscription<ShowDialogEvent> _handleDialog(
+  StreamSubscription<ShowDialogEvent<dynamic>> _handleDialog(
     BuildContext context,
     T viewModel,
   ) {
@@ -64,7 +62,9 @@ abstract class BaseView<T extends BaseViewModel>
         builder: (dialogContext) {
           return alertDialogBuilder(event, dialogContext);
         },
-      ).then((value) => event.onCompleted?.call(value));
+      ).then((value) {
+        event.onCompleted?.call(value);
+      });
     });
     return sub;
   }

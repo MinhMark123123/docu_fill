@@ -666,6 +666,7 @@ class ShowUseSettingDialogEvent extends ShowDialogEvent<void> {
     String? content,
     List<DialogAction>? actions,
     List<TemplateConfig>? listTemplate,
+    List<String>? options,
     Function(void)? onCompleted,
   }) {
     return ShowUseSettingDialogEvent(

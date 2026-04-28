@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 abstract class UiActionEvent<T> {
-  final Function(T? completeData)? onCompleted;
+  final void Function(T? completeData)? onCompleted;
 
   UiActionEvent({this.onCompleted});
 } // Base class for all UI actions
@@ -46,7 +46,7 @@ class ShowDialogEvent<T> extends UiActionEvent<T> {
     String? content,
     List<DialogAction>? actions,
     List<String>? options,
-    Function(T? completeData)? onCompleted,
+    void Function(T? completeData)? onCompleted,
   }) {
     return ShowDialogEvent<T>(
       title: title ?? this.title,

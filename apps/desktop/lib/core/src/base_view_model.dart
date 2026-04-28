@@ -59,10 +59,10 @@ class BaseViewModel extends ViewModel {
   }) async {
     Completer<T?> completer = Completer<T?>();
     _navigatePageEvent.postValue(
-      NavigatePageEvent<T>(
+      NavigatePageEvent<dynamic>(
         routeName: routeName,
         queryParameters: queryParameters,
-        onCompleted: (data) => completer.complete(data),
+        onCompleted: (data) => completer.complete(data as T?),
         type: type,
       ),
     );
@@ -88,11 +88,11 @@ class BaseViewModel extends ViewModel {
   }) async {
     Completer<T?> completer = Completer<T?>();
     _showDialogEvent.postValue(
-      ShowDialogEvent<T>(
+      ShowDialogEvent<dynamic>(
         title: title,
         content: content,
         actions: actions,
-        onCompleted: (data) => completer.complete(data),
+        onCompleted: (data) => completer.complete(data as T?),
       ),
     );
     return completer.future;
@@ -103,7 +103,7 @@ class BaseViewModel extends ViewModel {
   }) async {
     Completer<T?> completer = Completer<T?>();
     _showDialogEvent.postValue(
-      event.copyWith(onCompleted: (data) => completer.complete(data)),
+      event.copyWith(onCompleted: (data) => completer.complete(data as T?)),
     );
     return completer.future;
   }
@@ -114,10 +114,10 @@ class BaseViewModel extends ViewModel {
   }) async {
     Completer<int?> completer = Completer<int?>();
     _showDialogEvent.postValue(
-      ShowDialogEvent<int>(
+      ShowDialogEvent<dynamic>(
         title: title,
         options: options,
-        onCompleted: (data) => completer.complete(data),
+        onCompleted: (data) => completer.complete(data as int?),
       ),
     );
     return completer.future;
