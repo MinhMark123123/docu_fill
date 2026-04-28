@@ -504,9 +504,8 @@ class ConfigureViewModel extends BaseViewModel {
   Future<void> saveConfigure(BuildContext context) async {
     await Future.delayed(Duration.zero);
     if (!context.mounted) return;
-    final result = await showSimpleLoadingDialog(
-      context: context,
-      future: () async {
+    final result = await loadingGuard(
+      Future<bool>(() async {
         final uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
         final extension = _pathFilePicked!.split('.').last.toLowerCase();
         final newFileName = "$uniqueName.$extension";
@@ -539,7 +538,7 @@ class ConfigureViewModel extends BaseViewModel {
           generateTemplateConfig(name: _nameController.text, path: path),
         );
         return true;
-      },
+      }),
     );
     if (_mode.data.isImportMode) {
       await _extractDir?.delete(recursive: true);

@@ -64,7 +64,7 @@ const TemplateConfigModelSchema = CollectionSchema(
   getId: _templateConfigModelGetId,
   getLinks: _templateConfigModelGetLinks,
   attach: _templateConfigModelAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _templateConfigModelEstimateSize(

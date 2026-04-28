@@ -37,8 +37,18 @@ const AppSettingsModelSchema = CollectionSchema(
       name: r'geminiModel',
       type: IsarType.string,
     ),
-    r'languageCode': PropertySchema(
+    r'geminiSampleResult': PropertySchema(
       id: 4,
+      name: r'geminiSampleResult',
+      type: IsarType.string,
+    ),
+    r'geminiStudyData': PropertySchema(
+      id: 5,
+      name: r'geminiStudyData',
+      type: IsarType.string,
+    ),
+    r'languageCode': PropertySchema(
+      id: 6,
       name: r'languageCode',
       type: IsarType.string,
     ),
@@ -56,7 +66,7 @@ const AppSettingsModelSchema = CollectionSchema(
   getId: _appSettingsModelGetId,
   getLinks: _appSettingsModelGetLinks,
   attach: _appSettingsModelAttach,
-  version: '3.3.0-dev.3',
+  version: '3.3.2',
 );
 
 int _appSettingsModelEstimateSize(
@@ -84,6 +94,18 @@ int _appSettingsModelEstimateSize(
     }
   }
   {
+    final value = object.geminiSampleResult;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.geminiStudyData;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.languageCode;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -102,7 +124,9 @@ void _appSettingsModelSerialize(
   writer.writeBool(offsets[1], object.enableApiLogging);
   writer.writeString(offsets[2], object.geminiApiKey);
   writer.writeString(offsets[3], object.geminiModel);
-  writer.writeString(offsets[4], object.languageCode);
+  writer.writeString(offsets[4], object.geminiSampleResult);
+  writer.writeString(offsets[5], object.geminiStudyData);
+  writer.writeString(offsets[6], object.languageCode);
 }
 
 AppSettingsModel _appSettingsModelDeserialize(
@@ -116,8 +140,10 @@ AppSettingsModel _appSettingsModelDeserialize(
   object.enableApiLogging = reader.readBool(offsets[1]);
   object.geminiApiKey = reader.readStringOrNull(offsets[2]);
   object.geminiModel = reader.readStringOrNull(offsets[3]);
+  object.geminiSampleResult = reader.readStringOrNull(offsets[4]);
+  object.geminiStudyData = reader.readStringOrNull(offsets[5]);
   object.id = id;
-  object.languageCode = reader.readStringOrNull(offsets[4]);
+  object.languageCode = reader.readStringOrNull(offsets[6]);
   return object;
 }
 
@@ -137,6 +163,10 @@ P _appSettingsModelDeserializeProp<P>(
     case 3:
       return (reader.readStringOrNull(offset)) as P;
     case 4:
+      return (reader.readStringOrNull(offset)) as P;
+    case 5:
+      return (reader.readStringOrNull(offset)) as P;
+    case 6:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -727,6 +757,324 @@ extension AppSettingsModelQueryFilter
   }
 
   QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'geminiSampleResult'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'geminiSampleResult'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'geminiSampleResult',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'geminiSampleResult',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'geminiSampleResult',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'geminiSampleResult',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'geminiSampleResult',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'geminiSampleResult',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'geminiSampleResult',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'geminiSampleResult',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'geminiSampleResult', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiSampleResultIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'geminiSampleResult', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'geminiStudyData'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'geminiStudyData'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'geminiStudyData',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'geminiStudyData',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'geminiStudyData',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'geminiStudyData',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'geminiStudyData',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'geminiStudyData',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'geminiStudyData',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'geminiStudyData',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'geminiStudyData', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  geminiStudyDataIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'geminiStudyData', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
   idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -1006,6 +1354,34 @@ extension AppSettingsModelQuerySortBy
   }
 
   QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByGeminiSampleResult() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiSampleResult', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByGeminiSampleResultDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiSampleResult', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByGeminiStudyData() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiStudyData', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByGeminiStudyDataDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiStudyData', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
   sortByLanguageCode() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'languageCode', Sort.asc);
@@ -1078,6 +1454,34 @@ extension AppSettingsModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByGeminiSampleResult() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiSampleResult', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByGeminiSampleResultDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiSampleResult', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByGeminiStudyData() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiStudyData', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByGeminiStudyDataDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'geminiStudyData', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -1137,6 +1541,26 @@ extension AppSettingsModelQueryWhereDistinct
   }
 
   QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
+  distinctByGeminiSampleResult({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(
+        r'geminiSampleResult',
+        caseSensitive: caseSensitive,
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
+  distinctByGeminiStudyData({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(
+        r'geminiStudyData',
+        caseSensitive: caseSensitive,
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
   distinctByLanguageCode({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'languageCode', caseSensitive: caseSensitive);
@@ -1177,6 +1601,20 @@ extension AppSettingsModelQueryProperty
   geminiModelProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'geminiModel');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, String?, QQueryOperations>
+  geminiSampleResultProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'geminiSampleResult');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, String?, QQueryOperations>
+  geminiStudyDataProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'geminiStudyData');
     });
   }
 

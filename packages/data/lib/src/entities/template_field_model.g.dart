@@ -23,16 +23,21 @@ const TemplateFieldModelSchema = Schema(
       name: r'defaultValue',
       type: IsarType.string,
     ),
-    r'key': PropertySchema(id: 2, name: r'key', type: IsarType.string),
-    r'label': PropertySchema(id: 3, name: r'label', type: IsarType.string),
+    r'description': PropertySchema(
+      id: 2,
+      name: r'description',
+      type: IsarType.string,
+    ),
+    r'key': PropertySchema(id: 3, name: r'key', type: IsarType.string),
+    r'label': PropertySchema(id: 4, name: r'label', type: IsarType.string),
     r'options': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'options',
       type: IsarType.stringList,
     ),
-    r'required': PropertySchema(id: 5, name: r'required', type: IsarType.bool),
-    r'section': PropertySchema(id: 6, name: r'section', type: IsarType.string),
-    r'type': PropertySchema(id: 7, name: r'type', type: IsarType.string),
+    r'required': PropertySchema(id: 6, name: r'required', type: IsarType.bool),
+    r'section': PropertySchema(id: 7, name: r'section', type: IsarType.string),
+    r'type': PropertySchema(id: 8, name: r'type', type: IsarType.string),
   },
 
   estimateSize: _templateFieldModelEstimateSize,
@@ -55,6 +60,12 @@ int _templateFieldModelEstimateSize(
   }
   {
     final value = object.defaultValue;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.description;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
@@ -91,12 +102,13 @@ void _templateFieldModelSerialize(
 ) {
   writer.writeString(offsets[0], object.additionalInfo);
   writer.writeString(offsets[1], object.defaultValue);
-  writer.writeString(offsets[2], object.key);
-  writer.writeString(offsets[3], object.label);
-  writer.writeStringList(offsets[4], object.options);
-  writer.writeBool(offsets[5], object.required);
-  writer.writeString(offsets[6], object.section);
-  writer.writeString(offsets[7], object.type);
+  writer.writeString(offsets[2], object.description);
+  writer.writeString(offsets[3], object.key);
+  writer.writeString(offsets[4], object.label);
+  writer.writeStringList(offsets[5], object.options);
+  writer.writeBool(offsets[6], object.required);
+  writer.writeString(offsets[7], object.section);
+  writer.writeString(offsets[8], object.type);
 }
 
 TemplateFieldModel _templateFieldModelDeserialize(
@@ -108,12 +120,13 @@ TemplateFieldModel _templateFieldModelDeserialize(
   final object = TemplateFieldModel(
     additionalInfo: reader.readStringOrNull(offsets[0]),
     defaultValue: reader.readStringOrNull(offsets[1]),
-    key: reader.readStringOrNull(offsets[2]) ?? '',
-    label: reader.readStringOrNull(offsets[3]) ?? '',
-    options: reader.readStringList(offsets[4]),
-    required: reader.readBoolOrNull(offsets[5]) ?? false,
-    section: reader.readStringOrNull(offsets[6]),
-    type: reader.readStringOrNull(offsets[7]) ?? '',
+    description: reader.readStringOrNull(offsets[2]),
+    key: reader.readStringOrNull(offsets[3]) ?? '',
+    label: reader.readStringOrNull(offsets[4]) ?? '',
+    options: reader.readStringList(offsets[5]),
+    required: reader.readBoolOrNull(offsets[6]) ?? false,
+    section: reader.readStringOrNull(offsets[7]),
+    type: reader.readStringOrNull(offsets[8]) ?? '',
   );
   return object;
 }
@@ -130,16 +143,18 @@ P _templateFieldModelDeserializeProp<P>(
     case 1:
       return (reader.readStringOrNull(offset)) as P;
     case 2:
-      return (reader.readStringOrNull(offset) ?? '') as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 3:
       return (reader.readStringOrNull(offset) ?? '') as P;
     case 4:
-      return (reader.readStringList(offset)) as P;
+      return (reader.readStringOrNull(offset) ?? '') as P;
     case 5:
-      return (reader.readBoolOrNull(offset) ?? false) as P;
+      return (reader.readStringList(offset)) as P;
     case 6:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 7:
+      return (reader.readStringOrNull(offset)) as P;
+    case 8:
       return (reader.readStringOrNull(offset) ?? '') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -462,6 +477,165 @@ extension TemplateFieldModelQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(property: r'defaultValue', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'description'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'description'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'description',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'description',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'description',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'description',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'description',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'description',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'description',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'description',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'description', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateFieldModel, TemplateFieldModel, QAfterFilterCondition>
+  descriptionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'description', value: ''),
       );
     });
   }
