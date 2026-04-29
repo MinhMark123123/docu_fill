@@ -1,5 +1,6 @@
 import 'package:docu_fill/features/page.dart';
-import 'package:docu_fill/features/src/home/widgets/desktop/input_page.dart';
+import 'package:docu_fill/features/src/home/input_page.dart';
+import 'package:docu_fill/features/src/main/main_page.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

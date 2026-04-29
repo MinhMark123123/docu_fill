@@ -1,4 +1,4 @@
-import 'package:docu_fill/features/src/home/widgets/desktop/templates_collection_desktop.dart';
+import 'package:docu_fill/features/src/home/components/templates_collection_desktop.dart';
 import 'package:flutter/material.dart';
 
 class TemplatesCollection extends StatelessWidget {

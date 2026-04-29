@@ -1,6 +1,6 @@
 import 'package:localization/localization.dart';
 import 'package:docu_fill/features/src/home/view_model/home_view_model.dart';
-import 'package:docu_fill/features/src/home/widgets/item_document_collection.dart';
+import 'package:docu_fill/features/src/home/components/item_document_collection.dart';
 import 'package:design/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';

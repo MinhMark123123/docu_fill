@@ -1,7 +1,7 @@
 import 'package:data/data.dart';
 import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
-import 'package:docu_fill/features/src/home/widgets/image_picker_widget.dart';
+import 'package:docu_fill/features/src/home/components/image_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';

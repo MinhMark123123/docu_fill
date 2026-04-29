@@ -1,6 +1,6 @@
 import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
-import 'package:docu_fill/features/src/home/widgets/desktop/components/ai_result_selector_dialog.dart';
+import 'package:docu_fill/features/src/home/components/ai_result_selector_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';

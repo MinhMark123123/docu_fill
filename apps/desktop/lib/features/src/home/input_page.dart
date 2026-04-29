@@ -1,14 +1,11 @@
 import 'package:design/ui.dart';
 import 'package:docu_fill/core/core.dart';
-import 'package:docu_fill/core/src/events.dart';
+import 'package:docu_fill/features/src/home/components/field_input_desktop.dart';
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:docu_fill/route/routers.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
-
-import 'field_input_desktop.dart';
 
 class InputPage extends BaseView<FieldsInputViewModel> {
   final List<int>? ids;
@@ -41,5 +38,4 @@ class InputPage extends BaseView<FieldsInputViewModel> {
       body: FieldInputDesktop(),
     );
   }
-
 }

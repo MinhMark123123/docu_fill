@@ -1,4 +1,4 @@
-import 'package:docu_fill/features/src/home/widgets/templates_collection.dart';
+import 'package:docu_fill/features/src/home/components/templates_collection.dart';
 import 'package:flutter/material.dart';
 
 class HomeLayoutDesktop extends StatelessWidget {

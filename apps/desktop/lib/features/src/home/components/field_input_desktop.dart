@@ -1,7 +1,7 @@
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
-import 'package:docu_fill/features/src/home/widgets/desktop/field_input_confirm_box.dart';
-import 'package:docu_fill/features/src/home/widgets/desktop/filed_input_box.dart';
-import 'package:docu_fill/features/src/home/widgets/empty_fields_widget.dart';
+import 'package:docu_fill/features/src/home/components/field_input_confirm_box.dart';
+import 'package:docu_fill/features/src/home/components/filed_input_box.dart';
+import 'package:docu_fill/features/src/home/components/empty_fields_widget.dart';
 import 'package:design/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';

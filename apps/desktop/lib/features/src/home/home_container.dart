@@ -1,6 +1,6 @@
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/features/src/home/view_model/home_view_model.dart';
-import 'package:docu_fill/features/src/home/widgets/templates_collection.dart';
+import 'package:docu_fill/features/src/home/components/templates_collection.dart';
 import 'package:flutter/material.dart';
 
 class HomeContainer extends BaseView<HomeViewModel> {

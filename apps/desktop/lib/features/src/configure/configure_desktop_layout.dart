@@ -1,8 +1,11 @@
 import 'package:design/ui.dart';
-import 'package:docu_fill/features/src/configure/view/desktop/components/configure_confirm_box.dart';
-import 'package:docu_fill/features/src/configure/view/desktop/components/configure_header.dart';
-import 'package:docu_fill/features/src/configure/view/desktop/components/configure_table_container.dart';
+import 'package:docu_fill/features/src/configure/components/configure_confirm_box.dart';
+import 'package:docu_fill/features/src/configure/components/configure_confirm_box.dart';
+import 'package:docu_fill/features/src/configure/components/configure_header.dart';
+import 'package:docu_fill/features/src/configure/components/configure_table_container.dart';
 import 'package:flutter/material.dart';
+
+import 'components/configure_header.dart';
 
 class ConfigureDesktopLayout extends StatelessWidget {
   const ConfigureDesktopLayout({super.key});

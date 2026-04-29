@@ -4,10 +4,10 @@ import 'package:docu_fill/features/src/main/view_model/main_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
-class MainLayoutDesktop extends StatelessWidget {
+class MainPage extends StatelessWidget {
   final Widget child;
 
-  const MainLayoutDesktop({super.key, required this.child});
+  const MainPage({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

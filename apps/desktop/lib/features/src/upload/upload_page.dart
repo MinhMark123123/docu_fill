@@ -1,5 +1,5 @@
 import 'package:docu_fill/core/core.dart';
-import 'package:docu_fill/features/src/upload/view/desktop/upload_layout_desktop.dart';
+import 'package:docu_fill/features/src/upload/upload_layout_desktop.dart';
 import 'package:docu_fill/features/src/upload/view_model/upload_view_model.dart';
 import 'package:flutter/material.dart';
 

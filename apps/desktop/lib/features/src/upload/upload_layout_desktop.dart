@@ -1,8 +1,8 @@
 import 'package:design/ui.dart';
-import 'package:docu_fill/features/src/upload/view/desktop/components/upload_continue_button.dart';
-import 'package:docu_fill/features/src/upload/view/desktop/components/upload_drop_box.dart';
-import 'package:docu_fill/features/src/upload/view/desktop/components/upload_header.dart';
-import 'package:docu_fill/features/src/upload/view/desktop/components/upload_import_label.dart';
+import 'package:docu_fill/features/src/upload/components/upload_continue_button.dart';
+import 'package:docu_fill/features/src/upload/components/upload_drop_box.dart';
+import 'package:docu_fill/features/src/upload/components/upload_header.dart';
+import 'package:docu_fill/features/src/upload/components/upload_import_label.dart';
 import 'package:flutter/material.dart';
 
 class UploadLayoutDesktop extends StatelessWidget {

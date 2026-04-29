@@ -1,7 +1,7 @@
 import 'package:data/data.dart';
 import 'package:design/ui.dart';
+import 'package:docu_fill/features/src/configure/components/cell_default_value.dart';
 import 'package:docu_fill/features/src/configure/model/table_row_data.dart';
-import 'package:docu_fill/features/src/configure/view/widgets/cell_default_value.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';

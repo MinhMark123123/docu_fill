@@ -1,7 +1,7 @@
 import 'package:data/data.dart';
 import 'package:design/ui.dart';
-import 'package:docu_fill/features/src/home/widgets/desktop/components/field_items.dart';
-import 'package:docu_fill/features/src/home/widgets/desktop/components/fields_navigation_buttons.dart';
+import 'package:docu_fill/features/src/home/components/field_items.dart';
+import 'package:docu_fill/features/src/home/components/fields_navigation_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 
