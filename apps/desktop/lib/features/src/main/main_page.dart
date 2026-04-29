@@ -1,17 +1,17 @@
 import 'package:design/ui.dart';
+import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/features/page.dart';
 import 'package:docu_fill/features/src/main/view_model/main_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
-class MainPage extends StatelessWidget {
+class MainPage extends BaseView<MainViewModel> {
   final Widget child;
 
   const MainPage({super.key, required this.child});
 
   @override
-  Widget build(BuildContext context) {
-    final viewModel = getViewModel<MainViewModel>();
+  Widget build(BuildContext context, MainViewModel viewModel) {
     return Scaffold(
       body: Row(
         children: [
