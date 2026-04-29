@@ -407,59 +407,11 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   /// Loads and applies a previously saved AI analysis result
-  Future<void> importAiResult() async {
-    try {
-      final resultsDir = await _getAiResultsDir();
-      final files = await _getAiResultFiles(resultsDir);
-      if (files.isEmpty) {
-        showSnackbar(AppLang.messagesExtractNoText.tr());
-        return;
-      }
-
-      final selectedFile = await _selectAiResultFile(files);
-      if (selectedFile == null) return;
-
-      await _applySavedAiResult(selectedFile);
-      showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
-    } catch (e) {
-      debugPrint("Error importing AI result: $e");
-      showSnackbar(AppLang.actionsLoadCopyError.tr());
-    }
-  }
-
-  Future<Directory> _getAiResultsDir() async {
-    final appDocDir = await getApplicationDocumentsDirectory();
-    final dir = Directory(p.join(appDocDir.path, "ai_results"));
-    if (!await dir.exists()) await dir.create(recursive: true);
-    return dir;
-  }
-
-  Future<List<File>> _getAiResultFiles(Directory dir) async {
-    final files =
-        await dir
-            .list()
-            .where((e) => e is File && e.path.endsWith('.json'))
-            .cast<File>()
-            .toList();
-    files.sort((a, b) => b.lastModifiedSync().compareTo(a.lastModifiedSync()));
-    return files;
-  }
-
-  Future<File?> _selectAiResultFile(List<File> files) async {
-    final fileNames = files.map((f) => p.basename(f.path)).toList();
-    final index = await showSelectionDialog(
-      title: AppLang.messagesSelectFromAiResults.tr(),
-      options: fileNames,
-    );
-    return index != null ? files[index] : null;
-  }
-
-  Future<void> _applySavedAiResult(File file) async {
-    final content = await file.readAsString();
-    final Map<String, dynamic> data = jsonDecode(content);
-    final mappedData = data.map((key, value) => MapEntry(key, value.toString()));
+  void applyAiResult(Map<String, String> mappedData) {
     _applyAiDataToForm(mappedData);
+    showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
   }
+
 
   void _applyAiDataToForm(Map<String, String> mappedData) {
     final cloned = Map<String, List<TemplateField>>.from(

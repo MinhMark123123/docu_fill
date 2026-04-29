@@ -1,5 +1,6 @@
 import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
+import 'package:docu_fill/features/src/home/widgets/desktop/components/ai_result_selector_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
@@ -32,7 +33,13 @@ class QuickActionsRow extends StatelessWidget {
           label: AppLang.actionsCreateCopy.tr(),
         ),
         _ActionButton(
-          onPressed: () => viewModel.importAiResult(),
+          onPressed: () async {
+            final data = await showDialog<Map<String, String>>(
+              context: context,
+              builder: (context) => const AiResultSelectorDialog(),
+            );
+            if (data != null) viewModel.applyAiResult(data);
+          },
           icon: Icons.psychology_outlined,
           label: AppLang.actionsImportAiResult.tr(),
           color: context.colorScheme.tertiary,
