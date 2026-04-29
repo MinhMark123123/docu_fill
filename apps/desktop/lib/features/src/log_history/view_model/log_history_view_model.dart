@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:docu_fill/core/core.dart';
+import 'package:docu_fill/core/src/events.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 import 'package:path_provider/path_provider.dart';
@@ -50,6 +52,28 @@ class LogHistoryViewModel extends BaseViewModel {
       showSnackbar("Log deleted");
     } catch (e) {
       showSnackbar("Error deleting log: $e");
+    }
+  }
+
+  Future<void> confirmDeleteAll(BuildContext context) async {
+    final accepted = await showAppAlertDialog<bool>(
+      title: AppLang.actionsDelete.tr(),
+      content: AppLang.messagesConfirmDeleteAllLogs.tr(),
+      actions: [
+        DialogAction(
+          title: AppLang.actionsCancel.tr(),
+          onPressed: (dialogContext) => Navigator.pop(dialogContext, false),
+        ),
+        DialogAction(
+          title: AppLang.actionsDelete.tr(),
+          isDestructive: true,
+          onPressed: (dialogContext) => Navigator.pop(dialogContext, true),
+        ),
+      ],
+    );
+
+    if (accepted == true) {
+      await deleteAllLogs();
     }
   }
 

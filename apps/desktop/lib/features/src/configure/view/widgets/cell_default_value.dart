@@ -22,9 +22,9 @@ class CellDefaultValue extends StatelessWidget {
         border: const OutlineInputBorder(),
       ),
       onChanged: (value) {
-        getViewModel<ConfigureViewModel>().updateDefaultValue(
+        getViewModel<ConfigureViewModel>().updateField(
           data.fieldKey,
-          defaultValue: value,
+          (d) => d.copyWith(defaultValue: value),
         );
       },
     );

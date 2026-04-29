@@ -1,7 +1,5 @@
-# melos_managed_dependency_overrides: core,data,design,localization,analyzer,build,source_gen
+# melos_managed_dependency_overrides: core,data,design,localization
 dependency_overrides:
-  analyzer: any
-  build: any
   core:
     path: ../../packages/core
   data:
@@ -10,4 +8,3 @@ dependency_overrides:
     path: ../../packages/design
   localization:
     path: ../../packages/localization
-  source_gen: any

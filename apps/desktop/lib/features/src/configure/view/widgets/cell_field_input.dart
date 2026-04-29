@@ -16,9 +16,9 @@ class CellFieldInput extends StatelessWidget {
     return EnumDropdownButton(
       initialValue: data.inputType,
       onChanged: (FieldType? value) {
-        getViewModel<ConfigureViewModel>().updateInputType(
+        getViewModel<ConfigureViewModel>().updateField(
           data.fieldKey,
-          inputType: value,
+          (d) => d.copyWith(inputType: value),
         );
       },
     );

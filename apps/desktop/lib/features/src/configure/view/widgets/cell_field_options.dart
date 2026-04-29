@@ -28,9 +28,9 @@ class CellFieldOptions extends StatelessWidget {
         return AddOnInputText(
           initValue: data.options,
           onChanged: (values) {
-            getViewModel<ConfigureViewModel>().updateOptions(
+            getViewModel<ConfigureViewModel>().updateField(
               data.fieldKey,
-              options: values,
+              (d) => d.copyWith(options: values),
             );
           },
         );
@@ -57,7 +57,7 @@ class CellFieldOptions extends StatelessWidget {
             onChanged: (value) {
               getViewModel<ConfigureViewModel>().updateWidthImage(
                 data.fieldKey,
-                widthImage: value,
+                value,
               );
             },
           ),
@@ -73,7 +73,7 @@ class CellFieldOptions extends StatelessWidget {
             onChanged: (value) {
               getViewModel<ConfigureViewModel>().updateHeightImage(
                 data.fieldKey,
-                heightImage: value,
+                value,
               );
             },
           ),
@@ -86,7 +86,7 @@ class CellFieldOptions extends StatelessWidget {
             onSelected: (value) {
               getViewModel<ConfigureViewModel>().updateUnitImage(
                 data.fieldKey,
-                unitImage: ImageUnit.fromValue(value),
+                ImageUnit.fromValue(value),
               );
             },
           ),
@@ -103,16 +103,9 @@ class CellFieldOptions extends StatelessWidget {
         border: const OutlineInputBorder(),
       ),
       onChanged: (value) {
-        if (value.isEmpty) {
-          getViewModel<ConfigureViewModel>().updateAdditionalInfo(
-            data.fieldKey,
-            additionalInfo: "",
-          );
-          return;
-        }
-        getViewModel<ConfigureViewModel>().updateAdditionalInfo(
+        getViewModel<ConfigureViewModel>().updateField(
           data.fieldKey,
-          additionalInfo: value,
+          (d) => d.copyWith(additionalInfo: value),
         );
       },
     );

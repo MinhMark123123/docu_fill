@@ -66,13 +66,14 @@ final GoRouter router = GoRouter(
             GoRoute(
               path: RoutesPath.logHistory,
               builder: (BuildContext context, GoRouterState state) {
-                return const LogHistoryPage();
+                return LogHistoryPage();
               },
               routes: [
                 GoRoute(
                   path: RoutesPath.logDetail,
                   builder: (BuildContext context, GoRouterState state) {
-                    final fileName = state.uri.queryParameters['fileName'] ?? "";
+                    final fileName =
+                        state.uri.queryParameters['fileName'] ?? "";
                     return LogDetailPage(fileName: fileName);
                   },
                 ),

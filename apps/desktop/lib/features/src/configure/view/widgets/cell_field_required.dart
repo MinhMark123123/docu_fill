@@ -16,9 +16,9 @@ class CellFieldRequired extends StatelessWidget {
       child: Checkbox(
         value: data.isRequired,
         onChanged:
-            (value) => getViewModel<ConfigureViewModel>().updateIsRequired(
+            (value) => getViewModel<ConfigureViewModel>().updateField(
               data.fieldKey,
-              isRequired: value,
+              (d) => d.copyWith(isRequired: value),
             ),
       ),
     );

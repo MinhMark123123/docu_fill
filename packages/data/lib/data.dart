@@ -11,4 +11,5 @@ export 'src/template_field.dart';
 export 'src/services/template_service.dart';
 export 'src/services/data_extraction_service.dart';
 export 'src/services/gemini_service.dart';
+export 'src/services/template_parsing_service.dart';
 export 'src/dimensions.dart';

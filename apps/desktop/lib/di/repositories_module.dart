@@ -22,4 +22,5 @@ void setupRepositoriesModule() {
     () => DataExtractionService(),
   );
   sl.registerLazySingleton<GeminiService>(() => GeminiService(inject()));
+  sl.registerLazySingleton<TemplateParsingService>(() => TemplateParsingService());
 }

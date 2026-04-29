@@ -24,6 +24,20 @@ class TableRowData {
     this.description,
   });
 
+  factory TableRowData.fromTemplateField(TemplateField field) {
+    return TableRowData(
+      fieldKey: field.key,
+      fieldName: field.label,
+      inputType: field.type,
+      options: field.options,
+      isRequired: field.required,
+      additionalInfo: field.additionalInfo,
+      defaultValue: field.defaultValue,
+      section: field.section,
+      description: field.description,
+    );
+  }
+
   TableRowData copyWith({
     String? fieldKey,
     String? fieldName,

@@ -15,7 +15,12 @@ void setupViewModelModule() {
   );
   registerViewModel(() => SettingViewModel(settingsRepository: inject()));
   registerViewModel(() => UploadViewModel());
-  registerViewModel(() => ConfigureViewModel(templateRepository: inject()));
+  registerViewModel(
+    () => ConfigureViewModel(
+      templateRepository: inject(),
+      parsingService: inject(),
+    ),
+  );
   registerViewModel(
     () => FieldsInputViewModel(
       templateRepository: inject(),

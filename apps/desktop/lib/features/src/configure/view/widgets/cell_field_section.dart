@@ -17,9 +17,9 @@ class CellFieldSection extends StatelessWidget {
         border: const OutlineInputBorder(),
       ),
       onChanged: (value) {
-        getViewModel<ConfigureViewModel>().updateSection(
+        getViewModel<ConfigureViewModel>().updateField(
           data.fieldKey,
-          section: value,
+          (d) => d.copyWith(section: value),
         );
       },
     );
