@@ -30,6 +30,7 @@ abstract class AppLang {
   static const String actionsEdit = "actions.edit";
   static const String actionsExportData = "actions.export_data";
   static const String actionsExportSummary = "actions.export_summary";
+  static const String actionsExtractImages = "actions.extract_images";
   static const String actionsFillDocument = "actions.fill_document";
   static const String actionsFinishProcess = "actions.finish_process";
   static const String actionsGetStartedNow = "actions.get_started_now";
@@ -118,6 +119,7 @@ abstract class AppLang {
   static const String labelsTemplates = "labels.templates";
   static const String labelsThemeColor = "labels.theme_color";
   static const String labelsTimestamp = "labels.timestamp";
+  static const String labelsTools = "labels.tools";
   static const String labelsType = "labels.type";
   static const String labelsUnit = "labels.unit";
   static const String labelsUploadDocxFile = "labels.upload_docx_file";
@@ -136,7 +138,10 @@ abstract class AppLang {
   static const String messagesEnterTemplateNameHint = "messages.enter_template_name_hint";
   static const String messagesExcelUnsupportedFormat = "messages.excel_unsupported_format";
   static const String messagesExportSummarySuccess = "messages.export_summary_success";
+  static const String messagesExtractError = "messages.extract_error";
+  static const String messagesExtractImagesDesc = "messages.extract_images_desc";
   static const String messagesExtractNoText = "messages.extract_no_text";
+  static const String messagesExtractSuccess = "messages.extract_success";
   static const String messagesFieldIsRequired = "messages.field_is_required";
   static const String messagesFillInfoBelow = "messages.fill_info_below";
   static const String messagesGeminiApiKeyHint = "messages.gemini_api_key_hint";
@@ -153,7 +158,9 @@ abstract class AppLang {
   static const String messagesPickFolderToExport = "messages.pick_folder_to_export";
   static const String messagesReviewAndConfigureFields = "messages.review_and_configure_fields";
   static const String messagesReviewBeforeExport = "messages.review_before_export";
+  static const String messagesSelectDestFolder = "messages.select_dest_folder";
   static const String messagesSelectFromAiResults = "messages.select_from_ai_results";
+  static const String messagesSelectSourceFile = "messages.select_source_file";
   static const String messagesSettingExported = "messages.setting_exported";
   static const String messagesSettingsSaveSuccess = "messages.settings_save_success";
   static const String messagesSingleLineTextHint = "messages.single_line_text_hint";

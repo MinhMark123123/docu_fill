@@ -53,6 +53,12 @@ final GoRouter router = GoRouter(
           ],
         ),
         GoRoute(
+          path: RoutesPath.tool, // Use constant (relative)
+          builder: (BuildContext context, GoRouterState state) {
+            return const ToolPage();
+          },
+        ),
+        GoRoute(
           path: RoutesPath.setting, // Use constant (relative)
           builder: (BuildContext context, GoRouterState state) {
             return const SettingPage();

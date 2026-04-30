@@ -61,7 +61,8 @@
     "create_copy_success": "Đã tạo bản sao thành công!",
     "create_copy_error": "Lỗi khi tạo bản sao: {}",
     "export_summary": "Xuất tóm tắt (Text)",
-    "import_ai_result": "Nhập kết quả AI cũ"
+    "import_ai_result": "Nhập kết quả AI cũ",
+    "extract_images": "Trích xuất hình ảnh"
   },
   "labels": {
     "templates": "Mẫu",
@@ -114,7 +115,8 @@
     "response": "Kết quả trả về",
     "select_all": "Chọn tất cả",
     "key": "Mã",
-    "type": "Loại"
+    "type": "Loại",
+    "tools": "Công cụ"
   },
   "messages": {
     "review_and_configure_fields": "Xem lại và cấu hình các trường được phát hiện trong mẫu của bạn. Đảm bảo tất cả các trường được xác định chính xác và gán loại đầu vào phù hợp để thu thập dữ liệu chính xác.",
@@ -151,7 +153,12 @@
     "select_from_ai_results": "Chọn từ các kết quả phân tích AI đã lưu",
     "template_field_count": "{} trường",
     "no_matching_fields": "Không tìm thấy trường nào trùng khớp để sao chép cấu hình.",
-    "import_config_error": "Lỗi khi nhập tệp cấu hình."
+    "import_config_error": "Lỗi khi nhập tệp cấu hình.",
+    "extract_images_desc": "Trích xuất tất cả hình ảnh từ tệp Word (.docx) hoặc Excel (.xlsx) vào một thư mục.",
+    "select_source_file": "Chọn tệp nguồn (Word/Excel)",
+    "select_dest_folder": "Chọn thư mục lưu ảnh",
+    "extract_success": "Đã trích xuất {} hình ảnh thành công!",
+    "extract_error": "Lỗi khi trích xuất hình ảnh: {}"
   },
   "settings": {
     "general": {

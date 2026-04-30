@@ -9,3 +9,5 @@ export 'src/main/view_model/main_view_model.dart';
 export 'src/setting/setting_page.dart';
 export 'src/upload/upload_page.dart';
 export 'src/upload/view_model/upload_view_model.dart';
+export 'src/tool/tool_page.dart';
+export 'src/tool/view_model/tool_view_model.dart';
