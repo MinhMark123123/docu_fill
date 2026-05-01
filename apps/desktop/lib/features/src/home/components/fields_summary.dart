@@ -1,7 +1,7 @@
 import 'package:data/data.dart';
 import 'package:design/ui.dart';
-import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:docu_fill/features/src/home/components/fields_navigation_buttons.dart';
+import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
@@ -12,21 +12,25 @@ class FieldsSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = getViewModel<FieldsInputViewModel>();
-    final data = viewModel.composedTemplateUI.data;
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(Dimens.size32),
-      child: Column(
-        spacing: Dimens.size16,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const _SummaryHeader(),
-          const _ExportButton(),
-          ...data.entries.map((entry) => _SummarySection(entry: entry)),
-          Dimens.spacing.vertical(Dimens.size40),
-          const FieldsNavigationButtons(),
-        ],
-      ),
+    return StreamDataConsumer(
+      streamData: viewModel.composedTemplateUI,
+      builder: (context, data) {
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(Dimens.size32),
+          child: Column(
+            spacing: Dimens.size16,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const _SummaryHeader(),
+              const _ExportButton(),
+              ...data.entries.map((entry) => _SummarySection(entry: entry)),
+              Dimens.spacing.vertical(Dimens.size40),
+              const FieldsNavigationButtons(),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -104,11 +108,7 @@ class _SummarySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = getViewModel<FieldsInputViewModel>();
-    final sectionFields = entry.value.where(
-      (f) =>
-          viewModel.getInitValue(e: f) != null &&
-          entry.key != AppLang.labelsOverview.tr(),
-    );
+    final sectionFields = entry.value;
 
     if (sectionFields.isEmpty) return const SizedBox.shrink();
 
@@ -136,9 +136,7 @@ class _SummarySection extends StatelessWidget {
           ),
           child: Column(
             children:
-                sectionFields
-                    .map((f) => _SummaryFieldItem(field: f))
-                    .toList(),
+                sectionFields.map((f) => _SummaryFieldItem(field: f)).toList(),
           ),
         ),
         Dimens.spacing.vertical(Dimens.size16),
@@ -160,6 +158,7 @@ class _SummaryFieldItem extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: Dimens.size8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             flex: 1,
@@ -167,13 +166,22 @@ class _SummaryFieldItem extends StatelessWidget {
               field.label,
               style: context.textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w600,
+                color: context.colorScheme.onSurfaceVariant,
               ),
             ),
           ),
           Dimens.spacing.horizontal(Dimens.size16),
           Expanded(
             flex: 2,
-            child: Text(value ?? "-", style: context.textTheme.bodyMedium),
+            child: Text(
+              (value == null || value.isEmpty) ? "-" : value,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color:
+                    (value == null || value.isEmpty)
+                        ? context.colorScheme.outline
+                        : context.colorScheme.onSurface,
+              ),
+            ),
           ),
         ],
       ),
