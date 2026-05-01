@@ -26,6 +26,7 @@ class MainViewModel extends BaseViewModel {
 enum MainDesktopMenu {
   template,
   upload,
+  tools,
   setting;
 
   String label() {
@@ -34,6 +35,8 @@ enum MainDesktopMenu {
         return AppLang.labelsTemplates.tr();
       case MainDesktopMenu.upload:
         return AppLang.actionsUpload.tr();
+      case MainDesktopMenu.tools:
+        return AppLang.labelsTools.tr();
       case MainDesktopMenu.setting:
         return AppLang.labelsSettings.tr();
     }
@@ -45,6 +48,8 @@ enum MainDesktopMenu {
         return Icons.description_outlined;
       case MainDesktopMenu.upload:
         return Icons.upload_file_outlined;
+      case MainDesktopMenu.tools:
+        return Icons.construction_outlined;
       case MainDesktopMenu.setting:
         return Icons.settings_outlined;
     }
@@ -56,6 +61,8 @@ enum MainDesktopMenu {
         return Icons.description;
       case MainDesktopMenu.upload:
         return Icons.upload_file;
+      case MainDesktopMenu.tools:
+        return Icons.construction;
       case MainDesktopMenu.setting:
         return Icons.settings;
     }
@@ -67,6 +74,8 @@ enum MainDesktopMenu {
         return RoutesPath.home;
       case MainDesktopMenu.upload:
         return RoutesPath.homeUpload;
+      case MainDesktopMenu.tools:
+        return RoutesPath.tool;
       case MainDesktopMenu.setting:
         return RoutesPath.setting;
     }

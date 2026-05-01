@@ -61,7 +61,8 @@
     "create_copy_success": "Copy created successfully!",
     "create_copy_error": "Error creating copy: {}",
     "export_summary": "Export Summary (Text)",
-    "import_ai_result": "Import old AI result"
+    "import_ai_result": "Import old AI result",
+    "extract_images": "Extract Images"
   },
   "labels": {
     "templates": "Templates",
@@ -114,7 +115,8 @@
     "response": "Response",
     "select_all": "Select All",
     "key": "Key",
-    "type": "Type"
+    "type": "Type",
+    "tools": "Tools"
   },
   "messages": {
     "review_and_configure_fields": "Review and configure the fields detected in your template. Ensure all fields are correctly identified and assigned the appropriate input type for accurate data collection.",
@@ -151,7 +153,12 @@
     "select_from_ai_results": "Choose from saved AI analysis results",
     "template_field_count": "{} fields",
     "no_matching_fields": "No matching field keys found to copy configuration.",
-    "import_config_error": "Failed to import configuration file."
+    "import_config_error": "Failed to import configuration file.",
+    "extract_images_desc": "Extract all images from Word (.docx) or Excel (.xlsx) files into a folder.",
+    "select_source_file": "Select Source File (Word/Excel)",
+    "select_dest_folder": "Select Destination Folder",
+    "extract_success": "Extracted {} images successfully!",
+    "extract_error": "Error extracting images: {}"
   },
   "settings": {
     "general": {

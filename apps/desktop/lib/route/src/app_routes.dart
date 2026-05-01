@@ -1,5 +1,6 @@
 import 'package:docu_fill/features/page.dart';
-import 'package:docu_fill/features/src/home/widgets/desktop/input_page.dart';
+import 'package:docu_fill/features/src/home/input_page.dart';
+import 'package:docu_fill/features/src/main/main_page.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -52,6 +53,12 @@ final GoRouter router = GoRouter(
           ],
         ),
         GoRoute(
+          path: RoutesPath.tool, // Use constant (relative)
+          builder: (BuildContext context, GoRouterState state) {
+            return const ToolPage();
+          },
+        ),
+        GoRoute(
           path: RoutesPath.setting, // Use constant (relative)
           builder: (BuildContext context, GoRouterState state) {
             return const SettingPage();
@@ -66,13 +73,14 @@ final GoRouter router = GoRouter(
             GoRoute(
               path: RoutesPath.logHistory,
               builder: (BuildContext context, GoRouterState state) {
-                return const LogHistoryPage();
+                return LogHistoryPage();
               },
               routes: [
                 GoRoute(
                   path: RoutesPath.logDetail,
                   builder: (BuildContext context, GoRouterState state) {
-                    final fileName = state.uri.queryParameters['fileName'] ?? "";
+                    final fileName =
+                        state.uri.queryParameters['fileName'] ?? "";
                     return LogDetailPage(fileName: fileName);
                   },
                 ),

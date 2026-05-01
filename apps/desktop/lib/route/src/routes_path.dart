@@ -4,6 +4,7 @@ class RoutesPath {
   // --- Main Sub-routes ---
   static const String home = '/home'; // Relative to /main
   static const String setting = '/setting'; // Relative to /main
+  static const String tool = '/tool'; // Relative to /main
 
   // --- Home Sub-routes ---
   static const String input = 'input'; // Relative to /home/input

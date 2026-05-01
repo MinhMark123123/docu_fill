@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
-import 'package:archive/archive.dart';
 import 'package:core/core.dart';
 import 'package:data/data.dart';
 import 'package:docu_fill/core/core.dart';
@@ -14,9 +12,9 @@ import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:simple_loading_dialog/simple_loading_dialog.dart';
-import 'package:spreadsheet_decoder/spreadsheet_decoder.dart';
 
 part 'configure_view_model.g.dart';
 
@@ -45,9 +43,13 @@ enum ConfigureMode {
 @BindableViewModel()
 class ConfigureViewModel extends BaseViewModel {
   final TemplateRepository _templateRepository;
+  final TemplateParsingService _parsingService;
 
-  ConfigureViewModel({required TemplateRepository templateRepository})
-    : _templateRepository = templateRepository;
+  ConfigureViewModel({
+    required TemplateRepository templateRepository,
+    required TemplateParsingService parsingService,
+  }) : _templateRepository = templateRepository,
+       _parsingService = parsingService;
 
   @Bind()
   late final _fieldsData = <TableRowData>[].mtd(this);
@@ -179,7 +181,7 @@ class ConfigureViewModel extends BaseViewModel {
 
   Future<TemplateConfig?> pickAndParseTemplateFile() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: [AppConst.settingFileExtension.replaceAll(".", "")],
       );
@@ -187,87 +189,39 @@ class ConfigureViewModel extends BaseViewModel {
       if (result == null || result.files.single.path == null) return null;
 
       final bytes = await File(result.files.single.path!).readAsBytes();
-      final archive = ZipDecoder().decodeBytes(bytes);
-
-      for (final file in archive) {
-        if (file.isFile && file.name.endsWith(AppConst.settingJsonFileName)) {
-          final jsonString = utf8.decode(file.content as List<int>);
-          final jsonMap = jsonDecode(jsonString) as Map<String, dynamic>;
-          return TemplateConfig.fromJson(jsonMap);
-        }
-      }
+      return _parsingService.findConfigInArchive(bytes);
     } catch (e) {
       debugPrint("Error picking template file: $e");
-      showSnackbar(
-        "${AppLang.messagesImportConfigError.tr()}: ${e.toString()}",
-      );
+      showSnackbar("${AppLang.messagesImportConfigError.tr()}: $e");
     }
     return null;
   }
 
   Future<void> _loadImportSettingModeData() async {
     if (_pathFilePicked == null) return;
-    final f = File(_pathFilePicked!);
     try {
-      final bytes = await f.readAsBytes();
-      final archive = ZipDecoder().decodeBytes(bytes);
-
       final tempDir = await getTemporaryDirectory();
       _extractDir = Directory(extractDirPath(tempDir));
-      if (_extractDir?.existsSync() ?? false) {
-        _extractDir?.deleteSync(recursive: true);
-      }
-      await _extractDir!.create(recursive: true);
 
-      File? configFile;
-      File? docxFile;
+      final result = await _parsingService.parseTemplateArchive(
+        File(_pathFilePicked!),
+        _extractDir!,
+      );
 
-      for (final file in archive) {
-        final filename = file.name;
-        if (file.isFile) {
-          final data = file.content as List<int>;
-          final extractedFile = File(
-            '${_extractDir!.path}${Platform.pathSeparator}$filename',
-          );
-          await extractedFile.writeAsBytes(data);
-
-          if (filename.endsWith(AppConst.settingJsonFileName)) {
-            configFile = extractedFile;
-          } else if (filename.endsWith(AppConst.settingDocFileName) ||
-              filename.endsWith('.docx') ||
-              filename.endsWith('.xlsx')) {
-            docxFile = extractedFile;
-          }
-        }
-      }
-
-      if (configFile != null && docxFile != null) {
-        final jsonString = await configFile.readAsString();
-        final jsonMap = jsonDecode(jsonString) as Map<String, dynamic>;
-        final templateConfig = TemplateConfig.fromJson(jsonMap);
-
-        _nameController.text = templateConfig.templateName;
-
-        final fields = templateConfig.fields.map(
-          (e) => TableRowData(
-            fieldKey: e.key,
-            inputType: e.type,
-            fieldName: e.label,
-            options: e.options,
-            isRequired: e.required,
-            defaultValue: e.defaultValue,
-            additionalInfo: e.additionalInfo,
-            section: e.section,
-            description: e.description,
-          ),
-        );
-        _fieldsData.postValue(fields.toList());
-        _pathFilePicked = docxFile.path;
-        await checkEnableConfirm();
+      if (result != null) {
+        _applyImportedSettings(result.config, result.docPath);
       }
     } catch (e) {
       debugPrint("Error importing settings: $e");
     }
+  }
+
+  void _applyImportedSettings(TemplateConfig config, String docPath) {
+    _nameController.text = config.templateName;
+    final fields = config.fields.map((e) => TableRowData.fromTemplateField(e));
+    _fieldsData.postValue(fields.toList());
+    _pathFilePicked = docPath;
+    checkEnableConfirm();
   }
 
   String extractDirPath(Directory tempDir) =>
@@ -275,47 +229,19 @@ class ConfigureViewModel extends BaseViewModel {
 
   Future<void> _loadNewTemplateData() async {
     if (_pathFilePicked == null) return;
-    final extension = _pathFilePicked!.split('.').last.toLowerCase();
+    final file = File(_pathFilePicked!);
+    final extension = p.extension(_pathFilePicked!).toLowerCase();
 
-    if (extension == 'docx') {
-      await _loadDocxTemplateData();
-    } else if (extension == 'xlsx' || extension == 'xls') {
-      await _loadExcelTemplateData();
-    }
-  }
-
-  Future<void> _loadDocxTemplateData() async {
     try {
-      final f = File(_pathFilePicked!);
-      final bytes = await f.readAsBytes();
-      final text = DocxUtils.docxToText(bytes);
+      String text = "";
+      if (extension == '.docx') {
+        text = await _parsingService.parseDocx(file);
+      } else if (extension == '.xlsx' || extension == '.xls') {
+        text = await _parsingService.parseExcel(file);
+      }
       _extractFieldsFromText(text);
     } catch (e) {
-      debugPrint("Error loading Word template: $e");
-      if (e.toString().contains("Central Directory Record")) {
-        showSnackbar(AppLang.messagesExcelUnsupportedFormat.tr());
-      }
-    }
-  }
-
-  Future<void> _loadExcelTemplateData() async {
-    try {
-      final f = File(_pathFilePicked!);
-      final bytes = await f.readAsBytes();
-      final decoder = SpreadsheetDecoder.decodeBytes(bytes);
-      final StringBuffer buffer = StringBuffer();
-
-      for (var table in decoder.tables.keys) {
-        final sheet = decoder.tables[table];
-        if (sheet == null) continue;
-        for (var row in sheet.rows) {
-          final rowData = row.map((cell) => cell?.toString() ?? '').join(' ');
-          buffer.writeln(rowData);
-        }
-      }
-      _extractFieldsFromText(buffer.toString());
-    } catch (e) {
-      debugPrint('Error loading Excel template: $e');
+      debugPrint("Error loading template: $e");
       if (e.toString().contains("Central Directory Record")) {
         showSnackbar(AppLang.messagesExcelUnsupportedFormat.tr());
       }
@@ -323,10 +249,9 @@ class ConfigureViewModel extends BaseViewModel {
   }
 
   void _extractFieldsFromText(String text) {
-    final regex = RegExp(AppConst.placeHolderRegex);
-    final matches = regex.allMatches(text).map((e) => e.group(1)).toSet();
-    final fields = matches.map((key) {
-      return TableRowData(fieldKey: AppConst.composeKey(key: key!));
+    final keys = _parsingService.extractFieldsFromText(text);
+    final fields = keys.map((key) {
+      return TableRowData(fieldKey: AppConst.composeKey(key: key));
     });
     _fieldsData.postValue(fields.toList());
   }
@@ -335,70 +260,19 @@ class ConfigureViewModel extends BaseViewModel {
     return _fieldsData.data.firstWhere((element) => element.fieldKey == key);
   }
 
-  Future<void> updateFieldData(String key, TableRowData? data) async {
-    if (data == null) return;
+  Future<void> updateField(
+    String key,
+    TableRowData Function(TableRowData) update,
+  ) async {
     final index = fieldsData.data.indexWhere((e) => e.fieldKey == key);
     if (index == AppConst.commonUnknow) return;
-    final newData = removeUselessInput(newData: data);
-    _fieldsData.data[index] = newData;
-    await notifyDataChanged();
-  }
 
-  Future<void> updateFieldName(String key, {required String fieldName}) async {
-    await updateFieldData(key, fieldOfKey(key).copyWith(fieldName: fieldName));
-    await checkEnableConfirm();
-  }
+    final current = _fieldsData.data[index];
+    final updated = removeUselessInput(newData: update(current));
+    _fieldsData.data[index] = updated;
 
-  Future<void> updateDefaultValue(
-    String key, {
-    required String defaultValue,
-  }) async {
-    await updateFieldData(
-      key,
-      fieldOfKey(key).copyWith(defaultValue: defaultValue),
-    );
-    await checkEnableConfirm();
-  }
-
-  Future<void> updateAdditionalInfo(
-    String key, {
-    required String additionalInfo,
-  }) async {
-    await updateFieldData(
-      key,
-      fieldOfKey(key).copyWith(additionalInfo: additionalInfo),
-    );
-    await checkEnableConfirm();
-  }
-
-  Future<void> updateOptions(
-    String key, {
-    required List<String> options,
-  }) async {
-    await updateFieldData(key, fieldOfKey(key).copyWith(options: options));
-    await checkEnableConfirm();
-  }
-
-  Future<void> updateIsRequired(String key, {bool? isRequired}) async {
-    await updateFieldData(
-      key,
-      fieldOfKey(key).copyWith(isRequired: isRequired),
-    );
-    await checkEnableConfirm();
-  }
-
-  Future<void> updateInputType(String key, {FieldType? inputType}) async {
-    await updateFieldData(key, fieldOfKey(key).copyWith(inputType: inputType));
-    await checkEnableConfirm();
-  }
-
-  Future<void> updateSection(String key, {String? section}) async {
-    await updateFieldData(key, fieldOfKey(key).copyWith(section: section));
-    await checkEnableConfirm();
-  }
-
-  Future<void> notifyDataChanged() async {
     _fieldsData.postValue(List.from(_fieldsData.data));
+    await checkEnableConfirm();
   }
 
   TableRowData removeUselessInput({required TableRowData newData}) {
@@ -441,172 +315,143 @@ class ConfigureViewModel extends BaseViewModel {
     );
   }
 
-  Future<void> updateWidthImage(
-    String fieldKey, {
-    required String widthImage,
-  }) async {
-    final currentRaw = fieldOfKey(fieldKey).additionalInfo;
-    final splitter = currentRaw?.split(";");
-    final widthString = double.tryParse(widthImage);
-    if (widthString == null) return;
-    if (splitter == null || splitter.isEmpty) {
-      await updateAdditionalInfo(
-        fieldKey,
-        additionalInfo:
-            "$widthString;;"
-            "${ImageUnit.cm.value}",
-      );
-    } else {
-      await updateAdditionalInfo(
-        fieldKey,
-        additionalInfo: [widthString, splitter[1], splitter[2]].join(";"),
-      );
-    }
+  Future<void> updateWidthImage(String key, String width) async {
+    await updateField(key, (d) => _updateImageDimension(d, width, 0));
   }
 
-  Future<void> updateHeightImage(
-    String fieldKey, {
-    required String heightImage,
-  }) async {
-    final currentRaw = fieldOfKey(fieldKey).additionalInfo;
-    final splitter = currentRaw?.split(";");
-    final heightString = double.tryParse(heightImage);
-    if (heightString == null) return;
-    if (splitter == null || splitter.isEmpty) {
-      await updateAdditionalInfo(
-        fieldKey,
-        additionalInfo: ";$heightString;${ImageUnit.cm.value}",
-      );
-    } else {
-      await updateAdditionalInfo(
-        fieldKey,
-        additionalInfo: [splitter[0], heightString, splitter[2]].join(";"),
-      );
-    }
+  Future<void> updateHeightImage(String key, String height) async {
+    await updateField(key, (d) => _updateImageDimension(d, height, 1));
   }
 
-  Future<void> updateUnitImage(String fieldKey, {ImageUnit? unitImage}) async {
-    final currentRaw = fieldOfKey(fieldKey).additionalInfo;
-    final splitter = currentRaw?.split(";");
-    if (splitter == null || splitter.isEmpty) {
-      await updateAdditionalInfo(
-        fieldKey,
-        additionalInfo: ";;${unitImage?.value}",
-      );
-    } else {
-      await updateAdditionalInfo(
-        fieldKey,
-        additionalInfo: [splitter[0], splitter[1], unitImage?.value].join(";"),
-      );
-    }
+  Future<void> updateUnitImage(String key, ImageUnit? unit) async {
+    await updateField(
+      key,
+      (d) => _updateImageDimension(d, unit?.value ?? "", 2),
+    );
+  }
+
+  TableRowData _updateImageDimension(
+    TableRowData data,
+    String value,
+    int index,
+  ) {
+    final parts = (data.additionalInfo ?? ";;${ImageUnit.cm.value}").split(";");
+    if (parts.length < 3) return data;
+    parts[index] = value;
+    return data.copyWith(additionalInfo: parts.join(";"));
   }
 
   Future<void> saveConfigure(BuildContext context) async {
     await Future.delayed(Duration.zero);
     if (!context.mounted) return;
+
     final result = await loadingGuard(
       Future<bool>(() async {
-        final uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
-        final extension = _pathFilePicked!.split('.').last.toLowerCase();
-        final newFileName = "$uniqueName.$extension";
-        String? path;
-        if (_mode.data == ConfigureMode.addNew) {
-          path = await DocxUtils.saveDocxToAppDirectory(
-            originalDocxPath: _pathFilePicked!,
-            newFileName: newFileName,
-            customDirectoryName: "templates",
-          );
-        } else if (_mode.data.isImportMode && _extractDir != null) {
-          final extractedFile =
-              Directory(_extractDir!.path).listSync().firstWhere(
-                    (file) =>
-                        file is File &&
-                        (file.path.endsWith('.docx') ||
-                            file.path.endsWith('.xlsx') ||
-                            file.path.endsWith(AppConst.settingDocFileName)),
-                  )
-                  as File;
-
-          path = await DocxUtils.saveDocxToAppDirectory(
-            originalDocxPath: extractedFile.path,
-            newFileName: newFileName,
-            customDirectoryName: "templates",
-          );
-        }
+        final path = await _prepareTemplateFile();
         if (path == null) return false;
+
         await _templateRepository.saveTemplate(
           generateTemplateConfig(name: _nameController.text, path: path),
         );
         return true;
       }),
     );
-    if (_mode.data.isImportMode) {
-      await _extractDir?.delete(recursive: true);
-    }
-    await Future.delayed(Duration.zero);
+
+    if (_mode.data.isImportMode) await _extractDir?.delete(recursive: true);
+
     if (result) {
       showSnackbar(AppLang.messagesDocumentSuccessfullyCreate.tr());
       navigatePage(RoutesPath.home);
+    }
+  }
+
+  Future<String?> _prepareTemplateFile() async {
+    final uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+    final extension = p.extension(_pathFilePicked!).toLowerCase();
+    final newFileName = "$uniqueName$extension";
+
+    String? sourcePath;
+    if (_mode.data == ConfigureMode.addNew) {
+      sourcePath = _pathFilePicked;
+    } else if (_mode.data.isImportMode && _extractDir != null) {
+      sourcePath = _findTemplateInExtractDir();
+    }
+
+    if (sourcePath == null) return null;
+
+    return DocxUtils.saveDocxToAppDirectory(
+      originalDocxPath: sourcePath,
+      newFileName: newFileName,
+      customDirectoryName: "templates",
+    );
+  }
+
+  String? _findTemplateInExtractDir() {
+    try {
+      final file =
+          _extractDir!.listSync().firstWhere(
+                (f) => f is File && _parsingService.isTemplateDocument(f.path),
+              )
+              as File;
+      return file.path;
+    } catch (_) {
+      return null;
     }
   }
 
   Future<void> saveAsCopy(BuildContext context) async {
-    final userAccepted = await showConfirmDialog(context);
-    if (!userAccepted || !context.mounted) return;
-    await Future.delayed(Duration.zero);
+    await _handleTemplateAction(context, (current) async {
+      final path = await _prepareCopyPath(current.pathTemplate);
+      if (path == null) return false;
+      await _templateRepository.saveTemplate(
+        generateTemplateConfig(name: _nameController.text, path: path),
+      );
+      return true;
+    });
+  }
+
+  Future<void> edit(BuildContext context) async {
+    await _handleTemplateAction(context, (current) async {
+      await _templateRepository.edit(
+        current.id,
+        generateTemplateConfig(
+          name: _nameController.text,
+          path: current.pathTemplate,
+        ),
+      );
+      return true;
+    });
+  }
+
+  Future<void> _handleTemplateAction(
+    BuildContext context,
+    Future<bool> Function(TemplateConfig) action,
+  ) async {
+    final accepted = await showConfirmDialog(context);
+    if (!accepted || !context.mounted) return;
+
     final current = await _templateRepository.getTemplateById(_idEdit);
-    if (!context.mounted && current == null) return;
+    if (current == null) return;
+
     final result = await showSimpleLoadingDialog(
       context: context,
-      future: () async {
-        final uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
-        final extension = current!.pathTemplate.split('.').last.toLowerCase();
-        final newFileName = "$uniqueName.$extension";
-
-        final path = await DocxUtils.saveDocxToAppDirectory(
-          originalDocxPath: current.pathTemplate,
-          newFileName: newFileName,
-          customDirectoryName: "templates",
-        );
-
-        if (path == null) return false;
-        await _templateRepository.saveTemplate(
-          generateTemplateConfig(name: _nameController.text, path: path),
-        );
-        return true;
-      },
+      future: () => action(current),
     );
-    await Future.delayed(Duration.zero);
+
     if (result) {
       showSnackbar(AppLang.messagesDocumentSuccessfullyCreate.tr());
       navigatePage(RoutesPath.home);
     }
   }
 
-  Future<void> edit(BuildContext context) async {
-    final userAccepted = await showConfirmDialog(context);
-    if (!userAccepted || !context.mounted) return;
-    await Future.delayed(Duration.zero);
-    final current = await _templateRepository.getTemplateById(_idEdit);
-    if (!context.mounted && current == null) return;
-    final result = await showSimpleLoadingDialog(
-      context: context,
-      future: () async {
-        await _templateRepository.edit(
-          current!.id,
-          generateTemplateConfig(
-            name: _nameController.text,
-            path: current.pathTemplate,
-          ),
-        );
-        return true;
-      },
+  Future<String?> _prepareCopyPath(String originalPath) async {
+    final uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+    final extension = p.extension(originalPath).toLowerCase();
+    return DocxUtils.saveDocxToAppDirectory(
+      originalDocxPath: originalPath,
+      newFileName: "$uniqueName$extension",
+      customDirectoryName: "templates",
     );
-    await Future.delayed(Duration.zero);
-    if (result) {
-      showSnackbar(AppLang.messagesDocumentSuccessfullyCreate.tr());
-      navigatePage(RoutesPath.home);
-    }
   }
 
   Future<bool> showConfirmDialog(BuildContext context) async {

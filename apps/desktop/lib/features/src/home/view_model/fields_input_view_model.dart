@@ -113,58 +113,58 @@ class FieldsInputViewModel extends BaseViewModel {
 
   Future<void> _composedUI() async {
     final rawData = _templateService.groupFields(_templates.data);
+    _initializeDefaultValues(rawData);
 
-    // Initialize defaults for all groups
+    final localized = _localizeRawData(rawData);
+    _composedTemplateUI.postValue(localized);
+    checkValidate();
+  }
+
+  void _initializeDefaultValues(Map<String?, List<TemplateField>> rawData) {
     for (var fields in rawData.values) {
       for (var field in fields) {
-        if (_fieldKeys[field.key] == null) {
-          if (field.defaultValue?.isNotEmpty == true) {
-            setValue(
-              field: field,
-              value: field.defaultValue,
-              shouldCheckValidate: false,
-            );
-          } else if (field.type == FieldType.selection) {
-            setValue(
-              field: field,
-              value: field.options?.firstOrNull,
-              shouldCheckValidate: false,
-            );
-          }
+        if (_fieldKeys[field.key] != null) continue;
+        final defaultValue = _getDefaultValue(field);
+        if (defaultValue != null) {
+          setValue(field: field, value: defaultValue, shouldCheckValidate: false);
         }
       }
     }
+  }
 
+  String? _getDefaultValue(TemplateField field) {
+    if (field.defaultValue?.isNotEmpty == true) return field.defaultValue;
+    if (field.type == FieldType.selection) return field.options?.firstOrNull;
+    return null;
+  }
+
+  Map<String, List<TemplateField>> _localizeRawData(
+    Map<String?, List<TemplateField>> rawData,
+  ) {
     final hasNamedSections = rawData.keys.any(
       (k) => k != null && k != TemplateService.commonSectionKey,
     );
-
     final localized = <String, List<TemplateField>>{};
 
-    // Named sections
     for (final entry in rawData.entries) {
-      if (entry.key == null || entry.key == TemplateService.commonSectionKey) {
-        continue;
+      if (entry.key != null && entry.key != TemplateService.commonSectionKey) {
+        localized[entry.key!] = entry.value;
       }
-      localized[entry.key!] = entry.value;
     }
 
-    // Put "common" bucket when it exists
     if (rawData.containsKey(TemplateService.commonSectionKey)) {
       localized[AppLang.labelsCommon.tr()] =
           rawData[TemplateService.commonSectionKey]!;
     }
-    // Unsectioned fields (null key)
+
     if (rawData.containsKey(null)) {
       final label =
           hasNamedSections
-              ? AppLang.labelsGeneralInfo
-                  .tr() // coexists with named sections
-              : AppLang.labelsGeneral.tr(); // only group → keep it simple
+              ? AppLang.labelsGeneralInfo.tr()
+              : AppLang.labelsGeneral.tr();
       localized[label] = rawData[null]!;
     }
-    _composedTemplateUI.postValue(localized);
-    checkValidate();
+    return localized;
   }
 
   Future<void> loadTemplates() async {
@@ -316,63 +316,69 @@ class FieldsInputViewModel extends BaseViewModel {
 
   Future<void> importFromFile() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf', 'docx', 'xlsx', 'xls'],
-      );
-      if (result == null || result.files.single.path == null) return;
+      final path = await _pickImportFile();
+      if (path == null) return;
 
-      await loadingGuard(
-        Future(() async {
-          final file = File(result.files.single.path!);
-          String extractedText = "";
-          bool pdfError = false;
-          try {
-            extractedText = await _dataExtractionService.extractText(file);
-          } catch (e) {
-            if (e.toString().toLowerCase().contains("pdf")) {
-              pdfError = true;
-            } else {
-              rethrow;
-            }
-          }
-
-          if (extractedText.isEmpty && !pdfError) {
-            throw Exception(AppLang.messagesExtractNoText.tr());
-          }
-
-          final allFields = _templates.data.expand((t) => t.fields).toList();
-          final templateConfig = {
-            for (var f in allFields) f.key: f.description,
-          };
-
-          final mappedData =
-              pdfError
-                  ? await _geminiService.mapFileToTemplate(
-                    fileBytes: await file.readAsBytes(),
-                    fileName: file.path.split(Platform.pathSeparator).last,
-                    templateConfig: templateConfig,
-                  )
-                  : await _geminiService.mapTextToTemplate(
-                    rawText: extractedText,
-                    templateConfig: templateConfig,
-                  );
-
-          // AUTO-SAVE AI RESULT for future use
-          await _autoSaveAiResult(
-            sourceFileName: file.path.split(Platform.pathSeparator).last,
-            resultData: mappedData,
-          );
-
-          _applyAiDataToForm(mappedData);
-          showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
-        }),
-      );
+      await loadingGuard(_processFileImport(File(path)));
     } catch (e) {
       debugPrint("Error importing from file: $e");
       final errorMessage = e.toString().replaceFirst('Exception: ', '');
       showSnackbar("${AppLang.labelsError.tr()}: $errorMessage");
     }
+  }
+
+  Future<String?> _pickImportFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'docx', 'xlsx', 'xls'],
+    );
+    return result?.files.single.path;
+  }
+
+  Future<void> _processFileImport(File file) async {
+    final extraction = await _extractTextSafely(file);
+    final mappedData = await _mapFileToTemplate(file, extraction);
+
+    await _autoSaveAiResult(
+      sourceFileName: p.basename(file.path),
+      resultData: mappedData,
+    );
+
+    _applyAiDataToForm(mappedData);
+    showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
+  }
+
+  Future<({String text, bool pdfError})> _extractTextSafely(File file) async {
+    try {
+      final text = await _dataExtractionService.extractText(file);
+      if (text.isEmpty) throw Exception(AppLang.messagesExtractNoText.tr());
+      return (text: text, pdfError: false);
+    } catch (e) {
+      if (e.toString().toLowerCase().contains("pdf")) {
+        return (text: "", pdfError: true);
+      }
+      rethrow;
+    }
+  }
+
+  Future<Map<String, String>> _mapFileToTemplate(
+    File file,
+    ({String text, bool pdfError}) extraction,
+  ) async {
+    final allFields = _templates.data.expand((t) => t.fields).toList();
+    final templateConfig = {for (var f in allFields) f.key: f.description};
+
+    if (extraction.pdfError) {
+      return _geminiService.mapFileToTemplate(
+        fileBytes: await file.readAsBytes(),
+        fileName: p.basename(file.path),
+        templateConfig: templateConfig,
+      );
+    }
+    return _geminiService.mapTextToTemplate(
+      rawText: extraction.text,
+      templateConfig: templateConfig,
+    );
   }
 
   /// Automatically saves the AI analysis result to a local JSON file
@@ -401,56 +407,11 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   /// Loads and applies a previously saved AI analysis result
-  Future<void> importAiResult() async {
-    try {
-      final appDocDir = await getApplicationDocumentsDirectory();
-      final aiResultsDirPath = p.join(appDocDir.path, "ai_results");
-      final aiResultsDir = Directory(aiResultsDirPath);
-      if (!await aiResultsDir.exists()) {
-        await aiResultsDir.create(recursive: true);
-      }
-
-      final files =
-          await aiResultsDir
-              .list()
-              .where((e) => e is File && e.path.endsWith('.json'))
-              .cast<File>()
-              .toList();
-
-      if (files.isEmpty) {
-        showSnackbar(
-          AppLang.messagesExtractNoText.tr(),
-        ); // Or another appropriate message
-        return;
-      }
-
-      // Sort by last modified date (newest first)
-      files.sort(
-        (a, b) => b.lastModifiedSync().compareTo(a.lastModifiedSync()),
-      );
-
-      final fileNames = files.map((f) => p.basename(f.path)).toList();
-      final selectedIndex = await showSelectionDialog(
-        title: AppLang.messagesSelectFromAiResults.tr(),
-        options: fileNames,
-      );
-
-      if (selectedIndex == null) return;
-
-      final selectedFile = files[selectedIndex];
-      final String content = await selectedFile.readAsString();
-      final Map<String, dynamic> data = jsonDecode(content);
-      final mappedData = data.map(
-        (key, value) => MapEntry(key, value.toString()),
-      );
-
-      _applyAiDataToForm(mappedData);
-      showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
-    } catch (e) {
-      debugPrint("Error importing AI result: $e");
-      showSnackbar(AppLang.actionsLoadCopyError.tr());
-    }
+  void applyAiResult(Map<String, String> mappedData) {
+    _applyAiDataToForm(mappedData);
+    showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
   }
+
 
   void _applyAiDataToForm(Map<String, String> mappedData) {
     final cloned = Map<String, List<TemplateField>>.from(

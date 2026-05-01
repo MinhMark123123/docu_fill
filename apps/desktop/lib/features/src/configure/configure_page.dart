@@ -1,7 +1,7 @@
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/core/src/events.dart' show ShowDialogEvent;
-import 'package:docu_fill/features/src/configure/view/desktop/configure_desktop_layout.dart';
-import 'package:docu_fill/features/src/configure/view/widgets/use_field_selection_dialog.dart';
+import 'package:docu_fill/features/src/configure/configure_desktop_layout.dart';
+import 'package:docu_fill/features/src/configure/components/use_field_selection_dialog.dart';
 import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

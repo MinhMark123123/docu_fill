@@ -1,11 +1,11 @@
-import 'package:docu_fill/core/core.dart';
 import 'package:design/ui.dart';
-import 'package:localization/localization.dart';
+import 'package:docu_fill/core/src/base_view.dart';
+import 'package:docu_fill/features/src/log_history/components/log_detail_content.dart';
+import 'package:docu_fill/features/src/log_history/view_model/log_detail_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
-
-import 'view_model/log_detail_view_model.dart';
 
 class LogDetailPage extends BaseView<LogDetailViewModel> {
   final String fileName;
@@ -33,9 +33,9 @@ class LogDetailPage extends BaseView<LogDetailViewModel> {
                 icon: const Icon(Icons.copy),
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: content));
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(const SnackBar(content: Text("Copied to clipboard")));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Copied to clipboard")),
+                  );
                 },
               );
             },
@@ -45,48 +45,9 @@ class LogDetailPage extends BaseView<LogDetailViewModel> {
       body: StreamDataConsumer(
         streamData: viewModel.content,
         builder: (context, String content) {
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(Dimens.size24),
-            child: SelectionArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                   _buildSectionTitle(context, fileName, Icons.file_present),
-                  const SizedBox(height: 16),
-                  Card(
-                    color: context.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                    child: Padding(
-                      padding: EdgeInsets.all(Dimens.size16),
-                      child: Text(
-                        content,
-                        style: const TextStyle(
-                          fontFamily: 'monospace',
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+          return LogDetailContent(fileName: fileName, content: content);
         },
       ),
-    );
-  }
-
-  Widget _buildSectionTitle(BuildContext context, String title, IconData icon) {
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: context.colorScheme.primary),
-        const SizedBox(width: 12),
-        Text(
-          title,
-          style: context.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
     );
   }
 }
