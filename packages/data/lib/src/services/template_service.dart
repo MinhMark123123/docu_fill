@@ -34,7 +34,11 @@ class TemplateService {
 
     // Add the template file with its correct extension
     archive.addFile(
-      ArchiveFile("${AppConst.settingDocFileName}$extension", docBytes.length, docBytes),
+      ArchiveFile(
+        "${AppConst.settingDocFileName}$extension",
+        docBytes.length,
+        docBytes,
+      ),
     );
 
     final configMap = item.toJson();
@@ -111,22 +115,37 @@ class TemplateService {
       }
     }
 
-    // 2. Group fields by their raw section value (null = unsectioned)
+    // 2. Identify unique fields across all templates with priority rule
+    // Priority: Prefer field with a non-empty section over one without.
+    final Map<String, TemplateField> uniqueFieldsMap = {};
     for (var template in templates) {
       for (var field in template.fields) {
-        if (commonKeys.contains(field.key)) {
-          final commonList = groupedData[commonSectionKey]!;
-          if (!commonList.any((e) => e.key == field.key)) {
-            commonList.add(field);
+        final existing = uniqueFieldsMap[field.key];
+        if (existing == null) {
+          uniqueFieldsMap[field.key] = field;
+        } else {
+          final existingHasSection =
+              existing.section?.trim().isNotEmpty == true;
+          final currentHasSection = field.section?.trim().isNotEmpty == true;
+          // If current field has a section and existing one doesn't, use current.
+          if (!existingHasSection && currentHasSection) {
+            uniqueFieldsMap[field.key] = field;
           }
-          continue;
         }
-
-        // field.section is null when no section was configured
-        final sectionKey =
-            field.section?.trim().isEmpty == true ? null : field.section;
-        groupedData.putIfAbsent(sectionKey, () => []).add(field);
       }
+    }
+
+    // 3. Group the unique/prioritized fields
+    for (var field in uniqueFieldsMap.values) {
+      if (commonKeys.contains(field.key)) {
+        groupedData[commonSectionKey]!.add(field);
+        continue;
+      }
+
+      // field.section is null when no section was configured
+      final sectionKey =
+          field.section?.trim().isEmpty == true ? null : field.section;
+      groupedData.putIfAbsent(sectionKey, () => []).add(field);
     }
 
     return groupedData;
@@ -190,7 +209,9 @@ class TemplateService {
 
       if (extension == 'docx') {
         // --- ONLY DOCX: Handle Images ---
-        final Map<String, String> fieldKeysForImages = Map.from(processedFieldKeys);
+        final Map<String, String> fieldKeysForImages = Map.from(
+          processedFieldKeys,
+        );
         final imageReplacements = getImageReplacements(
           composedUI: composedUI,
           fieldKeys: fieldKeysForImages,
