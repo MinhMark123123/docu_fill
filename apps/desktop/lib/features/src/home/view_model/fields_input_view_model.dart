@@ -126,7 +126,11 @@ class FieldsInputViewModel extends BaseViewModel {
         if (_fieldKeys[field.key] != null) continue;
         final defaultValue = _getDefaultValue(field);
         if (defaultValue != null) {
-          setValue(field: field, value: defaultValue, shouldCheckValidate: false);
+          setValue(
+            field: field,
+            value: defaultValue,
+            shouldCheckValidate: false,
+          );
         }
       }
     }
@@ -145,9 +149,10 @@ class FieldsInputViewModel extends BaseViewModel {
       (k) => k != null && k != TemplateService.commonSectionKey,
     );
     final localized = <String, List<TemplateField>>{};
-
     for (final entry in rawData.entries) {
-      if (entry.key != null && entry.key != TemplateService.commonSectionKey) {
+      final isCommonKey = entry.key == TemplateService.commonSectionKey;
+      final isUnspecifiedKey = entry.key == TemplateService.unspecified;
+      if (entry.key != null && !isCommonKey && !isUnspecifiedKey) {
         localized[entry.key!] = entry.value;
       }
     }
@@ -156,13 +161,9 @@ class FieldsInputViewModel extends BaseViewModel {
       localized[AppLang.labelsCommon.tr()] =
           rawData[TemplateService.commonSectionKey]!;
     }
-
-    if (rawData.containsKey(null)) {
-      final label =
-          hasNamedSections
-              ? AppLang.labelsGeneralInfo.tr()
-              : AppLang.labelsGeneral.tr();
-      localized[label] = rawData[null]!;
+    if (rawData.containsKey(TemplateService.unspecified)) {
+      localized[AppLang.labelsGeneralInfo.tr()] =
+          rawData[TemplateService.unspecified]!;
     }
     return localized;
   }
@@ -411,7 +412,6 @@ class FieldsInputViewModel extends BaseViewModel {
     _applyAiDataToForm(mappedData);
     showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
   }
-
 
   void _applyAiDataToForm(Map<String, String> mappedData) {
     final cloned = Map<String, List<TemplateField>>.from(
