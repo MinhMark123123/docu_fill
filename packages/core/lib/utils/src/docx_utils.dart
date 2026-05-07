@@ -69,13 +69,67 @@ class DocxUtils {
         final document = xml.XmlDocument.parse(xmlContent);
 
         // --- STEP 0: Clean up XML to improve placeholder matching ---
-        // Remove proofing tags which often split placeholders (e.g. {{<proofErr/>key}})
+        // 1. Remove revision and ID attributes that cause runs to split
+        final attributesToRemove = [
+          'w:rsidR',
+          'w:rsidRPr',
+          'w:rsidDel',
+          'w:rsidP',
+          'w14:paraId',
+          'w14:textId'
+        ];
+        for (var node in document.findAllElements('*')) {
+          for (var attrName in attributesToRemove) {
+            node.attributes
+                .removeWhere((attr) => attr.name.toString() == attrName);
+          }
+        }
+
+        // 2. Remove proofing tags which often split placeholders (e.g. {{<proofErr/>key}})
         final proofNodes = [
           ...document.findAllElements('w:proofErr'),
           ...document.findAllElements('w:noProof'),
         ];
         for (var node in proofNodes) {
           node.parent?.children.remove(node);
+        }
+
+        // 3. Normalize Runs: Join adjacent runs with identical properties
+        for (var p in document.findAllElements('w:p')) {
+          final runs = p.findElements('w:r').toList();
+          for (int j = 0; j < runs.length - 1; j++) {
+            final r1 = runs[j];
+            final r2 = runs[j + 1];
+
+            // Only join if both are "simple" runs (only rPr and t)
+            final r1Simple = r1.children.every((c) =>
+                c is xml.XmlElement &&
+                (c.name.local == 'rPr' || c.name.local == 't'));
+            final r2Simple = r2.children.every((c) =>
+                c is xml.XmlElement &&
+                (c.name.local == 'rPr' || c.name.local == 't'));
+
+            if (!r1Simple || !r2Simple) continue;
+
+            final rPr1 = r1.getElement('w:rPr')?.toXmlString() ?? '';
+            final rPr2 = r2.getElement('w:rPr')?.toXmlString() ?? '';
+
+            final t1 = r1.getElement('w:t');
+            final t2 = r2.getElement('w:t');
+
+            if (rPr1 == rPr2 && t1 != null && t2 != null) {
+              // Merge t2 into t1
+              t1.innerText = t1.innerText + t2.innerText;
+              if (t1.innerText.startsWith(' ') || t1.innerText.endsWith(' ')) {
+                t1.setAttribute('xml:space', 'preserve');
+              }
+              // Remove r2
+              r2.parent?.children.remove(r2);
+              // Update list and index to re-check the merged run
+              runs.removeAt(j + 1);
+              j--;
+            }
+          }
         }
 
         // --- STEP 1: Process Paragraphs ---

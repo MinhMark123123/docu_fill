@@ -147,10 +147,10 @@ class ConfigureViewModel extends BaseViewModel {
     checkEnableConfirm();
   }
 
-  void applySelectedSettings(
+  Future<void> applySelectedSettings(
     List<TemplateField> selectedFields,
     String oldTemplateName,
-  ) {
+  ) async {
     final currentFields = List<TableRowData>.from(_fieldsData.data);
 
     for (var selected in selectedFields) {
@@ -169,7 +169,8 @@ class ConfigureViewModel extends BaseViewModel {
         );
       }
     }
-
+    _fieldsData.postValue([]);
+    await Future.delayed(Duration(milliseconds: 500));
     _fieldsData.postValue(currentFields);
 
     if (_nameController.text.isEmpty) {
@@ -431,7 +432,7 @@ class ConfigureViewModel extends BaseViewModel {
     if (!accepted || !context.mounted) return;
 
     final current = await _templateRepository.getTemplateById(_idEdit);
-    if (current == null) return;
+    if (current == null || !context.mounted) return;
 
     final result = await showSimpleLoadingDialog(
       context: context,

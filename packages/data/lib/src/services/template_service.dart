@@ -87,65 +87,53 @@ class TemplateService {
 
   /// Sentinel key used to mark fields that are shared across all templates.
   static const String commonSectionKey = '__common__';
+  static const String unspecified = '__unspecified__';
 
   /// Groups template fields by their [TemplateField.section] value.
-  Map<String?, List<TemplateField>> groupFields(
-    List<TemplateConfig> templates,
-  ) {
+  Map<String, List<TemplateField>> groupFields(List<TemplateConfig> templates) {
     if (templates.isEmpty) return {};
 
-    final groupedData = <String?, List<TemplateField>>{};
-
-    // 1. Identify common fields (only if multiple templates)
-    Set<String> commonKeys = {};
-    if (templates.length > 1) {
-      final allFieldKeys = templates.expand((t) => t.fields.map((f) => f.key));
-      final keyFrequency = allFieldKeys.fold(<String, int>{}, (map, key) {
-        map[key] = (map[key] ?? 0) + 1;
-        return map;
-      });
-      commonKeys =
-          keyFrequency.entries
-              .where((e) => e.value == templates.length)
-              .map((e) => e.key)
-              .toSet();
-
-      if (commonKeys.isNotEmpty) {
-        groupedData[commonSectionKey] = [];
-      }
-    }
-
-    // 2. Identify unique fields across all templates with priority rule
-    // Priority: Prefer field with a non-empty section over one without.
+    final int n = templates.length;
     final Map<String, TemplateField> uniqueFieldsMap = {};
+    final Map<String, int> templateAppearanceCount = {};
+
     for (var template in templates) {
+      // 1. Count which templates each key appears in (unique templates per key)
+      final Set<String> keysInThisTemplate =
+          template.fields.map((f) => f.key).toSet();
+      for (final key in keysInThisTemplate) {
+        templateAppearanceCount[key] = (templateAppearanceCount[key] ?? 0) + 1;
+      }
+
+      // 2. Pick the "best" field instance for each unique key
       for (var field in template.fields) {
         final existing = uniqueFieldsMap[field.key];
-        if (existing == null) {
+        final currentHasSection = field.section?.isNotEmpty == true;
+
+        // Priority: Field with section > Field without section.
+        if (existing == null ||
+            (existing.section?.isNotEmpty != true && currentHasSection)) {
           uniqueFieldsMap[field.key] = field;
-        } else {
-          final existingHasSection =
-              existing.section?.trim().isNotEmpty == true;
-          final currentHasSection = field.section?.trim().isNotEmpty == true;
-          // If current field has a section and existing one doesn't, use current.
-          if (!existingHasSection && currentHasSection) {
-            uniqueFieldsMap[field.key] = field;
-          }
         }
       }
     }
 
-    // 3. Group the unique/prioritized fields
-    for (var field in uniqueFieldsMap.values) {
-      if (commonKeys.contains(field.key)) {
-        groupedData[commonSectionKey]!.add(field);
-        continue;
+    // 3. Grouping phase
+    final Map<String, List<TemplateField>> groupedData = {};
+
+    for (final field in uniqueFieldsMap.values) {
+      final String groupKey;
+      if (field.section?.isNotEmpty == true) {
+        groupKey = field.section!;
+      } else {
+        // Logic: All templates -> common, Partial -> unspecified
+        groupKey =
+            (templateAppearanceCount[field.key] == n && n > 1)
+                ? commonSectionKey
+                : unspecified;
       }
 
-      // field.section is null when no section was configured
-      final sectionKey =
-          field.section?.trim().isEmpty == true ? null : field.section;
-      groupedData.putIfAbsent(sectionKey, () => []).add(field);
+      groupedData.putIfAbsent(groupKey, () => []).add(field);
     }
 
     return groupedData;
@@ -216,7 +204,6 @@ class TemplateService {
           composedUI: composedUI,
           fieldKeys: fieldKeysForImages,
         );
-
         rawBytes = await DocxUtils.composeModifiedDocxWithPlaceholders(
           originalBytes: originalBytes,
           replacements: processedFieldKeys,
