@@ -1,17 +1,16 @@
-import 'package:localization/localization.dart';
-import 'package:data/data.dart';
 import 'package:docu_fill/features/src/configure/model/table_row_data.dart';
 import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:design/ui.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
-class CellDefaultValue extends StatelessWidget {
+class CellAdditionalInfo extends StatelessWidget {
   final TableRowData data;
   final bool isReadOnly;
   final Function(String)? onChanged;
 
-  const CellDefaultValue({
+  const CellAdditionalInfo({
     super.key,
     required this.data,
     this.isReadOnly = false,
@@ -20,21 +19,18 @@ class CellDefaultValue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (data.inputType == FieldType.selection) {
-      return SizedBox.shrink();
-    }
     if (isReadOnly) {
       return Text(
-        data.defaultValue ?? "",
+        data.additionalInfo ?? "",
         style: context.textTheme.bodyMedium,
-        maxLines: 1,
+        maxLines: 2,
         overflow: TextOverflow.ellipsis,
       );
     }
     return TextFormField(
-      initialValue: data.defaultValue,
+      initialValue: data.additionalInfo,
       decoration: InputDecoration(
-        labelText: AppLang.labelsDefaultValue.tr(),
+        labelText: AppLang.labelsGeneralInfo.tr(),
         border: const OutlineInputBorder(),
       ),
       onChanged: (value) {
@@ -44,7 +40,7 @@ class CellDefaultValue extends StatelessWidget {
         }
         getViewModel<ConfigureViewModel>().updateField(
           data.fieldKey,
-          (d) => d.copyWith(defaultValue: value),
+          (d) => d.copyWith(additionalInfo: value),
         );
       },
     );

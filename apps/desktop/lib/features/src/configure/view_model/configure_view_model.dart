@@ -14,7 +14,6 @@ import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:simple_loading_dialog/simple_loading_dialog.dart';
 
 part 'configure_view_model.g.dart';
 
@@ -59,6 +58,14 @@ class ConfigureViewModel extends BaseViewModel {
   late final _enableNameTemplate = false.mtd(this);
   @Bind()
   late final _mode = ConfigureMode.addNew.mtd(this);
+  @Bind()
+  late final _searchText = "".mtd(this);
+  @Bind()
+  late final _filteredFields = <TableRowData>[].mtd(this);
+  @Bind()
+  late final _missingLabelFields = <TableRowData>[].mtd(this);
+  @Bind()
+  late final _scrollRequest = "".mtd(this);
 
   int _idEdit = -1;
   Directory? _extractDir;
@@ -67,6 +74,11 @@ class ConfigureViewModel extends BaseViewModel {
   final TextEditingController _nameController = TextEditingController();
 
   TextEditingController get nameController => _nameController;
+
+  StreamData<String> get searchText => _searchText;
+  StreamData<List<TableRowData>> get filteredFields => _filteredFields;
+  StreamData<List<TableRowData>> get missingLabelFields => _missingLabelFields;
+  StreamData<String> get scrollRequest => _scrollRequest;
 
   void setupPath({String? path, required ConfigureMode mode, int? idEdit}) {
     _pathFilePicked = path;
@@ -117,6 +129,7 @@ class ConfigureViewModel extends BaseViewModel {
     );
     _fieldsData.postValue(fields.toList());
     _nameController.text = template.templateName;
+    _updateFilteredFields();
     checkEnableConfirm();
   }
 
@@ -144,6 +157,7 @@ class ConfigureViewModel extends BaseViewModel {
     }
     _fieldsData.postValue(fieldsClone);
     _nameController.text = template.templateName;
+    _updateFilteredFields();
     checkEnableConfirm();
   }
 
@@ -176,7 +190,7 @@ class ConfigureViewModel extends BaseViewModel {
     if (_nameController.text.isEmpty) {
       _nameController.text = oldTemplateName;
     }
-
+    _updateFilteredFields();
     checkEnableConfirm();
   }
 
@@ -222,6 +236,7 @@ class ConfigureViewModel extends BaseViewModel {
     final fields = config.fields.map((e) => TableRowData.fromTemplateField(e));
     _fieldsData.postValue(fields.toList());
     _pathFilePicked = docPath;
+    _updateFilteredFields();
     checkEnableConfirm();
   }
 
@@ -255,6 +270,8 @@ class ConfigureViewModel extends BaseViewModel {
       return TableRowData(fieldKey: AppConst.composeKey(key: key));
     });
     _fieldsData.postValue(fields.toList());
+    _updateFilteredFields();
+    checkEnableConfirm();
   }
 
   TableRowData fieldOfKey(String key) {
@@ -271,21 +288,27 @@ class ConfigureViewModel extends BaseViewModel {
     final current = _fieldsData.data[index];
     final updated = removeUselessInput(newData: update(current));
     _fieldsData.data[index] = updated;
-
+    print("update $key and ${updated.defaultValue}");
     _fieldsData.postValue(List.from(_fieldsData.data));
+    _updateFilteredFields();
     await checkEnableConfirm();
   }
 
   TableRowData removeUselessInput({required TableRowData newData}) {
-    final raw = newData.copyWith();
-    final inputType = raw.inputType;
+    if (newData.fieldName?.trim().isEmpty ?? false) newData.fieldName = null;
+    if (newData.section?.trim().isEmpty ?? false) newData.section = null;
+    if (newData.defaultValue?.trim().isEmpty ?? false) newData.defaultValue = null;
+    if (newData.description?.trim().isEmpty ?? false) newData.description = null;
+    if (newData.additionalInfo?.trim().isEmpty ?? false) newData.additionalInfo = null;
+
+    final inputType = newData.inputType;
     if (!inputType.isSelection) {
-      raw.options = null;
+      newData.options = null;
     }
     if (inputType.isSelection) {
-      raw.defaultValue = "";
+      newData.defaultValue = null;
     }
-    return raw;
+    return newData;
   }
 
   Future<void> checkEnableConfirm() async {
@@ -293,8 +316,37 @@ class ConfigureViewModel extends BaseViewModel {
       final name = e.fieldName;
       return name == null || name.isEmpty;
     });
+
+    final missing = _fieldsData.data.where((e) {
+      final name = e.fieldName;
+      return name == null || name.isEmpty;
+    }).toList();
+    _missingLabelFields.postValue(missing);
+
     _enableNameTemplate.postValue(!hasNameEmpty);
     _enableConfirm.postValue(!hasNameEmpty && _nameController.text.isNotEmpty);
+  }
+
+  void onSearchChanged(String value) {
+    _searchText.postValue(value);
+    _updateFilteredFields();
+  }
+
+  void _updateFilteredFields() {
+    final query = _searchText.data.toLowerCase();
+    if (query.isEmpty) {
+      _filteredFields.postValue(_fieldsData.data);
+      return;
+    }
+    final filtered = _fieldsData.data.where((e) {
+      return e.fieldKey.toLowerCase().contains(query) ||
+          (e.fieldName?.toLowerCase().contains(query) ?? false);
+    }).toList();
+    _filteredFields.postValue(filtered);
+  }
+
+  void scrollToField(String key) {
+    _scrollRequest.postValue(key);
   }
 
   Future<void> confirm(BuildContext context) async {
@@ -307,7 +359,13 @@ class ConfigureViewModel extends BaseViewModel {
     required String name,
     required String path,
   }) {
-    final fields = _fieldsData.data.map((e) => e.toTemplateField()).toList();
+    final fields =
+        _fieldsData.data.map((e) {
+          print(
+            "save generateTemplateConfig ${e.fieldKey} and ${e.defaultValue}",
+          );
+          return e.toTemplateField();
+        }).toList();
     return TemplateConfig(
       templateName: name,
       pathTemplate: path,
@@ -434,10 +492,7 @@ class ConfigureViewModel extends BaseViewModel {
     final current = await _templateRepository.getTemplateById(_idEdit);
     if (current == null || !context.mounted) return;
 
-    final result = await showSimpleLoadingDialog(
-      context: context,
-      future: () => action(current),
-    );
+    final result = await loadingGuard(action(current));
 
     if (result) {
       showSnackbar(AppLang.messagesDocumentSuccessfullyCreate.tr());

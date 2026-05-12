@@ -1,13 +1,15 @@
+import 'package:data/data.dart';
+import 'package:design/ui.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/core/src/events.dart' show ShowDialogEvent;
-import 'package:docu_fill/features/src/configure/configure_desktop_layout.dart';
+import 'package:docu_fill/features/src/configure/components/configure_confirm_box.dart';
+import 'package:docu_fill/features/src/configure/components/configure_header.dart';
+import 'package:docu_fill/features/src/configure/components/configure_table_container.dart';
 import 'package:docu_fill/features/src/configure/components/use_field_selection_dialog.dart';
 import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
-import 'package:data/data.dart';
 
 class ConfigurePage extends BaseView<ConfigureViewModel> {
   final String? path;
@@ -55,7 +57,25 @@ class ConfigurePage extends BaseView<ConfigureViewModel> {
 
   @override
   Widget build(BuildContext context, viewModel) {
-    return const ConfigureDesktopLayout();
+    return Scaffold(
+      backgroundColor: context.colorScheme.surface,
+      body: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: Dimens.size32,
+          vertical: Dimens.size24,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ConfigureHeader(),
+            Dimens.spacing.vertical(Dimens.size32),
+            ConfigureConfirmBox(),
+            Dimens.spacing.vertical(Dimens.size24),
+            Expanded(child: ConfigureTableContainer()),
+          ],
+        ),
+      ),
+    );
   }
 
   @override

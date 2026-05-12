@@ -145,9 +145,6 @@ class FieldsInputViewModel extends BaseViewModel {
   Map<String, List<TemplateField>> _localizeRawData(
     Map<String?, List<TemplateField>> rawData,
   ) {
-    final hasNamedSections = rawData.keys.any(
-      (k) => k != null && k != TemplateService.commonSectionKey,
-    );
     final localized = <String, List<TemplateField>>{};
     for (final entry in rawData.entries) {
       final isCommonKey = entry.key == TemplateService.commonSectionKey;

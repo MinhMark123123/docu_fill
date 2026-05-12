@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:data/data.dart';
 import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/configure/components/cell_default_value.dart';
@@ -5,8 +7,11 @@ import 'package:docu_fill/features/src/configure/model/table_row_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:localization/localization.dart';
+import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 import 'package:two_dimensional_scrollables/two_dimensional_scrollables.dart';
 
+import '../view_model/configure_view_model.dart';
+import 'cell_additional_info.dart';
 import 'cell_field_description.dart';
 import 'cell_field_input.dart';
 import 'cell_field_key.dart';
@@ -14,6 +19,7 @@ import 'cell_field_name.dart';
 import 'cell_field_options.dart';
 import 'cell_field_required.dart';
 import 'cell_field_section.dart';
+import 'configure_edit_dialog.dart';
 
 enum TableColumn {
   fieldKey,
@@ -22,6 +28,7 @@ enum TableColumn {
   section,
   inputType,
   description,
+  additionalInfo,
   defaultValue,
   options;
 
@@ -40,8 +47,10 @@ enum TableColumn {
       case 5:
         return TableColumn.description;
       case 6:
-        return TableColumn.defaultValue;
+        return TableColumn.additionalInfo;
       case 7:
+        return TableColumn.defaultValue;
+      case 8:
         return TableColumn.options;
       default:
         return TableColumn.isRequired;
@@ -66,6 +75,8 @@ enum TableColumn {
         return AppLang.labelsDefaultValue.tr();
       case TableColumn.description:
         return AppLang.labelsPrompt.tr();
+      case TableColumn.additionalInfo:
+        return AppLang.labelsGeneralInfo.tr();
     }
   }
 
@@ -85,32 +96,43 @@ enum TableColumn {
       case TableColumn.fieldKey:
         return cellBox(child: CellFieldKey(data: data), alignment: alignment);
       case TableColumn.fieldName:
-        return cellBox(child: CellFieldName(data: data), alignment: alignment);
+        return cellBox(
+          child: CellFieldName(data: data, isReadOnly: true),
+          alignment: alignment,
+        );
       case TableColumn.section:
         return cellBox(
-          child: CellFieldSection(data: data),
+          child: CellFieldSection(data: data, isReadOnly: true),
           alignment: alignment,
         );
       case TableColumn.inputType:
-        return cellBox(child: CellFieldInput(data: data), alignment: alignment);
+        return cellBox(
+          child: CellFieldInput(data: data, isReadOnly: true),
+          alignment: alignment,
+        );
       case TableColumn.options:
         return cellBox(
-          child: CellFieldOptions(data: data),
+          child: CellFieldOptions(data: data, isReadOnly: true),
           alignment: alignment,
         );
       case TableColumn.isRequired:
         return cellBox(
-          child: CellFieldRequired(data: data),
+          child: CellFieldRequired(data: data, isReadOnly: true),
           alignment: alignment,
         );
       case TableColumn.defaultValue:
         return cellBox(
-          child: CellDefaultValue(data: data),
+          child: CellDefaultValue(data: data, isReadOnly: true),
           alignment: alignment,
         );
       case TableColumn.description:
         return cellBox(
-          child: CellFieldDescription(data: data),
+          child: CellFieldDescription(data: data, isReadOnly: true),
+          alignment: alignment,
+        );
+      case TableColumn.additionalInfo:
+        return cellBox(
+          child: CellAdditionalInfo(data: data, isReadOnly: true),
           alignment: alignment,
         );
     }
@@ -139,6 +161,8 @@ class CustomScrollableTable extends StatefulWidget {
 
 class _CustomScrollableTableState extends State<CustomScrollableTable> {
   final ScrollController _horizontalController = ScrollController();
+  final ScrollController _verticalController = ScrollController();
+  int? _hoveredRowIndex;
 
   final List<TableSpanExtent> columnWidths = [
     FixedSpanExtent(200), // fieldKey
@@ -147,13 +171,42 @@ class _CustomScrollableTableState extends State<CustomScrollableTable> {
     FixedSpanExtent(200), // section
     FixedSpanExtent(180), // inputType
     FixedSpanExtent(300), // description
+    FixedSpanExtent(250), // additionalInfo
     FixedSpanExtent(250), // defaultValue
     FixedSpanExtent(300), // options
   ];
 
+  StreamSubscription<String>? _scrollSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollSub = getViewModel<ConfigureViewModel>().scrollRequest
+        .asStream()
+        .listen((key) {
+          if (key.isEmpty) return;
+          final index = widget.data.indexWhere((e) => e.fieldKey == key);
+          if (index != -1) {
+            _scrollToRow(index);
+          }
+        });
+  }
+
+  void _scrollToRow(int index) {
+    const rowHeight = 60.0; // Using fixed height for simplicity
+    final targetOffset = index * rowHeight;
+    _verticalController.animateTo(
+      targetOffset,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   void dispose() {
     _horizontalController.dispose();
+    _verticalController.dispose();
+    _scrollSub?.cancel();
     super.dispose();
   }
 
@@ -165,8 +218,9 @@ class _CustomScrollableTableState extends State<CustomScrollableTable> {
       trackVisibility: true,
       scrollbarOrientation: ScrollbarOrientation.bottom,
       child: TableView.builder(
-        verticalDetails: const ScrollableDetails.vertical(
-          physics: ClampingScrollPhysics(),
+        verticalDetails: ScrollableDetails.vertical(
+          controller: _verticalController,
+          physics: const ClampingScrollPhysics(),
         ),
         horizontalDetails: ScrollableDetails.horizontal(
           controller: _horizontalController,
@@ -184,15 +238,33 @@ class _CustomScrollableTableState extends State<CustomScrollableTable> {
 
   TableViewCell _buildCell(BuildContext context, TableVicinity vicinity) {
     final isHeader = vicinity.row == 0;
+    final rowData =
+        (widget.data.isEmpty || isHeader)
+            ? null
+            : widget.data[vicinity.row - 1];
+
     return TableViewCell(
-      child: TableColumn.from(vicinity).buildChild(
-        context,
-        vicinity: vicinity,
-        data:
-            (widget.data.isEmpty || isHeader)
-                ? null
-                : widget.data[vicinity.row - 1],
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hoveredRowIndex = vicinity.row),
+        onExit: (_) => setState(() => _hoveredRowIndex = null),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap:
+              isHeader || rowData == null
+                  ? null
+                  : () => _showEditDialog(context, rowData),
+          child: TableColumn.from(
+            vicinity,
+          ).buildChild(context, vicinity: vicinity, data: rowData),
+        ),
       ),
+    );
+  }
+
+  void _showEditDialog(BuildContext context, TableRowData data) {
+    showDialog(
+      context: context,
+      builder: (context) => ConfigureEditDialog(data: data),
     );
   }
 
@@ -213,23 +285,22 @@ class _CustomScrollableTableState extends State<CustomScrollableTable> {
 
   TableSpan _buildRowSpan(BuildContext context, int index) {
     final isHeader = index == 0;
-    double extent = isHeader ? Dimens.size46 : Dimens.size72;
+    const double rowHeight = 60.0;
+    double extent = isHeader ? Dimens.size46 : rowHeight;
 
-    if (!isHeader && widget.data.isNotEmpty) {
-      final rowData = widget.data[index - 1];
-      if (rowData.inputType == FieldType.selection) {
-        final optionsCount = rowData.options?.length ?? 1;
-        final calculatedHeight =
-            (optionsCount * (Dimens.size40 + Dimens.size12)) +
-            Dimens.size48 +
-            Dimens.size40;
-        if (calculatedHeight > extent) {
-          extent = calculatedHeight;
-        }
-      }
-    }
+    final Color backgroundColor =
+        isHeader
+            ? context.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5)
+            : (_hoveredRowIndex == index
+                ? context.colorScheme.primaryContainer.withValues(alpha: 0.2)
+                : (index % 2 == 0
+                    ? context.colorScheme.inversePrimary.withValues(alpha: 0.15)
+                    : context.colorScheme.surfaceContainerHighest.withValues(
+                      alpha: 0.1,
+                    )));
 
     return TableSpan(
+      backgroundDecoration: TableSpanDecoration(color: backgroundColor),
       foregroundDecoration: TableSpanDecoration(
         border: TableSpanBorder(
           leading: isHeader ? borderSideDecoration(context) : BorderSide.none,
