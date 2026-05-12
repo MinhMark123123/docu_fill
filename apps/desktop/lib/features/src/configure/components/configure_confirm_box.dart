@@ -16,20 +16,28 @@ class ConfigureConfirmBox extends StatelessWidget {
         color: context.colorScheme.surfaceContainerLow,
         borderRadius: Dimens.radii.borderLarge(),
         border: Border.all(
-          color: context.colorScheme.outlineVariant.withOpacity(0.5),
+          color: context.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
-      child: StreamDataConsumer(
-        streamData: viewModel.mode,
-        builder: (context, mode) {
-          switch (mode) {
-            case ConfigureMode.addNew:
-            case ConfigureMode.importSetting:
-              return const _AddNewConfirm();
-            case ConfigureMode.edit:
-              return const _EditConfirm();
-          }
-        },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          StreamDataConsumer(
+            streamData: viewModel.mode,
+            builder: (context, mode) {
+              switch (mode) {
+                case ConfigureMode.addNew:
+                case ConfigureMode.importSetting:
+                  return const _AddNewConfirm();
+                case ConfigureMode.edit:
+                  return const _EditConfirm();
+              }
+            },
+          ),
+          const _MissingLabelsBanner(),
+          Dimens.spacing.vertical(Dimens.size16),
+          const _SearchInput(),
+        ],
       ),
     );
   }
@@ -79,6 +87,86 @@ class _EditConfirm extends StatelessWidget {
         Dimens.spacing.horizontal(Dimens.size16),
         _ActionButtons(viewModel: viewModel),
       ],
+    );
+  }
+}
+
+class _SearchInput extends StatelessWidget {
+  const _SearchInput();
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = getViewModel<ConfigureViewModel>();
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            onChanged: viewModel.onSearchChanged,
+            decoration: InputDecoration(
+              hintText: "Search fields...",
+              prefixIcon: const Icon(Icons.search),
+              isDense: true,
+              border: OutlineInputBorder(
+                borderRadius: Dimens.radii.borderMedium(),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MissingLabelsBanner extends StatelessWidget {
+  const _MissingLabelsBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = getViewModel<ConfigureViewModel>();
+    return StreamDataConsumer(
+      streamData: viewModel.missingLabelFields,
+      builder: (context, data) {
+        if (data.isEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: EdgeInsets.only(top: Dimens.size16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: context.colorScheme.error, size: 18),
+                  Dimens.spacing.horizontal(Dimens.size8),
+                  Text(
+                    "Missing Labels for Fields:",
+                    style: context.textTheme.labelMedium?.copyWith(
+                      color: context.colorScheme.error,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              Dimens.spacing.vertical(Dimens.size8),
+              SizedBox(
+                height: 40,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: data.length,
+                  separatorBuilder: (context, index) => Dimens.spacing.horizontal(Dimens.size8),
+                  itemBuilder: (context, index) {
+                    final field = data[index];
+                    return ActionChip(
+                      label: Text(field.fieldKey, style: context.textTheme.labelSmall),
+                      backgroundColor: context.colorScheme.errorContainer.withValues(alpha: 0.3),
+                      side: BorderSide(color: context.colorScheme.error.withValues(alpha: 0.5)),
+                      onPressed: () => viewModel.scrollToField(field.fieldKey),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

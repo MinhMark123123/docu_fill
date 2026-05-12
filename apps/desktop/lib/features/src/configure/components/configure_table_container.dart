@@ -20,7 +20,7 @@ class ConfigureTableContainer extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: StreamDataConsumer(
-        streamData: viewModel.fieldsData,
+        streamData: viewModel.filteredFields,
         builder: (context, data) {
           return CustomScrollableTable(data: data);
         },

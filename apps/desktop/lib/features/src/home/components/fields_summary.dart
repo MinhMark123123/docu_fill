@@ -14,21 +14,27 @@ class FieldsSummary extends StatelessWidget {
     final viewModel = getViewModel<FieldsInputViewModel>();
 
     return StreamDataConsumer(
-      streamData: viewModel.composedTemplateUI,
-      builder: (context, data) {
-        return SingleChildScrollView(
-          padding: EdgeInsets.all(Dimens.size32),
-          child: Column(
-            spacing: Dimens.size16,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _SummaryHeader(),
-              const _ExportButton(),
-              ...data.entries.map((entry) => _SummarySection(entry: entry)),
-              Dimens.spacing.vertical(Dimens.size40),
-              const FieldsNavigationButtons(),
-            ],
-          ),
+      streamData: viewModel.missingKeys,
+      builder: (context, missingKeys) {
+        return StreamDataConsumer(
+          streamData: viewModel.composedTemplateUI,
+          builder: (context, data) {
+            if (data.isEmpty) return const SizedBox.shrink();
+            return SingleChildScrollView(
+              padding: EdgeInsets.all(Dimens.size32),
+              child: Column(
+                spacing: Dimens.size16,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const _SummaryHeader(),
+                  const _ExportButton(),
+                  ...data.entries.map((entry) => _SummarySection(entry: entry)),
+                  Dimens.spacing.vertical(Dimens.size40),
+                  const FieldsNavigationButtons(),
+                ],
+              ),
+            );
+          },
         );
       },
     );
@@ -107,7 +113,6 @@ class _SummarySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = getViewModel<FieldsInputViewModel>();
     final sectionFields = entry.value;
 
     if (sectionFields.isEmpty) return const SizedBox.shrink();
