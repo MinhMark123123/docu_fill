@@ -63,6 +63,12 @@ class DocxUtils {
     final Map<String, (String, Size)> activeImageReplacements =
         imageReplacements != null ? Map.from(imageReplacements) : {};
 
+    // Remove keys that are already in singleLines from the replacements map.
+    // This prevents double-processing where a replacement might clear a placeholder
+    // before the singleLines logic can evaluate it (e.g. for paragraph removal).
+    for (final key in singleLines.keys) {
+      replacements.remove(key);
+    }
     for (final file in originalArchive) {
       if (file.isFile && isValidDocNamePart(file)) {
         final xmlContent = utf8.decode(file.content);
@@ -76,12 +82,13 @@ class DocxUtils {
           'w:rsidDel',
           'w:rsidP',
           'w14:paraId',
-          'w14:textId'
+          'w14:textId',
         ];
         for (var node in document.findAllElements('*')) {
           for (var attrName in attributesToRemove) {
-            node.attributes
-                .removeWhere((attr) => attr.name.toString() == attrName);
+            node.attributes.removeWhere(
+              (attr) => attr.name.toString() == attrName,
+            );
           }
         }
 
@@ -102,12 +109,16 @@ class DocxUtils {
             final r2 = runs[j + 1];
 
             // Only join if both are "simple" runs (only rPr and t)
-            final r1Simple = r1.children.every((c) =>
-                c is xml.XmlElement &&
-                (c.name.local == 'rPr' || c.name.local == 't'));
-            final r2Simple = r2.children.every((c) =>
-                c is xml.XmlElement &&
-                (c.name.local == 'rPr' || c.name.local == 't'));
+            final r1Simple = r1.children.every(
+              (c) =>
+                  c is xml.XmlElement &&
+                  (c.name.local == 'rPr' || c.name.local == 't'),
+            );
+            final r2Simple = r2.children.every(
+              (c) =>
+                  c is xml.XmlElement &&
+                  (c.name.local == 'rPr' || c.name.local == 't'),
+            );
 
             if (!r1Simple || !r2Simple) continue;
 
@@ -154,6 +165,7 @@ class DocxUtils {
           final String originalFullText =
               textNodes.map((t) => t.innerText).join();
           String currentText = originalFullText;
+
           bool textChanged = false;
           bool paragraphRemoved = false;
 
