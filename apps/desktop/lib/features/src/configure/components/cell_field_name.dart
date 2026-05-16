@@ -1,8 +1,8 @@
+import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/configure/model/table_row_data.dart';
 import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
-import 'package:design/ui.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
 class CellFieldName extends StatelessWidget {

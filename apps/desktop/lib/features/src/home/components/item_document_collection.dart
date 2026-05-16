@@ -1,7 +1,7 @@
-import 'package:localization/localization.dart';
 import 'package:core/core.dart';
 import 'package:design/ui.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 
 class ItemDocumentCollection extends StatelessWidget {
   final String id;
@@ -25,12 +25,12 @@ class ItemDocumentCollection extends StatelessWidget {
   Widget build(BuildContext context) {
     final bgColor =
         isSelected
-            ? context.colorScheme.primary.withOpacity(0.08)
+            ? context.colorScheme.primary.withValues(alpha: 0.08)
             : Colors.transparent;
     final borderColor =
         isSelected
-            ? context.colorScheme.primary.withOpacity(0.5)
-            : context.colorScheme.outlineVariant.withOpacity(0.5);
+            ? context.colorScheme.primary.withValues(alpha: 0.5)
+            : context.colorScheme.outlineVariant.withValues(alpha: 0.5);
     final textColor =
         isSelected
             ? context.colorScheme.primary
@@ -42,9 +42,9 @@ class ItemDocumentCollection extends StatelessWidget {
         vertical: Dimens.size4,
       ),
       decoration: BoxDecoration(
-        color: bgColor,
+        //color: bgColor,
         borderRadius: Dimens.radii.borderMedium(),
-        border: Border.all(color: borderColor, width: isSelected ? 1.5 : 1),
+        border: Border.all(color: borderColor, width: isSelected ? 2 : 1),
       ),
       child: ListTile(
         shape: RoundedRectangleBorder(

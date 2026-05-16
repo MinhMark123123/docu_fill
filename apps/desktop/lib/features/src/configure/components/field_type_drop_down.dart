@@ -110,6 +110,7 @@ class _EnumDropdownButtonState extends State<EnumDropdownButton> {
   Widget _buildButtonChild(BuildContext context, double width) {
     return Container(
       width: width,
+      alignment: Alignment(0, 0),
       padding: EdgeInsets.symmetric(
         horizontal: Dimens.size16,
         vertical: Dimens.size10,
