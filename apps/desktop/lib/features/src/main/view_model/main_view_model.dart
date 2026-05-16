@@ -21,6 +21,13 @@ class MainViewModel extends BaseViewModel {
     _currentMenu.postValue(menu);
     navigatePage(menu.pathRoute);
   }
+
+  void syncMenu(Uri uri) {
+    final menu = MainDesktopMenu.fromUri(uri);
+    if (_currentMenu.data != menu) {
+      _currentMenu.postValue(menu);
+    }
+  }
 }
 
 enum MainDesktopMenu {
@@ -79,5 +86,19 @@ enum MainDesktopMenu {
       case MainDesktopMenu.setting:
         return RoutesPath.setting;
     }
+  }
+
+  static MainDesktopMenu fromUri(Uri uri) {
+    final path = uri.path;
+    if (path.startsWith(RoutesPath.homeUpload)) return MainDesktopMenu.upload;
+    if (path.startsWith(RoutesPath.homeConfigure)) {
+      final mode = uri.queryParameters['mode'];
+      if (mode == 'edit') return MainDesktopMenu.template;
+      return MainDesktopMenu.upload;
+    }
+    if (path.startsWith(RoutesPath.tool)) return MainDesktopMenu.tools;
+    if (path.startsWith(RoutesPath.setting)) return MainDesktopMenu.setting;
+    if (path.startsWith(RoutesPath.home)) return MainDesktopMenu.template;
+    return MainDesktopMenu.template;
   }
 }

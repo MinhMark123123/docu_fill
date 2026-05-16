@@ -4,14 +4,17 @@ import 'package:docu_fill/features/page.dart';
 import 'package:docu_fill/features/src/main/view_model/main_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
+import 'package:go_router/go_router.dart';
 
 class MainPage extends BaseView<MainViewModel> {
   final Widget child;
+  final GoRouterState state;
 
-  const MainPage({super.key, required this.child});
+  const MainPage({super.key, required this.child, required this.state});
 
   @override
   Widget build(BuildContext context, MainViewModel viewModel) {
+    viewModel.syncMenu(state.uri);
     return Scaffold(
       body: Row(
         children: [
@@ -63,9 +66,5 @@ class MainPage extends BaseView<MainViewModel> {
         ],
       ),
     );
-  }
-
-  Widget body() {
-    return const Placeholder();
   }
 }

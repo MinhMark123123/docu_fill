@@ -1,3 +1,4 @@
+import 'package:data/data.dart';
 import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/configure/components/cell_additional_info.dart';
 import 'package:docu_fill/features/src/configure/components/cell_default_value.dart';
@@ -33,25 +34,18 @@ class _ConfigureEditDialogState extends State<ConfigureEditDialog> {
     _tempData = widget.data.copyWith();
   }
 
+  void _onConfirm() {
+    getViewModel<ConfigureViewModel>().updateField(
+      widget.data.fieldKey,
+      (d) => _tempData,
+    );
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Row(
-        children: [
-          Icon(Icons.edit, color: context.colorScheme.primary),
-          Dimens.spacing.horizontal(Dimens.size12),
-          Expanded(
-            child: Text(
-              AppLang.labelsConfigureTemplateFields.tr(),
-              style: context.textTheme.titleLarge,
-            ),
-          ),
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.close),
-          ),
-        ],
-      ),
+      title: _DialogHeader(onClose: () => Navigator.pop(context)),
       content: SizedBox(
         width: 600,
         child: SingleChildScrollView(
@@ -59,146 +53,127 @@ class _ConfigureEditDialogState extends State<ConfigureEditDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: _buildSection(
-                      context,
-                      AppLang.labelsFieldKey.tr(),
-                      CellFieldKey(data: _tempData),
-                    ),
+              _KeyAndRequiredRow(
+                data: _tempData,
+                onRequiredChanged:
+                    (value) => setState(() {
+                      _tempData = _tempData.copyWith(
+                        isRequired: value ?? false,
+                      );
+                    }),
+              ),
+              _DialogSection(
+                label: AppLang.labelsFieldName.tr(),
+                child: CellFieldName(
+                  data: _tempData,
+                  onChanged:
+                      (value) => setState(() {
+                        _tempData.fieldName =
+                            value.trim().isEmpty ? null : value;
+                      }),
+                ),
+              ),
+              _DialogSection(
+                label: AppLang.labelsSection.tr(),
+                child: CellFieldSection(
+                  data: _tempData,
+                  onChanged:
+                      (value) => setState(() {
+                        _tempData.section = value.trim().isEmpty ? null : value;
+                      }),
+                ),
+              ),
+              _DialogSection(
+                label: AppLang.labelsInputType.tr(),
+                child: CellFieldInput(
+                  data: _tempData,
+                  onChanged:
+                      (value) => setState(() {
+                        _tempData = _tempData.copyWith(inputType: value);
+                      }),
+                ),
+              ),
+              if (_tempData.inputType == FieldType.selection)
+                _DialogSection(
+                  label: AppLang.labelsOptions.tr(),
+                  child: CellFieldOptions(
+                    data: _tempData,
+                    onChanged: (updated) => setState(() => _tempData = updated),
                   ),
-                  Dimens.spacing.horizontal(Dimens.size16),
-                  Expanded(
-                    child: _buildSection(
-                      context,
-                      AppLang.labelsRequired.tr(),
-                      CellFieldRequired(
-                        data: _tempData,
-                        onChanged: (value) {
-                          setState(() {
-                            _tempData = _tempData.copyWith(
-                              isRequired: value ?? false,
-                            );
-                          });
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              _buildSection(
-                context,
-                AppLang.labelsFieldName.tr(),
-                CellFieldName(
+                ),
+              _DialogSection(
+                label: AppLang.labelsDefaultValue.tr(),
+                child: CellDefaultValue(
                   data: _tempData,
-                onChanged: (value) {
-                  setState(() {
-                    _tempData.fieldName = value.trim().isEmpty ? null : value;
-                  });
-                },
+                  onChanged:
+                      (value) => setState(() {
+                        _tempData.defaultValue =
+                            value.trim().isEmpty ? null : value;
+                      }),
                 ),
               ),
-              _buildSection(
-                context,
-                AppLang.labelsSection.tr(),
-                CellFieldSection(
+              _DialogSection(
+                label: AppLang.labelsPrompt.tr(),
+                child: CellFieldDescription(
                   data: _tempData,
-                onChanged: (value) {
-                  setState(() {
-                    _tempData.section = value.trim().isEmpty ? null : value;
-                  });
-                },
+                  onChanged:
+                      (value) => setState(() {
+                        _tempData.description =
+                            value.trim().isEmpty ? null : value;
+                      }),
                 ),
               ),
-              _buildSection(
-                context,
-                AppLang.labelsInputType.tr(),
-                CellFieldInput(
+              _DialogSection(
+                label: AppLang.labelsGeneralInfo.tr(),
+                child: CellAdditionalInfo(
                   data: _tempData,
-                  onChanged: (value) {
-                    setState(() {
-                      _tempData = _tempData.copyWith(inputType: value);
-                    });
-                  },
-                ),
-              ),
-              _buildSection(
-                context,
-                AppLang.labelsOptions.tr(),
-                CellFieldOptions(
-                  data: _tempData,
-                  onChanged: (updated) {
-                    setState(() {
-                      _tempData = updated;
-                    });
-                  },
-                ),
-              ),
-              _buildSection(
-                context,
-                AppLang.labelsDefaultValue.tr(),
-                CellDefaultValue(
-                  data: _tempData,
-                onChanged: (value) {
-                  setState(() {
-                    _tempData.defaultValue = value.trim().isEmpty ? null : value;
-                  });
-                },
-                ),
-              ),
-              _buildSection(
-                context,
-                AppLang.labelsPrompt.tr(),
-                CellFieldDescription(
-                  data: _tempData,
-                onChanged: (value) {
-                  setState(() {
-                    _tempData.description = value.trim().isEmpty ? null : value;
-                  });
-                },
-                ),
-              ),
-              _buildSection(
-                context,
-                AppLang.labelsGeneralInfo.tr(),
-                CellAdditionalInfo(
-                  data: _tempData,
-                onChanged: (value) {
-                  setState(() {
-                    _tempData.additionalInfo = value.trim().isEmpty ? null : value;
-                  });
-                },
+                  onChanged:
+                      (value) => setState(() {
+                        _tempData.additionalInfo =
+                            value.trim().isEmpty ? null : value;
+                      }),
                 ),
               ),
             ],
           ),
         ),
       ),
-      actions: [
-        ElevatedButton(
-          onPressed: () {
-            getViewModel<ConfigureViewModel>().updateField(
-              widget.data.fieldKey,
-              (d) => _tempData,
-            );
-            Navigator.pop(context);
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: context.colorScheme.primary,
-            foregroundColor: context.colorScheme.onPrimary,
-            shape: RoundedRectangleBorder(
-              borderRadius: Dimens.radii.borderMedium(),
-            ),
+      actions: [_ConfirmButton(onPressed: _onConfirm)],
+    );
+  }
+}
+
+class _DialogHeader extends StatelessWidget {
+  final VoidCallback onClose;
+
+  const _DialogHeader({required this.onClose});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(Icons.edit, color: context.colorScheme.primary),
+        Dimens.spacing.horizontal(Dimens.size12),
+        Expanded(
+          child: Text(
+            AppLang.labelsConfigureTemplateFields.tr(),
+            style: context.textTheme.titleLarge,
           ),
-          child: Text(AppLang.actionsConfirm.tr()),
         ),
+        IconButton(onPressed: onClose, icon: const Icon(Icons.close)),
       ],
     );
   }
+}
 
-  Widget _buildSection(BuildContext context, String label, Widget child) {
+class _DialogSection extends StatelessWidget {
+  final String label;
+  final Widget child;
+
+  const _DialogSection({required this.label, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(bottom: Dimens.size20),
       child: Column(
@@ -215,6 +190,59 @@ class _ConfigureEditDialogState extends State<ConfigureEditDialog> {
           child,
         ],
       ),
+    );
+  }
+}
+
+class _KeyAndRequiredRow extends StatelessWidget {
+  final TableRowData data;
+  final ValueChanged<bool?> onRequiredChanged;
+
+  const _KeyAndRequiredRow({
+    required this.data,
+    required this.onRequiredChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: _DialogSection(
+            label: AppLang.labelsFieldKey.tr(),
+            child: CellFieldKey(data: data),
+          ),
+        ),
+        Dimens.spacing.horizontal(Dimens.size16),
+        Expanded(
+          child: _DialogSection(
+            label: AppLang.labelsRequired.tr(),
+            child: CellFieldRequired(data: data, onChanged: onRequiredChanged),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ConfirmButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _ConfirmButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: context.colorScheme.primary,
+        foregroundColor: context.colorScheme.onPrimary,
+        shape: RoundedRectangleBorder(
+          borderRadius: Dimens.radii.borderMedium(),
+        ),
+      ),
+      child: Text(AppLang.actionsConfirm.tr()),
     );
   }
 }

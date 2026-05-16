@@ -19,7 +19,7 @@ final GoRouter router = GoRouter(
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
       builder: (BuildContext context, GoRouterState state, Widget child) {
-        return MainPage(child: child);
+        return MainPage(child: child, state: state);
       },
       routes: <RouteBase>[
         GoRoute(

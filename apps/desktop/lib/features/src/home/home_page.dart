@@ -1,7 +1,8 @@
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/features/src/home/view_model/home_view_model.dart';
-import 'package:docu_fill/features/src/home/home_layout_desktop.dart';
 import 'package:flutter/material.dart';
+
+import 'components/templates_collection.dart';
 
 class HomePage extends BaseView<HomeViewModel> {
   final Widget detailChild;
@@ -10,6 +11,13 @@ class HomePage extends BaseView<HomeViewModel> {
 
   @override
   Widget build(BuildContext context, HomeViewModel viewModel) {
-    return HomeLayoutDesktop(detailChild: detailChild);
+    return Scaffold(
+      body: Row(
+        children: [
+          Expanded(flex: 1, child: TemplatesCollection()),
+          Expanded(flex: 4, child: detailChild),
+        ],
+      ),
+    );
   }
 }

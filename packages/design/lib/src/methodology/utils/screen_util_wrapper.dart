@@ -1,7 +1,8 @@
 // ui/src/core/utils/screen_util_wrapper.dart (or chosen location)
-import 'context_extension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'context_extension.dart';
 
 class ScreenUtilWrapper extends StatelessWidget {
   final Widget Function(BuildContext, Widget?)? builder;
@@ -29,9 +30,9 @@ class ScreenUtilWrapper extends StatelessWidget {
       minTextAdapt: true,
       // Optional: Adapt text size
       splitScreenMode: true,
-      // enableScaleText: () => !isTabletOrLarger,
+      enableScaleText: () => !isTabletOrLarger,
       // Disable text scaling on tablets
-      // enableScaleWH: () => !isTabletOrLarger,
+      enableScaleWH: () => !isTabletOrLarger,
       // Disable width/height scaling on tablets
       builder: builder,
       // child: child, // The rest of your app

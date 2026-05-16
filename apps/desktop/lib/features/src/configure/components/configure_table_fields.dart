@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:data/data.dart';
 import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/configure/components/cell_default_value.dart';
 import 'package:docu_fill/features/src/configure/model/table_row_data.dart';
@@ -89,8 +88,8 @@ enum TableColumn {
       return cellBox(child: Text(labels(), style: context.textTheme.bodySmall));
     }
     if (data == null) return const SizedBox();
-    final alignment =
-        data.inputType == FieldType.selection ? Alignment(-1, -1) : null;
+    final alignment = Alignment(-1, 0);
+    // data.inputType == FieldType.selection ? Alignment(-1, -1) : null;
 
     switch (this) {
       case TableColumn.fieldKey:
@@ -99,6 +98,10 @@ enum TableColumn {
         return cellBox(
           child: CellFieldName(data: data, isReadOnly: true),
           alignment: alignment,
+          padding: EdgeInsets.symmetric(
+            horizontal: Dimens.size16,
+            vertical: Dimens.size8,
+          ),
         );
       case TableColumn.section:
         return cellBox(
@@ -129,6 +132,10 @@ enum TableColumn {
         return cellBox(
           child: CellFieldDescription(data: data, isReadOnly: true),
           alignment: alignment,
+          padding: EdgeInsets.symmetric(
+            horizontal: Dimens.size16,
+            vertical: Dimens.size8,
+          ),
         );
       case TableColumn.additionalInfo:
         return cellBox(
@@ -138,12 +145,18 @@ enum TableColumn {
     }
   }
 
-  Widget cellBox({required Widget child, AlignmentGeometry? alignment}) {
+  Widget cellBox({
+    required Widget child,
+    AlignmentGeometry? alignment,
+    EdgeInsets? padding,
+  }) {
     return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: Dimens.size16,
-        vertical: Dimens.size12,
-      ),
+      padding:
+          padding ??
+          EdgeInsets.symmetric(
+            horizontal: Dimens.size16,
+            vertical: Dimens.size16,
+          ),
       alignment: alignment ?? Alignment(-1, 0),
       child: child,
     );
@@ -285,8 +298,8 @@ class _CustomScrollableTableState extends State<CustomScrollableTable> {
 
   TableSpan _buildRowSpan(BuildContext context, int index) {
     final isHeader = index == 0;
-    const double rowHeight = 60.0;
-    double extent = isHeader ? Dimens.size46 : rowHeight;
+    double rowHeight = Dimens.size66;
+    double extent = isHeader ? Dimens.size60 : rowHeight;
 
     final Color backgroundColor =
         isHeader
