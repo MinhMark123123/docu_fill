@@ -8,11 +8,13 @@ import 'package:image_picker/image_picker.dart';
 
 class ImagePickerWidget extends StatefulWidget {
   final TemplateField imageFiled;
+  final String? initialValue;
   final Function(File?) onImageChanged;
 
   const ImagePickerWidget({
     super.key,
     required this.imageFiled,
+    this.initialValue,
     required this.onImageChanged,
   });
 
@@ -23,6 +25,28 @@ class ImagePickerWidget extends StatefulWidget {
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   File? _image;
   final picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+    _initImage();
+  }
+
+  @override
+  void didUpdateWidget(covariant ImagePickerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue) {
+      _initImage();
+    }
+  }
+
+  void _initImage() {
+    if (widget.initialValue != null && widget.initialValue!.isNotEmpty) {
+      _image = File(widget.initialValue!);
+    } else {
+      _image = null;
+    }
+  }
 
   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);

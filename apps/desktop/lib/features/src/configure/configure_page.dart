@@ -6,6 +6,7 @@ import 'package:docu_fill/features/src/configure/components/configure_confirm_bo
 import 'package:docu_fill/features/src/configure/components/configure_header.dart';
 import 'package:docu_fill/features/src/configure/components/configure_table_container.dart';
 import 'package:docu_fill/features/src/configure/components/use_field_selection_dialog.dart';
+import 'package:docu_fill/features/src/configure/model/configure_mode.dart';
 import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';

@@ -28,21 +28,30 @@ class GeminiModelSelector extends StatelessWidget {
         ),
         Dimens.spacing.vertical(Dimens.size12),
         StreamDataConsumer(
-          streamData: viewModel.selectedModel,
-          builder: (context, String selectedModel) {
-            return DropdownButtonFormField<String>(
-              initialValue: selectedModel,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12),
-              ),
-              onChanged: (String? newValue) => viewModel.onModelSelected(newValue),
-              items: viewModel.availableModels.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
+          streamData: viewModel.availableModels,
+          builder: (context, List<String> availableModels) {
+            return StreamDataConsumer(
+              streamData: viewModel.selectedModel,
+              builder: (context, String selectedModel) {
+                final items = availableModels.contains(selectedModel)
+                    ? availableModels
+                    : [...availableModels, selectedModel];
+
+                return DropdownButtonFormField<String>(
+                  value: items.contains(selectedModel) ? selectedModel : null,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                  onChanged: (String? newValue) => viewModel.onModelSelected(newValue),
+                  items: items.map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
                 );
-              }).toList(),
+              },
             );
           },
         ),

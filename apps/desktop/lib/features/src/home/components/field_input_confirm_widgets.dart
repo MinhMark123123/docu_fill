@@ -1,7 +1,9 @@
 import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:docu_fill/features/src/home/components/ai_result_selector_dialog.dart';
+import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
@@ -22,6 +24,29 @@ class QuickActionsRow extends StatelessWidget {
           ),
         ),
         Dimens.spacing.horizontal(Dimens.size8),
+        StreamDataConsumer(
+          streamData: viewModel.templates,
+          builder: (context, templates) {
+            if (!viewModel.hasImageFields) return const SizedBox.shrink();
+            return _ActionButton(
+              onPressed: () async {
+                final result = await context.push<Map<String, String?>>(
+                  RoutesPath.homeQuickImageInput,
+                  extra: {
+                    'imageFields': viewModel.imageFields,
+                    'currentValues': viewModel.fieldKeys,
+                  },
+                );
+                if (result != null) {
+                  viewModel.applyImageFields(result);
+                }
+              },
+              icon: Icons.photo_library_rounded,
+              label: AppLang.actionsQuickImageInput.tr(),
+              color: context.colorScheme.secondary,
+            );
+          },
+        ),
         _ActionButton(
           onPressed: () => viewModel.useCopy(),
           icon: Icons.content_paste_go,

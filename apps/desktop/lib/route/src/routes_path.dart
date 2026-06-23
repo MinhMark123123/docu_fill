@@ -2,12 +2,14 @@ class RoutesPath {
   RoutesPath._(); // Prevents instantiation
 
   // --- Main Sub-routes ---
+  static const String splash = '/';
   static const String home = '/home'; // Relative to /main
   static const String setting = '/setting'; // Relative to /main
   static const String tool = '/tool'; // Relative to /main
 
   // --- Home Sub-routes ---
   static const String input = 'input'; // Relative to /home/input
+  static const String quickImageInput = 'quick-image-input'; // Relative to /home
 
   // --- Setting Sub-routes ---
   static const String configure = 'configure'; // Relative to /main/configure
@@ -21,6 +23,7 @@ class RoutesPath {
   // This helps avoid manual string concatenation in your navigation calls.
   static const String homeConfigure = '$home/$configure';
   static const String homeUpload = '$home/$upload';
+  static const String homeQuickImageInput = '$home/$quickImageInput';
   static const String settingUpload = '$setting/$upload';
   static const String settingTheme = '$setting/$theme';
 }

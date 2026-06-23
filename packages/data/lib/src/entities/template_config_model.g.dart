@@ -18,24 +18,44 @@ const TemplateConfigModelSchema = CollectionSchema(
   name: r'TemplateConfigModel',
   id: 8002399659655026230,
   properties: {
-    r'fields': PropertySchema(
+    r'createdAt': PropertySchema(
       id: 0,
+      name: r'createdAt',
+      type: IsarType.dateTime,
+    ),
+    r'deletedAt': PropertySchema(
+      id: 1,
+      name: r'deletedAt',
+      type: IsarType.dateTime,
+    ),
+    r'fields': PropertySchema(
+      id: 2,
       name: r'fields',
       type: IsarType.objectList,
 
       target: r'TemplateFieldModel',
     ),
+    r'isDeleted': PropertySchema(
+      id: 3,
+      name: r'isDeleted',
+      type: IsarType.bool,
+    ),
     r'pathTemplate': PropertySchema(
-      id: 1,
+      id: 4,
       name: r'pathTemplate',
       type: IsarType.string,
     ),
     r'templateName': PropertySchema(
-      id: 2,
+      id: 5,
       name: r'templateName',
       type: IsarType.string,
     ),
-    r'version': PropertySchema(id: 3, name: r'version', type: IsarType.string),
+    r'updatedAt': PropertySchema(
+      id: 6,
+      name: r'updatedAt',
+      type: IsarType.dateTime,
+    ),
+    r'version': PropertySchema(id: 7, name: r'version', type: IsarType.string),
   },
 
   estimateSize: _templateConfigModelEstimateSize,
@@ -43,21 +63,7 @@ const TemplateConfigModelSchema = CollectionSchema(
   deserialize: _templateConfigModelDeserialize,
   deserializeProp: _templateConfigModelDeserializeProp,
   idName: r'id',
-  indexes: {
-    r'templateName': IndexSchema(
-      id: -879412639570306553,
-      name: r'templateName',
-      unique: true,
-      replace: true,
-      properties: [
-        IndexPropertySchema(
-          name: r'templateName',
-          type: IndexType.hash,
-          caseSensitive: true,
-        ),
-      ],
-    ),
-  },
+  indexes: {},
   links: {},
   embeddedSchemas: {r'TemplateFieldModel': TemplateFieldModelSchema},
 
@@ -97,15 +103,19 @@ void _templateConfigModelSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
+  writer.writeDateTime(offsets[0], object.createdAt);
+  writer.writeDateTime(offsets[1], object.deletedAt);
   writer.writeObjectList<TemplateFieldModel>(
-    offsets[0],
+    offsets[2],
     allOffsets,
     TemplateFieldModelSchema.serialize,
     object.fields,
   );
-  writer.writeString(offsets[1], object.pathTemplate);
-  writer.writeString(offsets[2], object.templateName);
-  writer.writeString(offsets[3], object.version);
+  writer.writeBool(offsets[3], object.isDeleted);
+  writer.writeString(offsets[4], object.pathTemplate);
+  writer.writeString(offsets[5], object.templateName);
+  writer.writeDateTime(offsets[6], object.updatedAt);
+  writer.writeString(offsets[7], object.version);
 }
 
 TemplateConfigModel _templateConfigModelDeserialize(
@@ -115,18 +125,22 @@ TemplateConfigModel _templateConfigModelDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = TemplateConfigModel(
+    createdAt: reader.readDateTimeOrNull(offsets[0]),
+    deletedAt: reader.readDateTimeOrNull(offsets[1]),
     fields:
         reader.readObjectList<TemplateFieldModel>(
-          offsets[0],
+          offsets[2],
           TemplateFieldModelSchema.deserialize,
           allOffsets,
           TemplateFieldModel(),
         ) ??
         const [],
     id: id,
-    pathTemplate: reader.readStringOrNull(offsets[1]) ?? '',
-    templateName: reader.readStringOrNull(offsets[2]) ?? '',
-    version: reader.readStringOrNull(offsets[3]) ?? '',
+    isDeleted: reader.readBoolOrNull(offsets[3]),
+    pathTemplate: reader.readStringOrNull(offsets[4]) ?? '',
+    templateName: reader.readStringOrNull(offsets[5]) ?? '',
+    updatedAt: reader.readDateTimeOrNull(offsets[6]),
+    version: reader.readStringOrNull(offsets[7]) ?? '',
   );
   return object;
 }
@@ -139,6 +153,10 @@ P _templateConfigModelDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 1:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 2:
       return (reader.readObjectList<TemplateFieldModel>(
                 offset,
                 TemplateFieldModelSchema.deserialize,
@@ -147,11 +165,15 @@ P _templateConfigModelDeserializeProp<P>(
               ) ??
               const [])
           as P;
-    case 1:
-      return (reader.readStringOrNull(offset) ?? '') as P;
-    case 2:
-      return (reader.readStringOrNull(offset) ?? '') as P;
     case 3:
+      return (reader.readBoolOrNull(offset)) as P;
+    case 4:
+      return (reader.readStringOrNull(offset) ?? '') as P;
+    case 5:
+      return (reader.readStringOrNull(offset) ?? '') as P;
+    case 6:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 7:
       return (reader.readStringOrNull(offset) ?? '') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -174,70 +196,6 @@ void _templateConfigModelAttach(
   TemplateConfigModel object,
 ) {
   object.id = id;
-}
-
-extension TemplateConfigModelByIndex on IsarCollection<TemplateConfigModel> {
-  Future<TemplateConfigModel?> getByTemplateName(String templateName) {
-    return getByIndex(r'templateName', [templateName]);
-  }
-
-  TemplateConfigModel? getByTemplateNameSync(String templateName) {
-    return getByIndexSync(r'templateName', [templateName]);
-  }
-
-  Future<bool> deleteByTemplateName(String templateName) {
-    return deleteByIndex(r'templateName', [templateName]);
-  }
-
-  bool deleteByTemplateNameSync(String templateName) {
-    return deleteByIndexSync(r'templateName', [templateName]);
-  }
-
-  Future<List<TemplateConfigModel?>> getAllByTemplateName(
-    List<String> templateNameValues,
-  ) {
-    final values = templateNameValues.map((e) => [e]).toList();
-    return getAllByIndex(r'templateName', values);
-  }
-
-  List<TemplateConfigModel?> getAllByTemplateNameSync(
-    List<String> templateNameValues,
-  ) {
-    final values = templateNameValues.map((e) => [e]).toList();
-    return getAllByIndexSync(r'templateName', values);
-  }
-
-  Future<int> deleteAllByTemplateName(List<String> templateNameValues) {
-    final values = templateNameValues.map((e) => [e]).toList();
-    return deleteAllByIndex(r'templateName', values);
-  }
-
-  int deleteAllByTemplateNameSync(List<String> templateNameValues) {
-    final values = templateNameValues.map((e) => [e]).toList();
-    return deleteAllByIndexSync(r'templateName', values);
-  }
-
-  Future<Id> putByTemplateName(TemplateConfigModel object) {
-    return putByIndex(r'templateName', object);
-  }
-
-  Id putByTemplateNameSync(
-    TemplateConfigModel object, {
-    bool saveLinks = true,
-  }) {
-    return putByIndexSync(r'templateName', object, saveLinks: saveLinks);
-  }
-
-  Future<List<Id>> putAllByTemplateName(List<TemplateConfigModel> objects) {
-    return putAllByIndex(r'templateName', objects);
-  }
-
-  List<Id> putAllByTemplateNameSync(
-    List<TemplateConfigModel> objects, {
-    bool saveLinks = true,
-  }) {
-    return putAllByIndexSync(r'templateName', objects, saveLinks: saveLinks);
-  }
 }
 
 extension TemplateConfigModelQueryWhereSort
@@ -317,61 +275,6 @@ extension TemplateConfigModelQueryWhere
       );
     });
   }
-
-  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterWhereClause>
-  templateNameEqualTo(String templateName) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IndexWhereClause.equalTo(
-          indexName: r'templateName',
-          value: [templateName],
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterWhereClause>
-  templateNameNotEqualTo(String templateName) {
-    return QueryBuilder.apply(this, (query) {
-      if (query.whereSort == Sort.asc) {
-        return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'templateName',
-                lower: [],
-                upper: [templateName],
-                includeUpper: false,
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'templateName',
-                lower: [templateName],
-                includeLower: false,
-                upper: [],
-              ),
-            );
-      } else {
-        return query
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'templateName',
-                lower: [templateName],
-                includeLower: false,
-                upper: [],
-              ),
-            )
-            .addWhereClause(
-              IndexWhereClause.between(
-                indexName: r'templateName',
-                lower: [],
-                upper: [templateName],
-                includeUpper: false,
-              ),
-            );
-      }
-    });
-  }
 }
 
 extension TemplateConfigModelQueryFilter
@@ -381,6 +284,152 @@ extension TemplateConfigModelQueryFilter
           TemplateConfigModel,
           QFilterCondition
         > {
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  createdAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'createdAt'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  createdAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'createdAt'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  createdAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'createdAt', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  createdAtGreaterThan(DateTime? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'createdAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  createdAtLessThan(DateTime? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'createdAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  createdAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'createdAt',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  deletedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'deletedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  deletedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'deletedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  deletedAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'deletedAt', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  deletedAtGreaterThan(DateTime? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'deletedAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  deletedAtLessThan(DateTime? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'deletedAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  deletedAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'deletedAt',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
   QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
   fieldsLengthEqualTo(int length) {
     return QueryBuilder.apply(this, (query) {
@@ -485,6 +534,33 @@ extension TemplateConfigModelQueryFilter
           upper: upper,
           includeUpper: includeUpper,
         ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  isDeletedIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'isDeleted'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  isDeletedIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'isDeleted'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  isDeletedEqualTo(bool? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'isDeleted', value: value),
       );
     });
   }
@@ -772,6 +848,79 @@ extension TemplateConfigModelQueryFilter
   }
 
   QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  updatedAtIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'updatedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  updatedAtIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'updatedAt'),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  updatedAtEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'updatedAt', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  updatedAtGreaterThan(DateTime? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'updatedAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  updatedAtLessThan(DateTime? value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'updatedAt',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
+  updatedAtBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'updatedAt',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterFilterCondition>
   versionEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -939,6 +1088,48 @@ extension TemplateConfigModelQueryLinks
 extension TemplateConfigModelQuerySortBy
     on QueryBuilder<TemplateConfigModel, TemplateConfigModel, QSortBy> {
   QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  sortByCreatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  sortByCreatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  sortByDeletedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deletedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  sortByDeletedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deletedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  sortByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  sortByIsDeletedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
   sortByPathTemplate() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'pathTemplate', Sort.asc);
@@ -967,6 +1158,20 @@ extension TemplateConfigModelQuerySortBy
   }
 
   QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  sortByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  sortByUpdatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
   sortByVersion() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'version', Sort.asc);
@@ -984,6 +1189,34 @@ extension TemplateConfigModelQuerySortBy
 extension TemplateConfigModelQuerySortThenBy
     on QueryBuilder<TemplateConfigModel, TemplateConfigModel, QSortThenBy> {
   QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  thenByCreatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  thenByCreatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'createdAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  thenByDeletedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deletedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  thenByDeletedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'deletedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
   thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -994,6 +1227,20 @@ extension TemplateConfigModelQuerySortThenBy
   thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  thenByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  thenByIsDeletedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDeleted', Sort.desc);
     });
   }
 
@@ -1026,6 +1273,20 @@ extension TemplateConfigModelQuerySortThenBy
   }
 
   QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  thenByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
+  thenByUpdatedAtDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'updatedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QAfterSortBy>
   thenByVersion() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'version', Sort.asc);
@@ -1043,6 +1304,27 @@ extension TemplateConfigModelQuerySortThenBy
 extension TemplateConfigModelQueryWhereDistinct
     on QueryBuilder<TemplateConfigModel, TemplateConfigModel, QDistinct> {
   QueryBuilder<TemplateConfigModel, TemplateConfigModel, QDistinct>
+  distinctByCreatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'createdAt');
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QDistinct>
+  distinctByDeletedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'deletedAt');
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QDistinct>
+  distinctByIsDeleted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isDeleted');
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QDistinct>
   distinctByPathTemplate({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'pathTemplate', caseSensitive: caseSensitive);
@@ -1053,6 +1335,13 @@ extension TemplateConfigModelQueryWhereDistinct
   distinctByTemplateName({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'templateName', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, TemplateConfigModel, QDistinct>
+  distinctByUpdatedAt() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'updatedAt');
     });
   }
 
@@ -1072,10 +1361,31 @@ extension TemplateConfigModelQueryProperty
     });
   }
 
+  QueryBuilder<TemplateConfigModel, DateTime?, QQueryOperations>
+  createdAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'createdAt');
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, DateTime?, QQueryOperations>
+  deletedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'deletedAt');
+    });
+  }
+
   QueryBuilder<TemplateConfigModel, List<TemplateFieldModel>, QQueryOperations>
   fieldsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'fields');
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, bool?, QQueryOperations>
+  isDeletedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isDeleted');
     });
   }
 
@@ -1090,6 +1400,13 @@ extension TemplateConfigModelQueryProperty
   templateNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'templateName');
+    });
+  }
+
+  QueryBuilder<TemplateConfigModel, DateTime?, QQueryOperations>
+  updatedAtProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'updatedAt');
     });
   }
 

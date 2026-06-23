@@ -23,7 +23,9 @@ class TemplateRepositoryImpl implements TemplateRepository {
 
   @override
   Future<void> saveTemplate(TemplateConfig template) async {
-    final model = TemplateConfigModel.fromDomain(template);
+    final model = TemplateConfigModel.fromDomain(
+      template.copyWith(updatedAt: DateTime.now()),
+    );
 
     await localDataSource.saveTemplate(model);
   }
@@ -31,6 +33,11 @@ class TemplateRepositoryImpl implements TemplateRepository {
   @override
   Future<void> deleteTemplate(int id) async {
     await localDataSource.deleteTemplate(id);
+  }
+
+  @override
+  Future<void> softDeleteTemplate(int id) async {
+    await localDataSource.softDeleteTemplate(id);
   }
 
   @override
@@ -58,8 +65,20 @@ class TemplateRepositoryImpl implements TemplateRepository {
   }
 
   @override
+  Future<TemplateConfig?> getTemplateByIdIncludingDeleted(int id) async {
+    final model = await localDataSource.getTemplateByIdIncludingDeleted(id);
+    return model?.toDomain();
+  }
+
+  @override
   Future<void> edit(int id, TemplateConfig template) async {
-    final model = TemplateConfigModel.fromDomainId(id, template);
+    final current = await localDataSource.getTemplateByIdIncludingDeleted(id);
+    final updatedTemplate = template.copyWith(
+      id: id,
+      createdAt: current?.createdAt,
+      updatedAt: DateTime.now(),
+    );
+    final model = TemplateConfigModel.fromDomainId(id, updatedTemplate);
     await localDataSource.saveTemplate(model);
   }
 }

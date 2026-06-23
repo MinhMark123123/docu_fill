@@ -179,6 +179,7 @@ class ImagePickerFieldItem extends StatelessWidget {
       isRequired: field.required,
       child: ImagePickerWidget(
         imageFiled: field,
+        initialValue: viewModel.getInitValue(e: field),
         onImageChanged:
             (image) => viewModel.setValue(field: field, value: image?.path),
       ),

@@ -4,7 +4,7 @@ import 'package:core/core.dart';
 import 'package:data/data.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/features/src/configure/configure_page.dart';
-import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
+import 'package:docu_fill/features/src/configure/model/configure_mode.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:localization/localization.dart';

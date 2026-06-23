@@ -11,3 +11,6 @@ export 'src/upload/upload_page.dart';
 export 'src/upload/view_model/upload_view_model.dart';
 export 'src/tool/tool_page.dart';
 export 'src/tool/view_model/tool_view_model.dart';
+export 'src/splash/splash_page.dart';
+export 'src/splash/view_model/splash_view_model.dart';
+
