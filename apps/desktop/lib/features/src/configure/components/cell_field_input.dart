@@ -33,7 +33,6 @@ class CellFieldInput extends StatelessWidget {
         ),
         child: Text(
           data.inputType.label(),
-          //style: context.textTheme.bodyMedium,
         ),
       );
     }

@@ -3,6 +3,7 @@ import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/log_history/view_model/log_history_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
+import 'package:path/path.dart' as p;
 
 class LogHistoryItem extends StatelessWidget {
   final FileSystemEntity log;
@@ -11,7 +12,7 @@ class LogHistoryItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = getViewModel<LogHistoryViewModel>();
-    final fileName = log.path.split('/').last;
+    final fileName = p.basename(log.path);
     final fileSize = (log as File).lengthSync();
 
     return Card(

@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 part 'log_history_view_model.g.dart';
@@ -95,7 +96,7 @@ class LogHistoryViewModel extends BaseViewModel {
   }
 
   void navigateToDetail(BuildContext context, FileSystemEntity log) {
-    final fileName = log.path.split('/').last;
+    final fileName = p.basename(log.path);
     final route =
         "${RoutesPath.setting}/${RoutesPath.logHistory}/${RoutesPath.logDetail}";
     navigatePage(route, queryParameters: {'fileName': fileName});

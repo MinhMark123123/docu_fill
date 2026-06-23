@@ -20,16 +20,19 @@ part 'fields_input_view_model.g.dart';
 class FieldsInputViewModel extends BaseViewModel {
   final TemplateRepository _templateRepository;
   final TemplateService _templateService;
+  final ExportHistoryService _exportHistoryService;
   final DataExtractionService _dataExtractionService;
   final GeminiService _geminiService;
 
   FieldsInputViewModel({
     required TemplateRepository templateRepository,
     required TemplateService templateService,
+    required ExportHistoryService exportHistoryService,
     required DataExtractionService dataExtractionService,
     required GeminiService geminiService,
   }) : _templateRepository = templateRepository,
        _templateService = templateService,
+       _exportHistoryService = exportHistoryService,
        _dataExtractionService = dataExtractionService,
        _geminiService = geminiService;
 
@@ -58,6 +61,39 @@ class FieldsInputViewModel extends BaseViewModel {
 
   String get currentSection =>
       sections.isNotEmpty ? sections[_currentSectionIndex.data] : "";
+
+  bool get hasImageFields {
+    return _templates.data.any(
+      (template) =>
+          template.fields.any((field) => field.type == FieldType.image),
+    );
+  }
+
+  List<TemplateField> get imageFields {
+    final List<TemplateField> list = [];
+    for (var template in _templates.data) {
+      for (var field in template.fields) {
+        if (field.type == FieldType.image) {
+          list.add(field);
+        }
+      }
+    }
+    return list;
+  }
+
+  Map<String, String?> get fieldKeys => Map<String, String?>.from(_fieldKeys);
+
+  void applyImageFields(Map<String, String?> imagePaths) {
+    final cloned = Map<String, List<TemplateField>>.from(
+      _composedTemplateUI.data,
+    );
+    _composedTemplateUI.postValue(<String, List<TemplateField>>{});
+    imagePaths.forEach((key, path) {
+      _fieldKeys[key] = path;
+    });
+    _composedTemplateUI.postValue(cloned);
+    checkValidate();
+  }
 
   void updateCurrentSectionIndex(int index) {
     _showSummary.postValue(false);
@@ -214,14 +250,29 @@ class FieldsInputViewModel extends BaseViewModel {
 
   Future<void> exported() async {
     await loadingGuard(
-      _templateService.executeExport(
-        templates: _templates.data,
-        exportDirectory: _directoryExported.data,
-        baseFileName: _nameDocExported.text,
-        fieldKeys: _fieldKeys,
-        singleLines: _singleField,
-        composedUI: _composedTemplateUI.data,
-      ),
+      Future(() async {
+        final templates = List<TemplateConfig>.from(_templates.data);
+        final exportDirectory = _directoryExported.data;
+        final baseFileName = _nameDocExported.text;
+        final fieldValues = Map<String, String?>.from(_fieldKeys);
+        final singleLineValues = Map<String, String?>.from(_singleField);
+        final result = await _templateService.executeExport(
+          templates: templates,
+          exportDirectory: exportDirectory,
+          baseFileName: baseFileName,
+          fieldKeys: fieldValues,
+          singleLines: singleLineValues,
+          composedUI: _composedTemplateUI.data,
+        );
+        await _exportHistoryService.saveExportHistory(
+          templates: templates,
+          exportDirectory: exportDirectory,
+          baseFileName: baseFileName,
+          fieldValues: fieldValues,
+          singleLineValues: singleLineValues,
+          result: result,
+        );
+      }),
     );
     await Future.delayed(Duration(milliseconds: 200));
     _isExportSuccess.postValue(true);

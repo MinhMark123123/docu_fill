@@ -2,6 +2,7 @@ import 'package:core/core.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/core/src/events.dart';
 import 'package:docu_fill/features/page.dart';
+import 'package:docu_fill/features/src/configure/model/configure_mode.dart';
 import 'package:docu_fill/route/routers.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';

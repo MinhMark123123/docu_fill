@@ -1,5 +1,6 @@
 import 'package:data/src/entities/template_config_model.dart';
 import 'package:data/src/entities/app_settings_model.dart';
+import 'package:data/src/entities/export_history_model.dart';
 
 import 'package:isar_community/isar.dart';
 import 'package:path_provider/path_provider.dart';
@@ -19,7 +20,11 @@ class IsarDatabase {
   Future<void> initialize() async {
     final dir = await getApplicationDocumentsDirectory();
     _isar = await Isar.open(
-      [TemplateConfigModelSchema, AppSettingsModelSchema],
+      [
+        TemplateConfigModelSchema,
+        AppSettingsModelSchema,
+        ExportHistoryModelSchema,
+      ],
       directory: dir.path,
       name: 'docu_fill',
     );

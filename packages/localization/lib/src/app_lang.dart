@@ -15,8 +15,10 @@ abstract class AppLang {
   static const String actionsBrowseFiles = "actions.browse_files";
   static const String actionsCancel = "actions.cancel";
   static const String actionsClear = "actions.clear";
+  static const String actionsClearAllImages = "actions.clear_all_images";
   static const String actionsClose = "actions.close";
   static const String actionsConfirm = "actions.confirm";
+  static const String actionsConfirmAndApply = "actions.confirm_and_apply";
   static const String actionsContinue = "actions.continue";
   static const String actionsCreate = "actions.create";
   static const String actionsCreateCopy = "actions.create_copy";
@@ -49,6 +51,7 @@ abstract class AppLang {
   static const String actionsPickImage = "actions.pick_image";
   static const String actionsPreviewDocument = "actions.preview_document";
   static const String actionsProceedToPayment = "actions.proceed_to_payment";
+  static const String actionsQuickImageInput = "actions.quick_image_input";
   static const String actionsReset = "actions.reset";
   static const String actionsRetryAction = "actions.retry_action";
   static const String actionsReturnToTemplates = "actions.return_to_templates";
@@ -56,6 +59,7 @@ abstract class AppLang {
   static const String actionsSaveCopyTitle = "actions.save_copy_title";
   static const String actionsSearch = "actions.search";
   static const String actionsSelectDateTime = "actions.select_date_time";
+  static const String actionsSelectMultipleImages = "actions.select_multiple_images";
   static const String actionsSend = "actions.send";
   static const String actionsShare = "actions.share";
   static const String actionsShowLess = "actions.show_less";
@@ -80,6 +84,7 @@ abstract class AppLang {
   static const String labelsDefaultValue = "labels.default_value";
   static const String labelsDetectedFields = "labels.detected_fields";
   static const String labelsDocuments = "labels.documents";
+  static const String labelsDragToReorder = "labels.drag_to_reorder";
   static const String labelsEnableMultipleChoice = "labels.enable_multiple_choice";
   static const String labelsEnterTemplateName = "labels.enter_template_name";
   static const String labelsError = "labels.error";
@@ -100,13 +105,18 @@ abstract class AppLang {
   static const String labelsKey = "labels.key";
   static const String labelsLogDetails = "labels.log_details";
   static const String labelsLogHistory = "labels.log_history";
+  static const String labelsMappedImagesCount = "labels.mapped_images_count";
   static const String labelsMultiple = "labels.multiple";
   static const String labelsNewTemplate = "labels.new_template";
   static const String labelsOptions = "labels.options";
   static const String labelsOverview = "labels.overview";
   static const String labelsPrompt = "labels.prompt";
   static const String labelsQuickActions = "labels.quick_actions";
+  static const String labelsQuickImageInputSubtitle = "labels.quick_image_input_subtitle";
+  static const String labelsQuickImageInputTip = "labels.quick_image_input_tip";
+  static const String labelsQuickImageInputTitle = "labels.quick_image_input_title";
   static const String labelsRecentTemplates = "labels.recent_templates";
+  static const String labelsRemoveImage = "labels.remove_image";
   static const String labelsRequired = "labels.required";
   static const String labelsResponse = "labels.response";
   static const String labelsSection = "labels.section";
@@ -164,6 +174,7 @@ abstract class AppLang {
   static const String messagesSettingExported = "messages.setting_exported";
   static const String messagesSettingsSaveSuccess = "messages.settings_save_success";
   static const String messagesSingleLineTextHint = "messages.single_line_text_hint";
+  static const String messagesSplashTagline = "messages.splash_tagline";
   static const String messagesTemplateFieldCount = "messages.template_field_count";
   static const String messagesUploadTemplate = "messages.upload_template";
 

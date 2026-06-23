@@ -62,7 +62,11 @@
     "create_copy_error": "Error creating copy: {}",
     "export_summary": "Export Summary (Text)",
     "import_ai_result": "Import old AI result",
-    "extract_images": "Extract Images"
+    "extract_images": "Extract Images",
+    "quick_image_input": "Quick Image Input",
+    "select_multiple_images": "Select multiple images at once",
+    "clear_all_images": "Clear all",
+    "confirm_and_apply": "Confirm & Apply"
   },
   "labels": {
     "templates": "Templates",
@@ -116,7 +120,13 @@
     "select_all": "Select All",
     "key": "Key",
     "type": "Type",
-    "tools": "Tools"
+    "tools": "Tools",
+    "quick_image_input_title": "Quick Image Input",
+    "quick_image_input_subtitle": "Select multiple images and drag & drop to arrange them into correct slots",
+    "quick_image_input_tip": "Tip: You can press and drag directly to swap images!",
+    "mapped_images_count": "Mapped {} / {}",
+    "drag_to_reorder": "Drag to reorder",
+    "remove_image": "Remove this image"
   },
   "messages": {
     "review_and_configure_fields": "Review and configure the fields detected in your template. Ensure all fields are correctly identified and assigned the appropriate input type for accurate data collection.",
@@ -158,7 +168,8 @@
     "select_source_file": "Select Source File (Word/Excel)",
     "select_dest_folder": "Select Destination Folder",
     "extract_success": "Extracted {} images successfully!",
-    "extract_error": "Error extracting images: {}"
+    "extract_error": "Error extracting images: {}",
+    "splash_tagline": "Smart Document Filling & Automation"
   },
   "settings": {
     "general": {

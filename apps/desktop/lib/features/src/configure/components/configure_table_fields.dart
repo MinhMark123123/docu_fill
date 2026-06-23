@@ -89,7 +89,6 @@ enum TableColumn {
     }
     if (data == null) return const SizedBox();
     final alignment = Alignment(-1, 0);
-    // data.inputType == FieldType.selection ? Alignment(-1, -1) : null;
 
     switch (this) {
       case TableColumn.fieldKey:

@@ -5,6 +5,7 @@ import 'package:core/core.dart';
 import 'package:data/data.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/core/src/events.dart';
+import 'package:docu_fill/features/src/configure/model/configure_mode.dart';
 import 'package:docu_fill/features/src/configure/model/table_row_data.dart';
 import 'package:docu_fill/route/routers.dart';
 import 'package:file_picker/file_picker.dart';
@@ -17,27 +18,7 @@ import 'package:path_provider/path_provider.dart';
 
 part 'configure_view_model.g.dart';
 
-enum ConfigureMode {
-  addNew,
-  edit,
-  importSetting;
-
-  String get valueString => toString().split('.').last;
-
-  static ConfigureMode? fromString(String? value) {
-    if (value == null) return null;
-    return ConfigureMode.values.firstWhere(
-      (e) => e.valueString == value,
-      orElse: () => ConfigureMode.addNew,
-    );
-  }
-
-  bool get isImportMode => this == ConfigureMode.importSetting;
-
-  bool get isEdit => this == ConfigureMode.edit;
-
-  bool get isAddNew => this == ConfigureMode.addNew;
-}
+// ConfigureMode is defined in configure_mode.dart
 
 @BindableViewModel()
 class ConfigureViewModel extends BaseViewModel {
@@ -76,8 +57,11 @@ class ConfigureViewModel extends BaseViewModel {
   TextEditingController get nameController => _nameController;
 
   StreamData<String> get searchText => _searchText;
+
   StreamData<List<TableRowData>> get filteredFields => _filteredFields;
+
   StreamData<List<TableRowData>> get missingLabelFields => _missingLabelFields;
+
   StreamData<String> get scrollRequest => _scrollRequest;
 
   void setupPath({String? path, required ConfigureMode mode, int? idEdit}) {
@@ -288,7 +272,6 @@ class ConfigureViewModel extends BaseViewModel {
     final current = _fieldsData.data[index];
     final updated = removeUselessInput(newData: update(current));
     _fieldsData.data[index] = updated;
-    print("update $key and ${updated.defaultValue}");
     _fieldsData.postValue(List.from(_fieldsData.data));
     _updateFilteredFields();
     await checkEnableConfirm();
@@ -297,9 +280,15 @@ class ConfigureViewModel extends BaseViewModel {
   TableRowData removeUselessInput({required TableRowData newData}) {
     if (newData.fieldName?.trim().isEmpty ?? false) newData.fieldName = null;
     if (newData.section?.trim().isEmpty ?? false) newData.section = null;
-    if (newData.defaultValue?.trim().isEmpty ?? false) newData.defaultValue = null;
-    if (newData.description?.trim().isEmpty ?? false) newData.description = null;
-    if (newData.additionalInfo?.trim().isEmpty ?? false) newData.additionalInfo = null;
+    if (newData.defaultValue?.trim().isEmpty ?? false) {
+      newData.defaultValue = null;
+    }
+    if (newData.description?.trim().isEmpty ?? false) {
+      newData.description = null;
+    }
+    if (newData.additionalInfo?.trim().isEmpty ?? false) {
+      newData.additionalInfo = null;
+    }
 
     final inputType = newData.inputType;
     if (!inputType.isSelection) {
@@ -317,10 +306,11 @@ class ConfigureViewModel extends BaseViewModel {
       return name == null || name.isEmpty;
     });
 
-    final missing = _fieldsData.data.where((e) {
-      final name = e.fieldName;
-      return name == null || name.isEmpty;
-    }).toList();
+    final missing =
+        _fieldsData.data.where((e) {
+          final name = e.fieldName;
+          return name == null || name.isEmpty;
+        }).toList();
     _missingLabelFields.postValue(missing);
 
     _enableNameTemplate.postValue(!hasNameEmpty);
@@ -338,10 +328,11 @@ class ConfigureViewModel extends BaseViewModel {
       _filteredFields.postValue(_fieldsData.data);
       return;
     }
-    final filtered = _fieldsData.data.where((e) {
-      return e.fieldKey.toLowerCase().contains(query) ||
-          (e.fieldName?.toLowerCase().contains(query) ?? false);
-    }).toList();
+    final filtered =
+        _fieldsData.data.where((e) {
+          return e.fieldKey.toLowerCase().contains(query) ||
+              (e.fieldName?.toLowerCase().contains(query) ?? false);
+        }).toList();
     _filteredFields.postValue(filtered);
   }
 
@@ -359,13 +350,7 @@ class ConfigureViewModel extends BaseViewModel {
     required String name,
     required String path,
   }) {
-    final fields =
-        _fieldsData.data.map((e) {
-          print(
-            "save generateTemplateConfig ${e.fieldKey} and ${e.defaultValue}",
-          );
-          return e.toTemplateField();
-        }).toList();
+    final fields = _fieldsData.data.map((e) => e.toTemplateField()).toList();
     return TemplateConfig(
       templateName: name,
       pathTemplate: path,
@@ -412,6 +397,7 @@ class ConfigureViewModel extends BaseViewModel {
         await _templateRepository.saveTemplate(
           generateTemplateConfig(name: _nameController.text, path: path),
         );
+        await Future.delayed(Duration(milliseconds: 100));
         return true;
       }),
     );
@@ -549,32 +535,4 @@ class ConfigureViewModel extends BaseViewModel {
   }
 }
 
-class ShowUseSettingDialogEvent extends ShowDialogEvent<void> {
-  final List<TemplateConfig> listTemplate;
-
-  ShowUseSettingDialogEvent({
-    super.actions,
-    required this.listTemplate,
-    super.content,
-    super.onCompleted,
-    super.title,
-  });
-
-  @override
-  ShowUseSettingDialogEvent copyWith({
-    String? title,
-    String? content,
-    List<DialogAction>? actions,
-    List<TemplateConfig>? listTemplate,
-    List<String>? options,
-    Function(void)? onCompleted,
-  }) {
-    return ShowUseSettingDialogEvent(
-      listTemplate: listTemplate ?? this.listTemplate,
-      title: title ?? this.title,
-      content: content ?? this.content,
-      actions: actions ?? this.actions,
-      onCompleted: onCompleted ?? this.onCompleted,
-    );
-  }
-}
+// ShowUseSettingDialogEvent is defined in configure_mode.dart

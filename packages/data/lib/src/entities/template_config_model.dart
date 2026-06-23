@@ -9,14 +9,14 @@ part 'template_config_model.g.dart'; // Will be generated
 class TemplateConfigModel {
   Id id = Isar.autoIncrement;
 
-  @Index(
-    unique: true,
-    replace: true,
-  ) // Ensure templateName is unique and replaces on conflict
   late String templateName;
   late String pathTemplate;
 
   late String version;
+  bool? isDeleted;
+  DateTime? deletedAt;
+  DateTime? createdAt;
+  DateTime? updatedAt;
 
   // List of embedded objects
   List<TemplateFieldModel> fields = [];
@@ -27,6 +27,10 @@ class TemplateConfigModel {
     this.templateName = '',
     this.pathTemplate = '',
     this.version = '',
+    this.isDeleted = false,
+    this.deletedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
     this.fields = const [],
   });
 
@@ -37,6 +41,10 @@ class TemplateConfigModel {
       templateName: domainConfig.templateName,
       pathTemplate: domainConfig.pathTemplate,
       version: domainConfig.version,
+      isDeleted: domainConfig.isDeleted,
+      deletedAt: domainConfig.deletedAt,
+      createdAt: domainConfig.createdAt,
+      updatedAt: domainConfig.updatedAt,
       fields:
           domainConfig.fields
               .map((field) => TemplateFieldModel.fromDomain(field))
@@ -54,6 +62,10 @@ class TemplateConfigModel {
       templateName: domainConfig.templateName,
       pathTemplate: domainConfig.pathTemplate,
       version: domainConfig.version,
+      isDeleted: domainConfig.isDeleted,
+      deletedAt: domainConfig.deletedAt,
+      createdAt: domainConfig.createdAt,
+      updatedAt: domainConfig.updatedAt,
       fields:
           domainConfig.fields
               .map((field) => TemplateFieldModel.fromDomain(field))
@@ -68,6 +80,34 @@ class TemplateConfigModel {
       pathTemplate: pathTemplate,
       version: version,
       fields: fields.map((modelField) => modelField.toDomain()).toList(),
+      isDeleted: isDeleted ?? false,
+      deletedAt: deletedAt,
+      createdAt: createdAt ?? DateTime.now(),
+      updatedAt: updatedAt ?? DateTime.now(),
     )..id = id;
+  }
+
+  TemplateConfigModel copyWith({
+    Id? id,
+    String? templateName,
+    String? pathTemplate,
+    String? version,
+    bool? isDeleted,
+    DateTime? deletedAt,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    List<TemplateFieldModel>? fields,
+  }) {
+    return TemplateConfigModel(
+      id: id ?? this.id,
+      templateName: templateName ?? this.templateName,
+      pathTemplate: pathTemplate ?? this.pathTemplate,
+      version: version ?? this.version,
+      isDeleted: isDeleted ?? this.isDeleted,
+      deletedAt: deletedAt ?? this.deletedAt,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      fields: fields ?? this.fields,
+    );
   }
 }

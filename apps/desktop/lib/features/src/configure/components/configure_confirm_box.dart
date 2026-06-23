@@ -1,4 +1,5 @@
 import 'package:design/ui.dart';
+import 'package:docu_fill/features/src/configure/model/configure_mode.dart';
 import 'package:docu_fill/features/src/configure/view_model/configure_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';

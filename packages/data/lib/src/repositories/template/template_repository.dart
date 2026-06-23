@@ -5,10 +5,12 @@ import 'package:data/src/template_config.dart';
 abstract class TemplateRepository {
   Future<List<TemplateConfig>> getAllTemplates();
   Future<TemplateConfig?> getTemplateById(int id);
+  Future<TemplateConfig?> getTemplateByIdIncludingDeleted(int id);
   Future<TemplateConfig?> getTemplateByName(String name);
   Future<void> saveTemplate(TemplateConfig template);
   Future<void> edit(int id, TemplateConfig template);
   Future<void> deleteTemplate(int id);
+  Future<void> softDeleteTemplate(int id);
   Stream<List<TemplateConfig>> watchAllTemplates();
   Stream<TemplateConfig?> watchTemplateByName(String name);
 }
