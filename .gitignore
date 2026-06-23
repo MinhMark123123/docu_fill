@@ -44,3 +44,7 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /packages/data/build
+
+# Local sample documents and research data
+example_docs/
+research_samples/
