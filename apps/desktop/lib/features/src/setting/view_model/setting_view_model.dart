@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 part 'setting_view_model.g.dart';
@@ -14,9 +15,13 @@ part 'setting_view_model.g.dart';
 @BindableViewModel()
 class SettingViewModel extends BaseViewModel {
   final SettingsRepository _settingsRepository;
+  final GeminiService _geminiService;
 
-  SettingViewModel({required SettingsRepository settingsRepository})
-    : _settingsRepository = settingsRepository;
+  SettingViewModel({
+    required SettingsRepository settingsRepository,
+    required GeminiService geminiService,
+  })  : _settingsRepository = settingsRepository,
+        _geminiService = geminiService;
 
   @Bind()
   late final _geminiApiKey = "".mtd(this);
@@ -33,7 +38,7 @@ class SettingViewModel extends BaseViewModel {
   @Bind()
   late final _enableApiLogging = false.mtd(this);
 
-  List<String> get availableModels => [
+  static const List<String> _fallbackModels = [
     'gemini-3.1-pro-preview',
     'gemini-3-flash-preview',
     'gemini-3.1-flash-lite-preview',
@@ -44,6 +49,9 @@ class SettingViewModel extends BaseViewModel {
     'gemini-1.5-flash',
     'gemini-1.5-flash-8b',
   ];
+
+  @Bind()
+  late final _availableModels = _fallbackModels.mtd(this);
 
   final TextEditingController apiKeyController = TextEditingController();
   final TextEditingController studyDataController = TextEditingController();
@@ -72,6 +80,8 @@ class SettingViewModel extends BaseViewModel {
     apiKeyController.text = key;
     studyDataController.text = studyData;
     sampleResultController.text = sampleResult;
+
+    await _fetchAvailableModels(key);
   }
 
   Future<void> changeLocale(BuildContext context, Locale locale) async {
@@ -96,13 +106,18 @@ class SettingViewModel extends BaseViewModel {
   Future<void> openLogsFolder() async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final logsPath = "${directory.path}${Platform.pathSeparator}api_logs";
+      final logsPath = p.join(directory.path, 'api_logs');
       final logsDir = Directory(logsPath);
       if (!await logsDir.exists()) {
         await logsDir.create(recursive: true);
       }
-      // Use Process.run to open the folder on macOS
-      await Process.run('open', [logsPath]);
+      if (Platform.isWindows) {
+        await Process.run('explorer.exe', [logsPath]);
+      } else if (Platform.isMacOS) {
+        await Process.run('open', [logsPath]);
+      } else {
+        await Process.run('xdg-open', [logsPath]);
+      }
     } catch (e) {
       showSnackbar("Could not open logs folder: $e");
     }
@@ -129,7 +144,27 @@ class SettingViewModel extends BaseViewModel {
     _geminiStudyData.postValue(studyDataController.text);
     _geminiSampleResult.postValue(sampleResultController.text);
 
+    await _fetchAvailableModels(apiKeyController.text);
+
     showSnackbar(AppLang.messagesSettingsSaveSuccess.tr());
+  }
+
+  Future<void> _fetchAvailableModels(String key) async {
+    if (key.isEmpty) {
+      _availableModels.postValue(_fallbackModels);
+      return;
+    }
+    try {
+      final models = await _geminiService.getAvailableModels(apiKey: key);
+      if (models.isNotEmpty) {
+        _availableModels.postValue(models);
+      } else {
+        _availableModels.postValue(_fallbackModels);
+      }
+    } catch (e) {
+      debugPrint("Failed to fetch models: $e");
+      _availableModels.postValue(_fallbackModels);
+    }
   }
 
   @override

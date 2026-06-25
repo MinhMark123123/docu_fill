@@ -57,7 +57,7 @@ class _LogContentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: context.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+      color: context.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
       child: Padding(
         padding: EdgeInsets.all(Dimens.size16),
         child: Text(

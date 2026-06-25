@@ -101,6 +101,15 @@ class _ConfigureEditDialogState extends State<ConfigureEditDialog> {
                     onChanged: (updated) => setState(() => _tempData = updated),
                   ),
                 ),
+              if (_tempData.inputType == FieldType.image)
+                _DialogSection(
+                  label:
+                      '${AppLang.labelsWidth.tr()} × ${AppLang.labelsHeight.tr()} (${AppLang.labelsUnit.tr()})',
+                  child: CellFieldOptions(
+                    data: _tempData,
+                    onChanged: (updated) => setState(() => _tempData = updated),
+                  ),
+                ),
               _DialogSection(
                 label: AppLang.labelsDefaultValue.tr(),
                 child: CellDefaultValue(
@@ -123,17 +132,18 @@ class _ConfigureEditDialogState extends State<ConfigureEditDialog> {
                       }),
                 ),
               ),
-              _DialogSection(
-                label: AppLang.labelsGeneralInfo.tr(),
-                child: CellAdditionalInfo(
-                  data: _tempData,
-                  onChanged:
-                      (value) => setState(() {
-                        _tempData.additionalInfo =
-                            value.trim().isEmpty ? null : value;
-                      }),
+              if (!_tempData.inputType.isImage)
+                _DialogSection(
+                  label: AppLang.labelsGeneralInfo.tr(),
+                  child: CellAdditionalInfo(
+                    data: _tempData,
+                    onChanged:
+                        (value) => setState(() {
+                          _tempData.additionalInfo =
+                              value.trim().isEmpty ? null : value;
+                        }),
+                  ),
                 ),
-              ),
             ],
           ),
         ),

@@ -1,5 +1,7 @@
+import 'package:data/data.dart';
 import 'package:docu_fill/features/page.dart';
 import 'package:docu_fill/features/src/home/input_page.dart';
+import 'package:docu_fill/features/src/home/quick_image_input_page.dart';
 import 'package:docu_fill/features/src/main/main_page.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
 import 'package:flutter/material.dart';
@@ -14,8 +16,14 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
 
 final GoRouter router = GoRouter(
   navigatorKey: _rootNavigatorKey,
-  initialLocation: RoutesPath.home, // Use the constant for initialLocation
+  initialLocation: RoutesPath.splash, // Set splash as the initial location
   routes: <RouteBase>[
+    GoRoute(
+      path: RoutesPath.splash,
+      builder: (BuildContext context, GoRouterState state) {
+        return const SplashPage();
+      },
+    ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
       builder: (BuildContext context, GoRouterState state, Widget child) {
@@ -29,6 +37,19 @@ final GoRouter router = GoRouter(
             return HomePage(detailChild: InputPage(key: Key("$ids"), ids: ids));
           },
           routes: <RouteBase>[
+            GoRoute(
+              path: RoutesPath.quickImageInput,
+              builder: (BuildContext context, GoRouterState state) {
+                final extra = state.extra as Map<String, dynamic>;
+                final imageFields = extra['imageFields'] as List<TemplateField>;
+                final currentValues =
+                    extra['currentValues'] as Map<String, String?>;
+                return QuickImageInputPage(
+                  imageFields: imageFields,
+                  currentValues: currentValues,
+                );
+              },
+            ),
             GoRoute(
               path: RoutesPath.configure, // Use constant (relative)
               builder: (BuildContext context, GoRouterState state) {

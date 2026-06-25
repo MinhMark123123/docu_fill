@@ -5,9 +5,10 @@ import 'dart:typed_data';
 import 'package:data/data.dart';
 import 'package:data/src/repositories/settings/settings_repository.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:googleai_dart/googleai_dart.dart' hide File;
 import 'package:intl/intl.dart';
 import 'package:mime/mime.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
 class GeminiService {
@@ -30,7 +31,6 @@ class GeminiService {
     }
 
     final modelName = settings?.geminiModel ?? 'gemini-1.5-flash';
-    final model = GenerativeModel(model: modelName, apiKey: apiKey);
 
     // Format fields description for prompt
     final fieldDescriptions = templateConfig.entries
@@ -66,19 +66,22 @@ $rawText
 JSON OUTPUT:
 ''';
 
-    final content = [Content.text(prompt)];
-    final response = await model.generateContent(content);
-
-    final responseText = response.text;
-    if (responseText == null) {
-      throw Exception('Gemini response was empty');
-    }
-
-    if (settings?.enableApiLogging ?? false) {
-      await _logToFile(prompt, responseText);
-    }
-
+    final client = GoogleAIClient.withApiKey(apiKey);
+    String? responseText;
+    Object? error;
     try {
+      final content = [
+        Content(role: 'user', parts: [TextPart(prompt)]),
+      ];
+      final response = await client.models.generateContent(
+        model: modelName,
+        request: GenerateContentRequest(contents: content),
+      );
+      responseText = response.text;
+      if (responseText == null) {
+        throw Exception('Gemini response was empty');
+      }
+
       final startIndex = responseText.indexOf('{');
       final endIndex = responseText.lastIndexOf('}');
       if (startIndex != -1 && endIndex != -1) {
@@ -88,9 +91,13 @@ JSON OUTPUT:
       }
       throw Exception('Could not find JSON in Gemini response');
     } catch (e) {
-      throw Exception(
-        'Failed to parse Gemini response: $e\nResponse: $responseText',
-      );
+      error = e;
+      rethrow;
+    } finally {
+      client.close();
+      if (settings?.enableApiLogging ?? false) {
+        await _logToFile(prompt, responseText, error: error);
+      }
     }
   }
 
@@ -110,7 +117,6 @@ JSON OUTPUT:
     }
 
     final modelName = settings?.geminiModel ?? 'gemini-1.5-flash';
-    final model = GenerativeModel(model: modelName, apiKey: apiKey);
 
     // Format fields description for prompt
     final fieldDescriptions = templateConfig.entries
@@ -145,23 +151,27 @@ $fieldDescriptions
 JSON OUTPUT:
 ''';
 
-    final content = [
-      Content.multi([TextPart(prompt), DataPart(mimeType, fileBytes)]),
-    ];
-
+    final client = GoogleAIClient.withApiKey(apiKey);
+    String? responseText;
+    Object? error;
     try {
-      final response = await model.generateContent(content);
-      final responseText = response.text;
+      final content = [
+        Content(
+          role: 'user',
+          parts: [
+            TextPart(prompt),
+            InlineDataPart(Blob.fromBytes(mimeType, fileBytes)),
+          ],
+        ),
+      ];
+      final response = await client.models.generateContent(
+        model: modelName,
+        request: GenerateContentRequest(contents: content),
+      );
+      responseText = response.text;
 
       if (responseText == null) {
         throw Exception('Gemini response was empty');
-      }
-
-      if (settings?.enableApiLogging ?? false) {
-        await _logToFile(
-          'FILE_UPLOAD_PROMPT: $fileName\n$prompt',
-          responseText,
-        );
       }
 
       final startIndex = responseText.indexOf('{');
@@ -175,14 +185,28 @@ JSON OUTPUT:
 
       throw Exception('Could not find a valid JSON object in Gemini response');
     } catch (e) {
+      error = e;
       throw Exception('Failed to process file with Gemini: $e');
+    } finally {
+      client.close();
+      if (settings?.enableApiLogging ?? false) {
+        await _logToFile(
+          'FILE_UPLOAD_PROMPT: $fileName\n$prompt',
+          responseText,
+          error: error,
+        );
+      }
     }
   }
 
-  Future<void> _logToFile(String prompt, String response) async {
+  Future<void> _logToFile(
+    String prompt,
+    String? response, {
+    Object? error,
+  }) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final logsPath = "${directory.path}/api_logs";
+      final logsPath = p.join(directory.path, 'api_logs');
       final logsDir = Directory(logsPath);
 
       if (!await logsDir.exists()) {
@@ -190,23 +214,57 @@ JSON OUTPUT:
       }
 
       final timestamp = DateFormat('yyyyMMdd_HHmmss').format(DateTime.now());
-      final logFile = File("$logsPath/log_$timestamp.txt");
+      final status = error != null ? 'ERROR' : 'SUCCESS';
+      final logFile = File(p.join(logsPath, 'log_${timestamp}_$status.txt'));
 
       final content = '''
       --- GEMINI API LOG ---
       TIMESTAMP: ${DateTime.now()}
-      
+      STATUS: $status
+      ${error != null ? 'ERROR: $error\n' : ''}
       --- PROMPT ---
       $prompt
       
       --- RESPONSE ---
-      $response
+      ${response ?? 'N/A'}
       ----------------------
       ''';
 
       await logFile.writeAsString(content);
     } catch (e) {
       debugPrint("Error writing log file: $e");
+    }
+  }
+
+  Future<List<String>> getAvailableModels({String? apiKey}) async {
+    final key =
+        apiKey ?? (await _settingsRepository.getSettings())?.geminiApiKey;
+    if (key == null || key.isEmpty) {
+      return [];
+    }
+
+    final client = GoogleAIClient.withApiKey(key);
+    try {
+      final response = await client.models.list();
+      final list =
+          response.models
+              .where(
+                (m) =>
+                    m.supportedGenerationMethods?.contains('generateContent') ??
+                    false,
+              )
+              .map((m) => m.name)
+              .where((name) => name.isNotEmpty)
+              .map(
+                (name) => name.startsWith('models/') ? name.substring(7) : name,
+              )
+              .toList();
+      return list;
+    } catch (e) {
+      debugPrint("Error fetching available models from Gemini API: $e");
+      rethrow;
+    } finally {
+      client.close();
     }
   }
 }

@@ -16,11 +16,7 @@ class TemplateService {
     : _templateRepository = templateRepository;
 
   Future<void> deleteTemplate(TemplateConfig item) async {
-    await _templateRepository.deleteTemplate(item.id);
-    final file = File(item.pathTemplate);
-    if (file.existsSync()) {
-      await file.delete();
-    }
+    await _templateRepository.softDeleteTemplate(item.id);
   }
 
   Future<List<int>?> createExportArchive(TemplateConfig item) async {
@@ -175,7 +171,7 @@ class TemplateService {
     return result;
   }
 
-  Future<void> executeExport({
+  Future<TemplateExportResult> executeExport({
     required List<TemplateConfig> templates,
     required String exportDirectory,
     required String baseFileName,
@@ -183,49 +179,98 @@ class TemplateService {
     required Map<String, String?> singleLines,
     required Map<String, List<TemplateField>> composedUI,
   }) async {
-    // 1. Prepare data (Date formatting, defaults)
     final processedFieldKeys = _processFields(templates, fieldKeys);
+    final outputFiles = <String>[];
+    final issues = <TemplateExportIssue>[];
 
-    // 2. Run individual template exports
     for (var template in templates) {
-      final fileOrigin = File(template.pathTemplate);
-      if (!fileOrigin.existsSync()) continue;
-
-      final extension = template.pathTemplate.split('.').last.toLowerCase();
-      final originalBytes = await fileOrigin.readAsBytes();
-      Uint8List rawBytes;
-
-      if (extension == 'docx') {
-        // --- ONLY DOCX: Handle Images ---
-        final Map<String, String> fieldKeysForImages = Map.from(
-          processedFieldKeys,
-        );
-        final imageReplacements = getImageReplacements(
-          composedUI: composedUI,
-          fieldKeys: fieldKeysForImages,
-        );
-        rawBytes = await DocxUtils.composeModifiedDocxWithPlaceholders(
-          originalBytes: originalBytes,
-          replacements: processedFieldKeys,
-          imageReplacements: imageReplacements,
+      try {
+        final filePath = await _exportTemplate(
+          template: template,
+          exportDirectory: exportDirectory,
+          baseFileName: baseFileName,
+          processedFieldKeys: processedFieldKeys,
           singleLines: singleLines,
+          composedUI: composedUI,
         );
-      } else if (extension == 'xlsx' || extension == 'xls') {
-        // --- EXCEL: Handle Text replacements only ---
-        rawBytes = await ExcelUtils.composeModifiedExcel(
-          originalBytes: originalBytes,
-          replacements: processedFieldKeys,
+        if (filePath == null) {
+          issues.add(
+            TemplateExportIssue.fromTemplate(
+              template,
+              'Template file is missing or unsupported.',
+            ),
+          );
+        } else {
+          outputFiles.add(filePath);
+        }
+      } catch (error) {
+        issues.add(
+          TemplateExportIssue.fromTemplate(template, error.toString()),
         );
-      } else {
-        // Skip unsupported formats
-        continue;
       }
-
-      final fileName = "${baseFileName}_${template.templateName}.$extension";
-      final filePath = p.join(exportDirectory, fileName);
-
-      await saveRawBytes(rawBytes, filePath);
     }
+
+    return TemplateExportResult(
+      outputFiles: outputFiles,
+      issues: issues,
+      requestedCount: templates.length,
+    );
+  }
+
+  Future<String?> _exportTemplate({
+    required TemplateConfig template,
+    required String exportDirectory,
+    required String baseFileName,
+    required Map<String, String> processedFieldKeys,
+    required Map<String, String?> singleLines,
+    required Map<String, List<TemplateField>> composedUI,
+  }) async {
+    final fileOrigin = File(template.pathTemplate);
+    if (!fileOrigin.existsSync()) return null;
+
+    final extension = p.extension(template.pathTemplate).replaceFirst('.', '');
+    final rawBytes = await _composeTemplateBytes(
+      extension: extension.toLowerCase(),
+      originalBytes: await fileOrigin.readAsBytes(),
+      processedFieldKeys: processedFieldKeys,
+      singleLines: singleLines,
+      composedUI: composedUI,
+    );
+    if (rawBytes == null) return null;
+
+    final fileName = "${baseFileName}_${template.templateName}.$extension";
+    final filePath = p.join(exportDirectory, fileName);
+    await saveRawBytes(rawBytes, filePath);
+    return filePath;
+  }
+
+  Future<Uint8List?> _composeTemplateBytes({
+    required String extension,
+    required Uint8List originalBytes,
+    required Map<String, String> processedFieldKeys,
+    required Map<String, String?> singleLines,
+    required Map<String, List<TemplateField>> composedUI,
+  }) async {
+    if (extension == 'docx') {
+      final fieldKeysForImages = Map<String, String>.from(processedFieldKeys);
+      final imageReplacements = getImageReplacements(
+        composedUI: composedUI,
+        fieldKeys: fieldKeysForImages,
+      );
+      return await DocxUtils.composeModifiedDocxWithPlaceholders(
+        originalBytes: originalBytes,
+        replacements: processedFieldKeys,
+        imageReplacements: imageReplacements,
+        singleLines: singleLines,
+      );
+    }
+    if (extension == 'xlsx' || extension == 'xls') {
+      return await ExcelUtils.composeModifiedExcel(
+        originalBytes: originalBytes,
+        replacements: processedFieldKeys,
+      );
+    }
+    return null;
   }
 
   /// Exports the input summary as a plain text file.

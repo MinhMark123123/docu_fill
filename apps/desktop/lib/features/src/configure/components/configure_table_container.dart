@@ -15,7 +15,7 @@ class ConfigureTableContainer extends StatelessWidget {
         color: Colors.white,
         borderRadius: Dimens.radii.borderLarge(),
         border: Border.all(
-          color: context.colorScheme.outlineVariant.withOpacity(0.5),
+          color: context.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       clipBehavior: Clip.antiAlias,

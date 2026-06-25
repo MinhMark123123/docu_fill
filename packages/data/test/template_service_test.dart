@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:data/data.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -244,9 +246,46 @@ void main() {
       );
     });
   });
+
+  group('TemplateService - template deletion', () {
+    test(
+      'soft deletes configuration and keeps physical template file',
+      () async {
+        final repository = _FakeTemplateRepository();
+        final service = TemplateService(templateRepository: repository);
+        final tempDir = await Directory.systemTemp.createTemp(
+          'docu_fill_test_',
+        );
+        final templateFile = File('${tempDir.path}/template.docx');
+        await templateFile.writeAsString('template');
+
+        await service.deleteTemplate(
+          TemplateConfig(
+            id: 12,
+            templateName: 'Template',
+            pathTemplate: templateFile.path,
+            version: '1',
+            fields: [],
+          ),
+        );
+
+        expect(repository.softDeletedIds, [12]);
+        expect(await templateFile.exists(), isTrue);
+
+        await tempDir.delete(recursive: true);
+      },
+    );
+  });
 }
 
 class _FakeTemplateRepository implements TemplateRepository {
+  final List<int> softDeletedIds = [];
+
+  @override
+  Future<void> softDeleteTemplate(int id) async {
+    softDeletedIds.add(id);
+  }
+
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }

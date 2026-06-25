@@ -12,8 +12,17 @@ void setupRepositoriesModule() {
   sl.registerLazySingleton<TemplateRepository>(
     () => TemplateRepositoryImpl(localDataSource: inject()),
   );
+  sl.registerLazySingleton<ExportHistoryLocalDataSource>(
+    () => ExportHistoryLocalDataSourceImpl(inject()),
+  );
+  sl.registerLazySingleton<ExportHistoryRepository>(
+    () => ExportHistoryRepositoryImpl(localDataSource: inject()),
+  );
   sl.registerLazySingleton<TemplateService>(
     () => TemplateService(templateRepository: inject()),
+  );
+  sl.registerLazySingleton<ExportHistoryService>(
+    () => ExportHistoryService(repository: inject()),
   );
   sl.registerLazySingleton<SettingsRepository>(
     () => SettingsRepositoryImpl(inject()),
@@ -22,5 +31,7 @@ void setupRepositoriesModule() {
     () => DataExtractionService(),
   );
   sl.registerLazySingleton<GeminiService>(() => GeminiService(inject()));
-  sl.registerLazySingleton<TemplateParsingService>(() => TemplateParsingService());
+  sl.registerLazySingleton<TemplateParsingService>(
+    () => TemplateParsingService(),
+  );
 }

@@ -1,12 +1,12 @@
+import 'package:data/data.dart';
 import 'package:docu_fill/app.dart';
+import 'package:docu_fill/di/app_get_it.dart';
 import 'package:docu_fill/di/repositories_module.dart';
 import 'package:docu_fill/di/view_model_module.dart';
-import 'package:localization/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:localization/localization.dart';
 import 'package:window_manager/window_manager.dart';
-
-import 'package:data/data.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +29,6 @@ void main() async {
   await IsarDatabase.instance.initialize();
   setupRepositoriesModule();
   setupViewModelModule();
-
+  performMigrationIfNeeded(inject());
   runApp(const MyApp());
 }

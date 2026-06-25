@@ -4,8 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 
-class GeminiConfigFields extends StatelessWidget {
+class GeminiConfigFields extends StatefulWidget {
   const GeminiConfigFields({super.key});
+
+  @override
+  State<GeminiConfigFields> createState() => _GeminiConfigFieldsState();
+}
+
+class _GeminiConfigFieldsState extends State<GeminiConfigFields> {
+  bool _obscureApiKey = true;
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +26,18 @@ class GeminiConfigFields extends StatelessWidget {
             hintText: AppLang.messagesGeminiApiKeyHint.tr(),
             border: const OutlineInputBorder(),
             prefixIcon: const Icon(Icons.key),
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureApiKey ? Icons.visibility_off : Icons.visibility,
+              ),
+              onPressed: () {
+                setState(() {
+                  _obscureApiKey = !_obscureApiKey;
+                });
+              },
+            ),
           ),
-          obscureText: true,
+          obscureText: _obscureApiKey,
         ),
         Dimens.spacing.vertical(Dimens.size24),
         TextField(

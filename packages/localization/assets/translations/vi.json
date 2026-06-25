@@ -62,7 +62,11 @@
     "create_copy_error": "Lỗi khi tạo bản sao: {}",
     "export_summary": "Xuất tóm tắt (Text)",
     "import_ai_result": "Nhập kết quả AI cũ",
-    "extract_images": "Trích xuất hình ảnh"
+    "extract_images": "Trích xuất hình ảnh",
+    "quick_image_input": "Nhập hình nhanh",
+    "select_multiple_images": "Chọn nhiều ảnh cùng lúc",
+    "clear_all_images": "Xóa tất cả",
+    "confirm_and_apply": "Xác nhận & Áp dụng"
   },
   "labels": {
     "templates": "Mẫu",
@@ -116,7 +120,13 @@
     "select_all": "Chọn tất cả",
     "key": "Mã",
     "type": "Loại",
-    "tools": "Công cụ"
+    "tools": "Công cụ",
+    "quick_image_input_title": "Nhập hình nhanh",
+    "quick_image_input_subtitle": "Chọn nhiều ảnh và kéo thả giữa các ô để sắp xếp vị trí thích hợp",
+    "quick_image_input_tip": "Mẹo: Bạn có thể nhấn giữ chuột và kéo thả trực tiếp để đổi chỗ các ảnh!",
+    "mapped_images_count": "Đã nhập {} / {}",
+    "drag_to_reorder": "Kéo để sắp xếp",
+    "remove_image": "Xóa hình ảnh này"
   },
   "messages": {
     "review_and_configure_fields": "Xem lại và cấu hình các trường được phát hiện trong mẫu của bạn. Đảm bảo tất cả các trường được xác định chính xác và gán loại đầu vào phù hợp để thu thập dữ liệu chính xác.",
@@ -158,7 +168,8 @@
     "select_source_file": "Chọn tệp nguồn (Word/Excel)",
     "select_dest_folder": "Chọn thư mục lưu ảnh",
     "extract_success": "Đã trích xuất {} hình ảnh thành công!",
-    "extract_error": "Lỗi khi trích xuất hình ảnh: {}"
+    "extract_error": "Lỗi khi trích xuất hình ảnh: {}",
+    "splash_tagline": "Tự động hóa điền tài liệu thông minh"
   },
   "settings": {
     "general": {
