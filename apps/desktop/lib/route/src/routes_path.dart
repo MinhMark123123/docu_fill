@@ -4,6 +4,8 @@ class RoutesPath {
   // --- Main Sub-routes ---
   static const String splash = '/';
   static const String home = '/home'; // Relative to /main
+  static const String dashboard = '/dashboard';
+  static const String exportHistory = '/export-history';
   static const String setting = '/setting'; // Relative to /main
   static const String tool = '/tool'; // Relative to /main
 

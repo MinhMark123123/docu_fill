@@ -40,4 +40,10 @@ void setupViewModelModule() {
   registerViewModel(() => ToolViewModel());
   registerViewModel(() => SplashViewModel());
   registerViewModel(() => QuickImageInputViewModel());
+  registerViewModel(() => DashboardViewModel(exportHistoryRepository: inject()));
+  registerViewModel(() => ExportHistoryViewModel(
+        exportHistoryRepository: inject(),
+        templateService: inject(),
+        exportHistoryService: inject(),
+      ));
 }

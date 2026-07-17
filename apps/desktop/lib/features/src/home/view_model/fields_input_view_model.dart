@@ -141,6 +141,31 @@ class FieldsInputViewModel extends BaseViewModel {
     loadTemplates();
   }
 
+  void restoreFromHistory(ExportHistory history) {
+    _isExportSuccess.postValue(false);
+    _idsSelected.postValue(history.templateIds);
+    _directoryExported.postValue(history.exportDirectory);
+    _nameDocExported.text = history.baseFileName;
+    _currentSectionIndex.postValue(0);
+    _showSummary.postValue(false);
+
+    _fieldKeys.clear();
+    history.fieldValues.forEach((key, entry) {
+      if (entry.value != null) {
+        _fieldKeys[key] = entry.value;
+      }
+    });
+
+    _singleField.clear();
+    history.singleLineValues.forEach((key, entry) {
+      if (entry.value != null) {
+        _singleField[key] = entry.value;
+      }
+    });
+
+    loadTemplates();
+  }
+
   @override
   void onDispose() {
     super.onDispose();

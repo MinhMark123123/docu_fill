@@ -12,7 +12,7 @@ class AppTheme {
   static ThemeData get lightTheme {
     final textThemeLight = _buildTextTheme(
       AppTypography.appTextTheme,
-      AppColorsDefine.bodyTextColor.light.withOpacity(0.9),
+      AppColorsDefine.bodyTextColor.light.withValues(alpha: 0.9),
       AppColorsDefine.bodyTextColor.light,
     );
     final ColorScheme colorScheme = ColorScheme.fromSeed(
@@ -59,7 +59,7 @@ class AppTheme {
   static ThemeData get darkTheme {
     final textThemeDark = _buildTextTheme(
       AppTypography.appTextTheme,
-      Colors.white.withOpacity(0.95),
+      Colors.white.withValues(alpha: 0.95),
       AppColorsDefine.bodyTextColor.dark,
     );
     final colorScheme = ColorScheme.fromSeed(

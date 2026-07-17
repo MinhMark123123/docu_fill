@@ -28,6 +28,8 @@ class TemplateLocalDataSourceImpl implements TemplateLocalDataSource {
     return await _isar.templateConfigModels
         .filter()
         .isDeletedEqualTo(false)
+        .or()
+        .isDeletedIsNull()
         .findAll();
   }
 
@@ -36,7 +38,8 @@ class TemplateLocalDataSourceImpl implements TemplateLocalDataSource {
     return await _isar.templateConfigModels
         .filter()
         .templateNameEqualTo(name)
-        .isDeletedEqualTo(false)
+        .and()
+        .group((q) => q.isDeletedEqualTo(false).or().isDeletedIsNull())
         .findFirst();
   }
 
@@ -101,7 +104,8 @@ class TemplateLocalDataSourceImpl implements TemplateLocalDataSource {
     return await _isar.templateConfigModels
         .filter()
         .idEqualTo(id)
-        .isDeletedEqualTo(false)
+        .and()
+        .group((q) => q.isDeletedEqualTo(false).or().isDeletedIsNull())
         .findFirst();
   }
 

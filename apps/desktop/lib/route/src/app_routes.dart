@@ -74,6 +74,18 @@ final GoRouter router = GoRouter(
           ],
         ),
         GoRoute(
+          path: RoutesPath.dashboard,
+          builder: (BuildContext context, GoRouterState state) {
+            return const DashboardPage();
+          },
+        ),
+        GoRoute(
+          path: RoutesPath.exportHistory,
+          builder: (BuildContext context, GoRouterState state) {
+            return const ExportHistoryPage();
+          },
+        ),
+        GoRoute(
           path: RoutesPath.tool, // Use constant (relative)
           builder: (BuildContext context, GoRouterState state) {
             return const ToolPage();

@@ -114,7 +114,7 @@ class AppAvatar extends StatelessWidget {
                 radius: effectiveRadius,
                 backgroundColor:
                     placeholderBackgroundColor ??
-                    _getRandomBackgroundColor(displayName).withOpacity(0.7),
+                    _getRandomBackgroundColor(displayName).withValues(alpha: 0.7),
                 // Slightly transparent during load
                 child: SizedBox(
                   // You can put a CircularProgressIndicator here if desired

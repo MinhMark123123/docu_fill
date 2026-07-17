@@ -24,8 +24,12 @@ void main() {
           ],
         ),
       ],
-      fieldValues: {'customer_name': 'Minh'},
-      singleLineValues: {'note': 'Approved'},
+      fieldValues: {
+        'customer_name': FieldValueEntry(label: 'Customer name', value: 'Minh'),
+      },
+      singleLineValues: {
+        'note': FieldValueEntry(label: 'Note', value: 'Approved'),
+      },
       outputFiles: ['/tmp/exports/contract_Template.docx'],
       documentCount: 1,
     );
@@ -36,8 +40,10 @@ void main() {
     expect(restored.baseFileName, history.baseFileName);
     expect(restored.status, ExportHistoryStatus.success);
     expect(restored.templateSnapshots.first.templateName, 'Template');
-    expect(restored.fieldValues['customer_name'], 'Minh');
-    expect(restored.singleLineValues['note'], 'Approved');
+    expect(restored.fieldValues['customer_name']?.value, 'Minh');
+    expect(restored.fieldValues['customer_name']?.label, 'Customer name');
+    expect(restored.singleLineValues['note']?.value, 'Approved');
+    expect(restored.singleLineValues['note']?.label, 'Note');
     expect(restored.outputFiles, history.outputFiles);
   });
 }

@@ -13,6 +13,14 @@ class MainViewModel extends BaseViewModel {
   @Bind()
   late final _currentMenu = MainDesktopMenu.template.mtd(this);
 
+  List<MainDesktopMenu> get railMenus => [
+        MainDesktopMenu.template,
+        MainDesktopMenu.exportHistory,
+        MainDesktopMenu.upload,
+        MainDesktopMenu.tools,
+        MainDesktopMenu.setting,
+      ];
+
   void selectMenu(BuildContext context, MainDesktopMenu menu) {
     if (menu == _currentMenu.data &&
         GoRouter.of(context).state.fullPath == menu.pathRoute) {
@@ -32,6 +40,8 @@ class MainViewModel extends BaseViewModel {
 
 enum MainDesktopMenu {
   template,
+  dashboard,
+  exportHistory,
   upload,
   tools,
   setting;
@@ -40,6 +50,10 @@ enum MainDesktopMenu {
     switch (this) {
       case MainDesktopMenu.template:
         return AppLang.labelsTemplates.tr();
+      case MainDesktopMenu.dashboard:
+        return AppLang.labelsDashboard.tr();
+      case MainDesktopMenu.exportHistory:
+        return AppLang.labelsExportHistory.tr();
       case MainDesktopMenu.upload:
         return AppLang.actionsUpload.tr();
       case MainDesktopMenu.tools:
@@ -53,6 +67,10 @@ enum MainDesktopMenu {
     switch (this) {
       case MainDesktopMenu.template:
         return Icons.description_outlined;
+      case MainDesktopMenu.dashboard:
+        return Icons.dashboard_outlined;
+      case MainDesktopMenu.exportHistory:
+        return Icons.history_outlined;
       case MainDesktopMenu.upload:
         return Icons.upload_file_outlined;
       case MainDesktopMenu.tools:
@@ -66,6 +84,10 @@ enum MainDesktopMenu {
     switch (this) {
       case MainDesktopMenu.template:
         return Icons.description;
+      case MainDesktopMenu.dashboard:
+        return Icons.dashboard;
+      case MainDesktopMenu.exportHistory:
+        return Icons.history;
       case MainDesktopMenu.upload:
         return Icons.upload_file;
       case MainDesktopMenu.tools:
@@ -79,6 +101,10 @@ enum MainDesktopMenu {
     switch (this) {
       case MainDesktopMenu.template:
         return RoutesPath.home;
+      case MainDesktopMenu.dashboard:
+        return RoutesPath.dashboard;
+      case MainDesktopMenu.exportHistory:
+        return RoutesPath.exportHistory;
       case MainDesktopMenu.upload:
         return RoutesPath.homeUpload;
       case MainDesktopMenu.tools:
@@ -90,6 +116,8 @@ enum MainDesktopMenu {
 
   static MainDesktopMenu fromUri(Uri uri) {
     final path = uri.path;
+    if (path.startsWith(RoutesPath.dashboard)) return MainDesktopMenu.dashboard;
+    if (path.startsWith(RoutesPath.exportHistory)) return MainDesktopMenu.exportHistory;
     if (path.startsWith(RoutesPath.homeUpload)) return MainDesktopMenu.upload;
     if (path.startsWith(RoutesPath.homeConfigure)) {
       final mode = uri.queryParameters['mode'];

@@ -1,5 +1,5 @@
-import 'package:core/core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class DateInputFormat extends StatelessWidget {
   const DateInputFormat({super.key});

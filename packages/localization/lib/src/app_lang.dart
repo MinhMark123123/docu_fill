@@ -20,6 +20,7 @@ abstract class AppLang {
   static const String actionsConfirm = "actions.confirm";
   static const String actionsConfirmAndApply = "actions.confirm_and_apply";
   static const String actionsContinue = "actions.continue";
+  static const String actionsCopyPath = "actions.copy_path";
   static const String actionsCreate = "actions.create";
   static const String actionsCreateCopy = "actions.create_copy";
   static const String actionsCreateCopyError = "actions.create_copy_error";
@@ -47,12 +48,15 @@ abstract class AppLang {
   static const String actionsNo = "actions.no";
   static const String actionsOpen = "actions.open";
   static const String actionsOpenDocument = "actions.open_document";
+  static const String actionsOpenFolder = "actions.open_folder";
   static const String actionsOpenSettings = "actions.open_settings";
   static const String actionsPickImage = "actions.pick_image";
   static const String actionsPreviewDocument = "actions.preview_document";
   static const String actionsProceedToPayment = "actions.proceed_to_payment";
   static const String actionsQuickImageInput = "actions.quick_image_input";
+  static const String actionsReExport = "actions.re_export";
   static const String actionsReset = "actions.reset";
+  static const String actionsRestoreToForm = "actions.restore_to_form";
   static const String actionsRetryAction = "actions.retry_action";
   static const String actionsReturnToTemplates = "actions.return_to_templates";
   static const String actionsSave = "actions.save";
@@ -77,21 +81,32 @@ abstract class AppLang {
 
   // --- Labels ---
   static const String labelsActions = "labels.actions";
+  static const String labelsAll = "labels.all";
   static const String labelsAllTemplates = "labels.all_templates";
+  static const String labelsBaseFileName = "labels.base_file_name";
   static const String labelsCm = "labels.cm";
   static const String labelsCommon = "labels.common";
   static const String labelsConfigureTemplateFields = "labels.configure_template_fields";
+  static const String labelsDailyExports = "labels.daily_exports";
+  static const String labelsDashboard = "labels.dashboard";
   static const String labelsDefaultValue = "labels.default_value";
   static const String labelsDetectedFields = "labels.detected_fields";
+  static const String labelsDocumentCount = "labels.document_count";
   static const String labelsDocuments = "labels.documents";
   static const String labelsDragToReorder = "labels.drag_to_reorder";
   static const String labelsEnableMultipleChoice = "labels.enable_multiple_choice";
   static const String labelsEnterTemplateName = "labels.enter_template_name";
   static const String labelsError = "labels.error";
   static const String labelsExportConfiguration = "labels.export_configuration";
+  static const String labelsExportDirectory = "labels.export_directory";
+  static const String labelsExportHistory = "labels.export_history";
+  static const String labelsExportHistoryDetail = "labels.export_history_detail";
   static const String labelsExportProgress = "labels.export_progress";
+  static const String labelsExports = "labels.exports";
+  static const String labelsFailed = "labels.failed";
   static const String labelsFieldKey = "labels.field_key";
   static const String labelsFieldName = "labels.field_name";
+  static const String labelsFiles = "labels.files";
   static const String labelsGeneral = "labels.general";
   static const String labelsGeneralInfo = "labels.general_info";
   static const String labelsHeight = "labels.height";
@@ -102,6 +117,7 @@ abstract class AppLang {
   static const String labelsInputOptions = "labels.input_options";
   static const String labelsInputSummary = "labels.input_summary";
   static const String labelsInputType = "labels.input_type";
+  static const String labelsInputValues = "labels.input_values";
   static const String labelsKey = "labels.key";
   static const String labelsLogDetails = "labels.log_details";
   static const String labelsLogHistory = "labels.log_history";
@@ -109,7 +125,9 @@ abstract class AppLang {
   static const String labelsMultiple = "labels.multiple";
   static const String labelsNewTemplate = "labels.new_template";
   static const String labelsOptions = "labels.options";
+  static const String labelsOutputFiles = "labels.output_files";
   static const String labelsOverview = "labels.overview";
+  static const String labelsPartialSuccess = "labels.partial_success";
   static const String labelsPrompt = "labels.prompt";
   static const String labelsQuickActions = "labels.quick_actions";
   static const String labelsQuickImageInputSubtitle = "labels.quick_image_input_subtitle";
@@ -119,17 +137,27 @@ abstract class AppLang {
   static const String labelsRemoveImage = "labels.remove_image";
   static const String labelsRequired = "labels.required";
   static const String labelsResponse = "labels.response";
+  static const String labelsSearchHistoryHint = "labels.search_history_hint";
   static const String labelsSection = "labels.section";
   static const String labelsSelectAll = "labels.select_all";
+  static const String labelsSelectHistoryHint = "labels.select_history_hint";
+  static const String labelsSelectMonth = "labels.select_month";
   static const String labelsSettings = "labels.settings";
   static const String labelsSingle = "labels.single";
+  static const String labelsStatus = "labels.status";
+  static const String labelsSuccess = "labels.success";
+  static const String labelsSuccessRate = "labels.success_rate";
   static const String labelsSupportedFileTypes = "labels.supported_file_types";
   static const String labelsTemplateFill = "labels.template_fill";
   static const String labelsTemplateName = "labels.template_name";
+  static const String labelsTemplateSnapshots = "labels.template_snapshots";
   static const String labelsTemplates = "labels.templates";
   static const String labelsThemeColor = "labels.theme_color";
   static const String labelsTimestamp = "labels.timestamp";
   static const String labelsTools = "labels.tools";
+  static const String labelsTopTemplates = "labels.top_templates";
+  static const String labelsTotalExportActions = "labels.total_export_actions";
+  static const String labelsTotalExportedFiles = "labels.total_exported_files";
   static const String labelsType = "labels.type";
   static const String labelsUnit = "labels.unit";
   static const String labelsUploadDocxFile = "labels.upload_docx_file";
@@ -147,6 +175,7 @@ abstract class AppLang {
   static const String messagesEnterDateFormat = "messages.enter_date_format";
   static const String messagesEnterTemplateNameHint = "messages.enter_template_name_hint";
   static const String messagesExcelUnsupportedFormat = "messages.excel_unsupported_format";
+  static const String messagesExportDirNotFound = "messages.export_dir_not_found";
   static const String messagesExportSummarySuccess = "messages.export_summary_success";
   static const String messagesExtractError = "messages.extract_error";
   static const String messagesExtractImagesDesc = "messages.extract_images_desc";
@@ -163,9 +192,15 @@ abstract class AppLang {
   static const String messagesImportSetting = "messages.import_setting";
   static const String messagesInputTextHint = "messages.input_text_hint";
   static const String messagesNameTheDocumentExported = "messages.name_the_document_exported";
+  static const String messagesNoHistoryFound = "messages.no_history_found";
   static const String messagesNoLogsFound = "messages.no_logs_found";
   static const String messagesNoMatchingFields = "messages.no_matching_fields";
+  static const String messagesPathCopied = "messages.path_copied";
   static const String messagesPickFolderToExport = "messages.pick_folder_to_export";
+  static const String messagesReExportConfirm = "messages.re_export_confirm";
+  static const String messagesReExportError = "messages.re_export_error";
+  static const String messagesReExportSuccess = "messages.re_export_success";
+  static const String messagesRestoreConfirm = "messages.restore_confirm";
   static const String messagesReviewAndConfigureFields = "messages.review_and_configure_fields";
   static const String messagesReviewBeforeExport = "messages.review_before_export";
   static const String messagesSelectDestFolder = "messages.select_dest_folder";
@@ -176,6 +211,7 @@ abstract class AppLang {
   static const String messagesSingleLineTextHint = "messages.single_line_text_hint";
   static const String messagesSplashTagline = "messages.splash_tagline";
   static const String messagesTemplateFieldCount = "messages.template_field_count";
+  static const String messagesTemplateFileNotFound = "messages.template_file_not_found";
   static const String messagesUploadTemplate = "messages.upload_template";
 
   // --- Settings ---

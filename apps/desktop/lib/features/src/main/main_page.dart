@@ -3,6 +3,7 @@ import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/features/page.dart';
 import 'package:docu_fill/features/src/main/view_model/main_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
 import 'package:go_router/go_router.dart';
 
@@ -39,20 +40,31 @@ class MainPage extends BaseView<MainViewModel> {
                 unselectedLabelTextStyle: context.textTheme.labelSmall
                     ?.copyWith(color: context.colorScheme.onSurfaceVariant),
                 destinations:
-                    MainDesktopMenu.values.map((e) {
+                    viewModel.railMenus.map((e) {
                       return NavigationRailDestination(
                         icon: Icon(e.icon()),
                         selectedIcon: Icon(e.selectedIcon()),
                         label: Text(e.label()),
                       );
                     }).toList(),
-                selectedIndex: MainDesktopMenu.values.indexOf(currentMenu),
+                selectedIndex: viewModel.railMenus.contains(currentMenu)
+                    ? viewModel.railMenus.indexOf(currentMenu)
+                    : null,
                 onDestinationSelected: (index) {
-                  viewModel.selectMenu(context, MainDesktopMenu.values[index]);
+                  viewModel.selectMenu(context, viewModel.railMenus[index]);
                 },
                 leading: Padding(
                   padding: EdgeInsets.symmetric(vertical: Dimens.size24),
-                  child: AppAvatar(displayName: ""),
+                  child: Tooltip(
+                    message: AppLang.labelsDashboard.tr(),
+                    child: InkWell(
+                      onTap: () {
+                        viewModel.selectMenu(context, MainDesktopMenu.dashboard);
+                      },
+                      customBorder: const CircleBorder(),
+                      child: AppAvatar(displayName: ""),
+                    ),
+                  ),
                 ),
               );
             },

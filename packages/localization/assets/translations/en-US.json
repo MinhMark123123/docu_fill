@@ -66,7 +66,11 @@
     "quick_image_input": "Quick Image Input",
     "select_multiple_images": "Select multiple images at once",
     "clear_all_images": "Clear all",
-    "confirm_and_apply": "Confirm & Apply"
+    "confirm_and_apply": "Confirm & Apply",
+    "re_export": "Re-export",
+    "restore_to_form": "Restore to Form",
+    "open_folder": "Open Folder",
+    "copy_path": "Copy path"
   },
   "labels": {
     "templates": "Templates",
@@ -126,7 +130,31 @@
     "quick_image_input_tip": "Tip: You can press and drag directly to swap images!",
     "mapped_images_count": "Mapped {} / {}",
     "drag_to_reorder": "Drag to reorder",
-    "remove_image": "Remove this image"
+    "remove_image": "Remove this image",
+    "dashboard": "Dashboard",
+    "export_history": "Export History",
+    "search_history_hint": "Search by file name, template, fields...",
+    "status": "Status",
+    "all": "All",
+    "success": "Success",
+    "partial_success": "Partial Success",
+    "failed": "Failed",
+    "export_history_detail": "Export Details",
+    "base_file_name": "Base File Name",
+    "export_directory": "Export Directory",
+    "document_count": "Document Count",
+    "output_files": "Output Files",
+    "input_values": "Input Values",
+    "template_snapshots": "Templates Used",
+    "total_exported_files": "Total Exported Files",
+    "total_export_actions": "Total Export Actions",
+    "success_rate": "Success Rate",
+    "top_templates": "Top Templates",
+    "daily_exports": "Daily Exports",
+    "select_month": "Select Month",
+    "exports": "exports",
+    "files": "files",
+    "select_history_hint": "Select an item from history to view details"
   },
   "messages": {
     "review_and_configure_fields": "Review and configure the fields detected in your template. Ensure all fields are correctly identified and assigned the appropriate input type for accurate data collection.",
@@ -169,7 +197,15 @@
     "select_dest_folder": "Select Destination Folder",
     "extract_success": "Extracted {} images successfully!",
     "extract_error": "Error extracting images: {}",
-    "splash_tagline": "Smart Document Filling & Automation"
+    "splash_tagline": "Smart Document Filling & Automation",
+    "re_export_confirm": "Are you sure you want to re-export this history? This will generate a new document.",
+    "restore_confirm": "This will populate the form with values from this history. Continue?",
+    "re_export_success": "Re-exported successfully!",
+    "re_export_error": "Failed to re-export: {}",
+    "no_history_found": "No export history found.",
+    "template_file_not_found": "Template file not found at: {}",
+    "export_dir_not_found": "Export directory not found at: {}",
+    "path_copied": "Copied path to clipboard"
   },
   "settings": {
     "general": {

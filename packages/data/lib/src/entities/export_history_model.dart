@@ -50,8 +50,14 @@ class ExportHistoryModel {
       templateSnapshotsJson: jsonEncode(
         history.templateSnapshots.map((template) => template.toJson()).toList(),
       ),
-      fieldValuesJson: jsonEncode(history.fieldValues),
-      singleLineValuesJson: jsonEncode(history.singleLineValues),
+      fieldValuesJson: jsonEncode(
+        history.fieldValues.map((key, value) => MapEntry(key, value.toJson())),
+      ),
+      singleLineValuesJson: jsonEncode(
+        history.singleLineValues.map(
+          (key, value) => MapEntry(key, value.toJson()),
+        ),
+      ),
       outputFiles: history.outputFiles,
       errorMessage: history.errorMessage,
       documentCount: history.documentCount,
@@ -68,8 +74,8 @@ class ExportHistoryModel {
       status: _statusFromName(status),
       templateIds: templateIds,
       templateSnapshots: _templateSnapshots(),
-      fieldValues: _stringMap(fieldValuesJson),
-      singleLineValues: _stringMap(singleLineValuesJson),
+      fieldValues: _fieldValueMap(fieldValuesJson),
+      singleLineValues: _fieldValueMap(singleLineValuesJson),
       outputFiles: outputFiles,
       errorMessage: errorMessage,
       documentCount: documentCount,
@@ -86,12 +92,23 @@ class ExportHistoryModel {
         .toList();
   }
 
-  Map<String, String?> _stringMap(String content) {
+  Map<String, FieldValueEntry> _fieldValueMap(String content) {
     final decoded = jsonDecode(content);
     if (decoded is! Map) return {};
     return decoded.map(
-      (key, value) => MapEntry(key.toString(), value?.toString()),
+      (key, value) => MapEntry(
+        key.toString(),
+        _fieldValueEntry(key.toString(), value),
+      ),
     );
+  }
+
+  // Old records stored plain string values instead of {label, value} objects.
+  FieldValueEntry _fieldValueEntry(String key, dynamic value) {
+    if (value is Map) {
+      return FieldValueEntry.fromJson(Map<String, dynamic>.from(value));
+    }
+    return FieldValueEntry(label: key, value: value?.toString());
   }
 
   ExportHistoryStatus _statusFromName(String value) {

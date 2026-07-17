@@ -76,19 +76,7 @@ class _DateTimePickerButtonState extends State<DateTimePickerButton> {
       return;
     }
 
-    // 2. Pick Time (initialize with current time if no date was previously selected,
-    // or use the time from the previously selected DateTime)
-    final TimeOfDay initialTimeForPicker =
-        _selectedDateTime != null
-            ? TimeOfDay.fromDateTime(_selectedDateTime!)
-            : TimeOfDay.fromDateTime(
-              now,
-            ); // Crucially, use current time for time picker start
     if (!context.mounted) return;
-    /*final TimeOfDay? pickedTime = await showTimePicker(
-      context: context,
-      initialTime: initialTimeForPicker,
-    );*/
 
     // 3. Combine date and time
     final newSelectedDateTime = DateTime(

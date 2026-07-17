@@ -13,4 +13,8 @@ export 'src/tool/tool_page.dart';
 export 'src/tool/view_model/tool_view_model.dart';
 export 'src/splash/splash_page.dart';
 export 'src/splash/view_model/splash_view_model.dart';
+export 'src/export_history/export_history_page.dart';
+export 'src/export_history/view_model/export_history_view_model.dart';
+export 'src/dashboard/dashboard_page.dart';
+export 'src/dashboard/view_model/dashboard_view_model.dart';
 
