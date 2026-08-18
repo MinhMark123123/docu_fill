@@ -8,5 +8,6 @@ abstract class ExportHistoryRepository {
     required DateTime start,
     required DateTime end,
   });
+  Future<List<ExportHistory>> getHistoriesByMonth(int year, int month);
   Stream<List<ExportHistory>> watchRecentHistories({int limit = 50});
 }

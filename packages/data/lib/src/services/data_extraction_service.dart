@@ -57,18 +57,4 @@ class DataExtractionService {
       rethrow;
     }
   }
-
-  Future<String> _extractFromPdf(File file) async {
-    try {
-      final bytes = await file.readAsBytes();
-      final PdfDocument document = PdfDocument(inputBytes: bytes);
-      final PdfTextExtractor extractor = PdfTextExtractor(document);
-      final String text = extractor.extractText();
-      document.dispose();
-      return text;
-    } catch (e) {
-      debugPrint('Error extracting from PDF: $e');
-      return '';
-    }
-  }
 }

@@ -66,7 +66,11 @@
     "quick_image_input": "Nhập hình nhanh",
     "select_multiple_images": "Chọn nhiều ảnh cùng lúc",
     "clear_all_images": "Xóa tất cả",
-    "confirm_and_apply": "Xác nhận & Áp dụng"
+    "confirm_and_apply": "Xác nhận & Áp dụng",
+    "re_export": "Xuất lại",
+    "restore_to_form": "Nạp lại vào form",
+    "open_folder": "Mở thư mục",
+    "copy_path": "Sao chép đường dẫn"
   },
   "labels": {
     "templates": "Mẫu",
@@ -126,7 +130,31 @@
     "quick_image_input_tip": "Mẹo: Bạn có thể nhấn giữ chuột và kéo thả trực tiếp để đổi chỗ các ảnh!",
     "mapped_images_count": "Đã nhập {} / {}",
     "drag_to_reorder": "Kéo để sắp xếp",
-    "remove_image": "Xóa hình ảnh này"
+    "remove_image": "Xóa hình ảnh này",
+    "dashboard": "Thống kê",
+    "export_history": "Lịch sử xuất",
+    "search_history_hint": "Tìm kiếm theo tên file, template, trường...",
+    "status": "Trạng thái",
+    "all": "Tất cả",
+    "success": "Thành công",
+    "partial_success": "Thành công một phần",
+    "failed": "Lỗi",
+    "export_history_detail": "Chi tiết xuất bản",
+    "base_file_name": "Tên tệp cơ bản",
+    "export_directory": "Thư mục xuất",
+    "document_count": "Số lượng văn bản",
+    "output_files": "Tệp đầu ra",
+    "input_values": "Dữ liệu đã nhập",
+    "template_snapshots": "Mẫu đã sử dụng",
+    "total_exported_files": "Tổng số tệp đã xuất",
+    "total_export_actions": "Tổng số lần xuất",
+    "success_rate": "Tỷ lệ thành công",
+    "top_templates": "Mẫu dùng nhiều nhất",
+    "daily_exports": "Số lượng xuất theo ngày",
+    "select_month": "Chọn tháng",
+    "exports": "lượt xuất",
+    "files": "tệp",
+    "select_history_hint": "Chọn một mục từ lịch sử để xem chi tiết"
   },
   "messages": {
     "review_and_configure_fields": "Xem lại và cấu hình các trường được phát hiện trong mẫu của bạn. Đảm bảo tất cả các trường được xác định chính xác và gán loại đầu vào phù hợp để thu thập dữ liệu chính xác.",
@@ -169,7 +197,15 @@
     "select_dest_folder": "Chọn thư mục lưu ảnh",
     "extract_success": "Đã trích xuất {} hình ảnh thành công!",
     "extract_error": "Lỗi khi trích xuất hình ảnh: {}",
-    "splash_tagline": "Tự động hóa điền tài liệu thông minh"
+    "splash_tagline": "Tự động hóa điền tài liệu thông minh",
+    "re_export_confirm": "Bạn có chắc chắn muốn xuất lại lịch sử này? Thao tác này sẽ tạo một tài liệu mới.",
+    "restore_confirm": "Thao tác này sẽ điền dữ liệu của lịch sử này vào form hiện tại. Tiếp tục?",
+    "re_export_success": "Xuất lại thành công!",
+    "re_export_error": "Xuất lại thất bại: {}",
+    "no_history_found": "Không tìm thấy lịch sử xuất nào.",
+    "template_file_not_found": "Không tìm thấy tệp mẫu tại: {}",
+    "export_dir_not_found": "Không tìm thấy thư mục xuất tại: {}",
+    "path_copied": "Đã sao chép đường dẫn vào clipboard"
   },
   "settings": {
     "general": {

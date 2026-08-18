@@ -17,19 +17,36 @@ class ExportHistoryService {
     required Map<String, String?> singleLineValues,
     required TemplateExportResult result,
   }) async {
+    final labelByKey = <String, String>{
+      for (final template in templates)
+        for (final field in template.fields) field.key: field.label,
+    };
+
     final history = ExportHistory(
       baseFileName: baseFileName,
       exportDirectory: exportDirectory,
       status: _resolveStatus(result),
       templateIds: templates.map((template) => template.id).toList(),
       templateSnapshots: templates,
-      fieldValues: Map<String, String?>.from(fieldValues),
-      singleLineValues: Map<String, String?>.from(singleLineValues),
+      fieldValues: _toFieldValueEntries(fieldValues, labelByKey),
+      singleLineValues: _toFieldValueEntries(singleLineValues, labelByKey),
       outputFiles: result.outputFiles,
       errorMessage: result.errorMessage,
       documentCount: result.documentCount,
     );
     await _repository.saveHistory(history);
+  }
+
+  Map<String, FieldValueEntry> _toFieldValueEntries(
+    Map<String, String?> values,
+    Map<String, String> labelByKey,
+  ) {
+    return values.map(
+      (key, value) => MapEntry(
+        key,
+        FieldValueEntry(label: labelByKey[key] ?? key, value: value),
+      ),
+    );
   }
 
   ExportHistoryStatus _resolveStatus(TemplateExportResult result) {

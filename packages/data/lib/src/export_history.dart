@@ -26,6 +26,19 @@ enum CaseStudyStatus {
 }
 
 @JsonSerializable(explicitToJson: true)
+class FieldValueEntry {
+  final String label;
+  final String? value;
+
+  const FieldValueEntry({required this.label, this.value});
+
+  factory FieldValueEntry.fromJson(Map<String, dynamic> json) =>
+      _$FieldValueEntryFromJson(json);
+
+  Map<String, dynamic> toJson() => _$FieldValueEntryToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
 class ExportHistory {
   int id;
   final DateTime createdAt;
@@ -34,8 +47,8 @@ class ExportHistory {
   final ExportHistoryStatus status;
   final List<int> templateIds;
   final List<TemplateConfig> templateSnapshots;
-  final Map<String, String?> fieldValues;
-  final Map<String, String?> singleLineValues;
+  final Map<String, FieldValueEntry> fieldValues;
+  final Map<String, FieldValueEntry> singleLineValues;
   final List<String> outputFiles;
   final String? errorMessage;
   final int documentCount;

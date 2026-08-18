@@ -661,26 +661,26 @@ packages:
     dependency: transitive
     description:
       name: maac_mvvm
-      sha256: c05935db2dc533542f7ebf11a7f4e4c511008213f561de19b988191979e0f442
+      sha256: "5328bfc3779d18b19fd9ac5194b62fb66e77dd326e12f9c2133f386d2525192b"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.2"
+    version: "0.2.3"
   maac_mvvm_annotation:
     dependency: "direct main"
     description:
       name: maac_mvvm_annotation
-      sha256: c756bbc55e5a525f32400373c2829e0d83b289764cd0b48b4831a1b91e4c3771
+      sha256: "2e4aff0d0d1f8490579c973efb4ea5b8733fc9c438842b21864c05aa1c9c3dbd"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.3"
+    version: "0.0.3+1"
   maac_mvvm_generator:
     dependency: "direct dev"
     description:
       name: maac_mvvm_generator
-      sha256: "5b30c5e81d4d1749a689bd92b33e949e9223f6ef340443b2db467a89c1cc1336"
+      sha256: "22645d57090c360ccadd3c886786938821dfe93ca9d4d90bb179ad5048f9790a"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.4"
+    version: "0.0.4+1"
   maac_mvvm_with_get_it:
     dependency: "direct main"
     description:

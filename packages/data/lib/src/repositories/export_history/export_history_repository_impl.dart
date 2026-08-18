@@ -38,6 +38,13 @@ class ExportHistoryRepositoryImpl implements ExportHistoryRepository {
   }
 
   @override
+  Future<List<ExportHistory>> getHistoriesByMonth(int year, int month) async {
+    final start = DateTime(year, month, 1);
+    final end = DateTime(year, month + 1, 1).subtract(const Duration(milliseconds: 1));
+    return getHistoriesBetween(start: start, end: end);
+  }
+
+  @override
   Stream<List<ExportHistory>> watchRecentHistories({int limit = 50}) {
     return localDataSource
         .watchRecentHistories(limit: limit)

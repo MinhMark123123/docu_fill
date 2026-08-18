@@ -69,6 +69,9 @@ class DocxUtils {
     for (final key in singleLines.keys) {
       replacements.remove(key);
     }
+    for (final key in activeImageReplacements.keys) {
+      replacements.remove(key);
+    }
     for (final file in originalArchive) {
       if (file.isFile && isValidDocNamePart(file)) {
         final xmlContent = utf8.decode(file.content);
@@ -166,7 +169,6 @@ class DocxUtils {
               textNodes.map((t) => t.innerText).join();
           String currentText = originalFullText;
 
-          bool textChanged = false;
           bool paragraphRemoved = false;
 
           // --- STEP 2: Handle Single Line Removals ---
@@ -207,7 +209,6 @@ class DocxUtils {
               if (nodeText.contains(key)) {
                 nodeText = nodeText.replaceAll(key, value);
                 nodeChanged = true;
-                textChanged = true;
               }
             });
 
@@ -216,7 +217,6 @@ class DocxUtils {
               if (value != null && value.isNotEmpty && nodeText.contains(key)) {
                 nodeText = nodeText.replaceAll(key, value);
                 nodeChanged = true;
-                textChanged = true;
               }
             });
 
@@ -270,7 +270,6 @@ class DocxUtils {
             for (int k = 1; k < textNodes.length; k++) {
               textNodes[k].innerText = '';
             }
-            textChanged = true;
           }
         }
 
