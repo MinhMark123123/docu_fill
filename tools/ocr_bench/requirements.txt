@@ -1,0 +1,14 @@
+# Install torch/torchvision from the CPU index first:
+#   pip install torch==2.15.0 torchvision==0.29.2 --index-url https://download.pytorch.org/whl/cpu
+# vietocr is installed with --no-deps (its pinned deps are training-only):
+#   pip install vietocr==0.3.13 --no-deps
+einops==0.8.2
+gdown==6.5.1
+numpy==2.5.4
+onnxruntime==1.31.1
+opencv-python-headless==5.0.0.93
+pillow==13.0.0
+pymupdf==2.0
+PyYAML==6.0.3
+RapidFuzz==3.14.6
+rapidocr==3.10.0

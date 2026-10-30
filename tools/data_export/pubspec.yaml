@@ -1,0 +1,14 @@
+name: docu_fill_data_export
+description: Convert DocuFill data collected from installed apps into JSON datasets.
+publish_to: 'none'
+version: 1.0.0
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  data:
+    path: ../../packages/data
+  isar_community: 3.3.2
+  archive: ^3.3.6
+  path: ^1.9.1
