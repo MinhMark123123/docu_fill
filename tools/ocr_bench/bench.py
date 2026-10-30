@@ -23,6 +23,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import engines  # noqa: E402  (installs netguard)
+import layout  # noqa: E402
 
 from rapidfuzz import fuzz  # noqa: E402
 
@@ -101,6 +102,17 @@ def match(value: str, text_exact: str, text_loose: str) -> str:
     return "miss"
 
 
+def document_text(result: dict, pdf: str, use_layout: bool, text_of) -> str:
+    """Joins `text_of(line)` for every OCR line, in layout order if requested."""
+    if not use_layout:
+        return "\n".join(text_of(l) for p in result["pages"] for l in p["lines"])
+    pages = []
+    for (_, img), page in zip(engines.render_pages(pdf, result["dpi"]), result["pages"]):
+        lines = [{**l, "text": text_of(l)} for l in page["lines"]]
+        pages.append(layout.page_text(lines, img))
+    return "\n".join(pages)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--pdf-dir", required=True)
@@ -110,6 +122,7 @@ def main() -> None:
     ap.add_argument("--engines", default=",".join(engines.ENGINES))
     ap.add_argument("--dpi", default="200")
     ap.add_argument("--out", default="out")
+    ap.add_argument("--layout", action="store_true", help="rebuild text from table cells")
     args = ap.parse_args()
 
     out = Path(args.out)
@@ -128,6 +141,8 @@ def main() -> None:
     for engine_name in args.engines.split(","):
         for dpi in map(int, args.dpi.split(",")):
             totals = {"all": [0, 0, 0], "pdf": [0, 0, 0], "num": [0, 0, 0]}  # exact, any, count
+            num_auto = 0  # numeric values found using only lines both recognizers agree on
+            digit_lines = conflict_lines = 0
             seconds, pages = 0.0, 0
             for case in cases:
                 pdf = find_pdf(args.pdf_dir, case["pdf_prefix"])
@@ -138,14 +153,27 @@ def main() -> None:
                 seconds += sum(p["seconds"] for p in result["pages"])
                 pages += len(result["pages"])
 
-                text = "\n".join(l["text"] for p in result["pages"] for l in p["lines"])
+                all_lines = [l for p in result["pages"] for l in p["lines"]]
+                for l in all_lines:
+                    if l.get("alt") is not None:  # re-derive so cached runs follow reconcile()
+                        l["safe"], l["flag"] = engines.reconcile(l["text"], l["alt"])
+                text = document_text(result, pdf, args.layout, lambda l: l["text"])
                 text_exact, text_loose = norm_exact(text), norm_loose(text)
+                digit_lines += sum(1 for l in all_lines if l.get("flag"))
+                conflict_lines += sum(1 for l in all_lines if l.get("flag") == "digits_conflict")
+                # Disputed numbers are masked, so values relying on them are not "auto".
+                agreed = document_text(
+                    result, pdf, args.layout, lambda l: l.get("safe") or l["text"]
+                )
+                agreed_exact, agreed_loose = norm_exact(agreed), norm_loose(agreed)
                 gemini = gemini_by_file.get(pdf_name, {})
                 for key, value in gold_values(histories[case["history_id"]]).items():
                     level = match(value, text_exact, text_loose)
                     # Gemini read this exact value from the PDF -> surely on the page.
                     confirmed = norm_loose(str(gemini.get(key, ""))) == norm_loose(value)
                     numeric = is_numeric(value)
+                    auto = numeric and match(value, agreed_exact, agreed_loose) != "miss"
+                    num_auto += confirmed and auto
                     buckets = ["all"] + ["pdf"] * confirmed + ["num"] * (confirmed and numeric)
                     for bucket in buckets:
                         totals[bucket][0] += level == "exact"
@@ -155,7 +183,7 @@ def main() -> None:
                         {
                             "engine": engine_name, "dpi": dpi, "case": case["id"],
                             "key": key, "gold": value, "pdf_confirmed": confirmed, "numeric": numeric,
-                            "match": level,
+                            "match": level, "numeric_auto": auto,
                         }
                     )
             row = {"engine": engine_name, "dpi": dpi, "sec_per_page": round(seconds / max(pages, 1), 2)}
@@ -163,6 +191,9 @@ def main() -> None:
                 row[f"{bucket}_n"] = count
                 row[f"{bucket}_exact"] = round(exact / max(count, 1), 3)
                 row[f"{bucket}_found"] = round(found / max(count, 1), 3)
+            row["num_auto"] = round(num_auto / max(totals["num"][2], 1), 3)
+            row["conflict_rate"] = round(conflict_lines / max(digit_lines, 1), 3)
+            row["layout"] = args.layout
             summary.append(row)
             print(json.dumps(row), flush=True)
 
@@ -175,13 +206,13 @@ def main() -> None:
         writer = csv.DictWriter(f, fieldnames=list(summary[0]))
         writer.writeheader()
         writer.writerows(summary)
-    print("\nengine               dpi  s/page  all(n) exact found  pdf(n) exact found  num(n) found")
+    print("\nengine               dpi  s/page  all(n) exact found  pdf(n) exact found  num(n) found  auto conflict")
     for r in summary:
         print(
             f"{r['engine']:<20} {r['dpi']:>3} {r['sec_per_page']:>7} "
             f"{r['all_n']:>6} {r['all_exact']:>5} {r['all_found']:>5} "
             f"{r['pdf_n']:>7} {r['pdf_exact']:>5} {r['pdf_found']:>5}"
-            f"  {r['num_n']:>6} {r['num_found']:>5}"
+            f"  {r['num_n']:>6} {r['num_found']:>5} {r['num_auto']:>5} {r['conflict_rate']:>8}"
         )
 
 

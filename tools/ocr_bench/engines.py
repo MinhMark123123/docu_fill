@@ -1,6 +1,7 @@
 """OCR engines used by the benchmark. All models load from ./models only."""
 
 import io
+import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
@@ -21,6 +22,9 @@ class Line:
     text: str
     box: list  # 4 points [[x, y], ...] in page pixels
     score: float
+    alt: str | None = None  # second recognizer's reading (hybrid engine)
+    flag: str | None = None  # "digits_agree" / "digits_conflict"
+    safe: str | None = None  # text with disputed numbers masked
 
 
 def render_pages(pdf_path: str, dpi: int):
@@ -32,11 +36,12 @@ def render_pages(pdf_path: str, dpi: int):
         yield i, img.copy()
 
 
-def _rapid(det: str, rec: str | None, version, det_type, rec_type, lang=None):
+def _rapid(det: str, rec: str | None, version, det_type, rec_type, lang=None, text_score=0.5):
     from rapidocr import RapidOCR
 
     params = {
         "Global.log_level": "warning",
+        "Global.text_score": text_score,
         "Global.max_side_len": 4000,
         "Cls.model_path": str(MODELS / "ch_ppocr_mobile_v2.0_cls_mobile.onnx"),
         "Det.model_path": str(MODELS / det),
@@ -93,33 +98,35 @@ def _crop_quad(img: np.ndarray, box: np.ndarray, pad: int = 3) -> np.ndarray:
     )
 
 
+def _vietocr(model: str):
+    from vietocr.tool.config import Cfg
+    from vietocr.tool.predictor import Predictor
+
+    cfg = Cfg.load_config_from_file(str(MODELS / "vietocr" / "base.yml"))
+    cfg.update(
+        Cfg.load_config_from_file(
+            str(MODELS / "vietocr" / f"{model.replace('_', '-')}.yml")
+        )
+    )
+    cfg["weights"] = str(MODELS / "vietocr" / f"{model}.pth")
+    cfg["cnn"]["pretrained"] = False  # avoid torchvision ImageNet download
+    cfg["device"] = "cpu"
+    cfg["predictor"]["beamsearch"] = False
+    return Predictor(cfg)
+
+
 class DetVietOcrEngine:
     """PP-OCRv6 text detection + VietOCR recognition per detected line."""
 
     def __init__(self, model: str = "vgg_seq2seq", det: str = "small"):
-        import torch
         from rapidocr.utils.typings import ModelType, OCRVersion
-        from vietocr.tool.config import Cfg
-        from vietocr.tool.predictor import Predictor
 
-        torch.set_num_threads(max(1, torch.get_num_threads()))
         det_file, det_type = {
             "small": ("PP-OCRv6_det_small.onnx", ModelType.SMALL),
             "medium": ("PP-OCRv6_det_medium.onnx", ModelType.MEDIUM),
         }[det]
         self._det = _rapid(det_file, None, OCRVersion.PPOCRV6, det_type, None)
-
-        cfg = Cfg.load_config_from_file(str(MODELS / "vietocr" / "base.yml"))
-        cfg.update(
-            Cfg.load_config_from_file(
-                str(MODELS / "vietocr" / f"{model.replace('_', '-')}.yml")
-            )
-        )
-        cfg["weights"] = str(MODELS / "vietocr" / f"{model}.pth")
-        cfg["cnn"]["pretrained"] = False  # avoid torchvision ImageNet download
-        cfg["device"] = "cpu"
-        cfg["predictor"]["beamsearch"] = False
-        self._rec = Predictor(cfg)
+        self._rec = _vietocr(model)
 
     def __call__(self, img: np.ndarray) -> list[Line]:
         out = self._det(img)
@@ -131,6 +138,74 @@ class DetVietOcrEngine:
         return [
             Line(t, b.tolist(), float(p)) for t, b, p in zip(texts, boxes, probs)
         ]
+
+
+def digits(text: str) -> str:
+    return re.sub(r"\D", "", text)
+
+
+NUMBER = re.compile(r"\d+(?:[.,/:-]\d+)*")
+MASK = "⁇"  # replaces a number the two recognizers disagree on
+
+
+def reconcile(text: str, alt: str) -> tuple[str, str | None]:
+    """Masks every number in `text` (VietOCR) whose digits do not also appear
+    as a number in `alt` (PP-OCRv6). Returns (safe_text, flag)."""
+    alt_numbers = {digits(m.group()) for m in NUMBER.finditer(alt)}
+    conflict = False
+
+    def check(m):
+        nonlocal conflict
+        if digits(m.group()) in alt_numbers:
+            return m.group()
+        conflict = True
+        return MASK
+
+    safe = NUMBER.sub(check, text)
+    if not NUMBER.search(text) and not alt_numbers:
+        return safe, None
+    return safe, "digits_conflict" if conflict else "digits_agree"
+
+
+class HybridEngine:
+    """PP-OCRv6 detection + two independent recognizers on the same crops.
+
+    VietOCR gives the text (full Vietnamese diacritics); PP-OCRv6 rec reads
+    digits reliably. Each number VietOCR reads must also be read by PP-OCRv6,
+    otherwise it is masked in `safe` and the line is flagged
+    "digits_conflict", so a value built from it goes to manual review instead
+    of being trusted.
+    """
+
+    def __init__(self, model: str = "vgg_seq2seq"):
+        from rapidocr.utils.typings import ModelType, OCRVersion
+
+        v6, small = OCRVersion.PPOCRV6, ModelType.SMALL
+        # text_score=0 keeps every detected line; filtering is done downstream.
+        self._paddle = _rapid(
+            "PP-OCRv6_det_small.onnx", "PP-OCRv6_rec_small.onnx", v6, small, small, text_score=0
+        )
+        self._rec = _vietocr(model)
+
+    def __call__(self, img: np.ndarray) -> list[Line]:
+        out = self._paddle(img)
+        if out.boxes is None:
+            return []
+        boxes = list(out.boxes)
+        crops = [Image.fromarray(_crop_quad(img, b)) for b in boxes]
+        texts, probs = self._rec.predict_batch(crops, return_prob=True)
+        lines = []
+        for text, prob, box, paddle_text, paddle_score in zip(
+            texts, probs, boxes, out.txts, out.scores
+        ):
+            safe, flag = reconcile(text, paddle_text)
+            lines.append(
+                Line(
+                    text, box.tolist(), min(float(prob), float(paddle_score)),
+                    paddle_text, flag, safe,
+                )
+            )
+        return lines
 
 
 class TesseractEngine:
@@ -189,4 +264,5 @@ ENGINES = {
     "tess_fast": lambda: TesseractEngine("fast"),
     "det_vietocr_s2s": lambda: DetVietOcrEngine("vgg_seq2seq"),
     "det_vietocr_tf": lambda: DetVietOcrEngine("vgg_transformer"),
+    "hybrid_s2s": lambda: HybridEngine("vgg_seq2seq"),
 }
