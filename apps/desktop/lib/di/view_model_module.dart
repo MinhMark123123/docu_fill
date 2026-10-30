@@ -15,8 +15,11 @@ void setupViewModelModule() {
         HomeViewModel(templateRepository: inject(), templateService: inject()),
   );
   registerViewModel(
-    () =>
-        SettingViewModel(settingsRepository: inject(), geminiService: inject()),
+    () => SettingViewModel(
+      settingsRepository: inject(),
+      geminiService: inject(),
+      dataExportService: inject(),
+    ),
   );
   registerViewModel(() => UploadViewModel());
   registerViewModel(

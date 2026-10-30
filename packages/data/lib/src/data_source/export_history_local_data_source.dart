@@ -5,6 +5,7 @@ abstract class ExportHistoryLocalDataSource {
   Future<Id> saveHistory(ExportHistoryModel history);
   Future<ExportHistoryModel?> getHistoryById(int id);
   Future<List<ExportHistoryModel>> getRecentHistories({int limit = 50});
+  Future<List<ExportHistoryModel>> getAllHistories();
   Future<List<ExportHistoryModel>> getHistoriesBetween({
     required DateTime start,
     required DateTime end,
@@ -36,6 +37,11 @@ class ExportHistoryLocalDataSourceImpl implements ExportHistoryLocalDataSource {
         .sortByCreatedAtDesc()
         .limit(limit)
         .findAll();
+  }
+
+  @override
+  Future<List<ExportHistoryModel>> getAllHistories() async {
+    return await _isar.exportHistoryModels.where().findAll();
   }
 
   @override

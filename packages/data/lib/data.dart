@@ -13,6 +13,7 @@ export 'src/repositories/export_history/export_history_repository_impl.dart';
 export 'src/repositories/settings/settings_repository.dart';
 export 'src/repositories/template/template_repository.dart';
 export 'src/repositories/template/template_repository_impl.dart';
+export 'src/services/data_export_service.dart';
 export 'src/services/data_extraction_service.dart';
 export 'src/services/export_history_service.dart';
 export 'src/services/gemini_service.dart';

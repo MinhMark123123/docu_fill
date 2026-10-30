@@ -223,6 +223,13 @@
       "enable_logging": "Enable API Logging",
       "open_logs": "Open Logs Folder",
       "save_btn": "Save Gemini Settings"
+    },
+    "data": {
+      "title": "Analysis data",
+      "description": "Export templates, export history (with source texts and confirmed values) and logs to a zip file for analysis and improving automatic mapping. The Gemini API key is not included. The file contains customer data: only move it via USB or internal channels.",
+      "export": "Export analysis data",
+      "export_success": "Data exported: {}",
+      "export_error": "Could not export data: {}"
     }
   }
 }

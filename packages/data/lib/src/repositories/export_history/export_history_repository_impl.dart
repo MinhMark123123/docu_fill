@@ -26,6 +26,12 @@ class ExportHistoryRepositoryImpl implements ExportHistoryRepository {
   }
 
   @override
+  Future<List<ExportHistory>> getAllHistories() async {
+    final models = await localDataSource.getAllHistories();
+    return models.map((model) => model.toDomain()).toList();
+  }
+
+  @override
   Future<List<ExportHistory>> getHistoriesBetween({
     required DateTime start,
     required DateTime end,

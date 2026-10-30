@@ -223,6 +223,13 @@
       "enable_logging": "Bật ghi nhật ký API",
       "open_logs": "Mở thư mục nhật ký",
       "save_btn": "Lưu cài đặt Gemini"
+    },
+    "data": {
+      "title": "Dữ liệu phân tích",
+      "description": "Xuất template, lịch sử xuất file (kèm văn bản nguồn và giá trị đã xác nhận) và log ra file zip để phân tích, cải thiện việc tự điền dữ liệu. Không bao gồm Gemini API key. File chứa dữ liệu khách hàng: chỉ chuyển qua USB hoặc kênh nội bộ.",
+      "export": "Xuất dữ liệu phân tích",
+      "export_success": "Đã xuất dữ liệu: {}",
+      "export_error": "Không thể xuất dữ liệu: {}"
     }
   }
 }

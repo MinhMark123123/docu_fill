@@ -16,6 +16,7 @@ class ExportHistoryService {
     required Map<String, String?> fieldValues,
     required Map<String, String?> singleLineValues,
     required TemplateExportResult result,
+    List<SourceDocument> sources = const [],
   }) async {
     final labelByKey = <String, String>{
       for (final template in templates)
@@ -33,6 +34,7 @@ class ExportHistoryService {
       outputFiles: result.outputFiles,
       errorMessage: result.errorMessage,
       documentCount: result.documentCount,
+      sources: sources,
     );
     await _repository.saveHistory(history);
   }

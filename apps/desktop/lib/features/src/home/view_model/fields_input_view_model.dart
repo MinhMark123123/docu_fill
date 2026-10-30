@@ -125,6 +125,10 @@ class FieldsInputViewModel extends BaseViewModel {
   final _fieldKeys = <String, String?>{};
   final _singleField = <String, String?>{};
 
+  /// Files imported for the current case; saved with the export so mapping
+  /// can learn from what the user finally exported.
+  final _sources = <SourceDocument>[];
+
   String? getInitValue({required TemplateField e}) {
     if (e.type == FieldType.selection) {
       return _fieldKeys[e.key] ?? e.options?.firstOrNull;
@@ -137,6 +141,7 @@ class FieldsInputViewModel extends BaseViewModel {
 
   void performInit(List<int>? ids) {
     _isExportSuccess.postValue(false);
+    _sources.clear();
     _idsSelected.postValue(ids ?? []);
     loadTemplates();
   }
@@ -162,6 +167,10 @@ class FieldsInputViewModel extends BaseViewModel {
         _singleField[key] = entry.value;
       }
     });
+
+    _sources
+      ..clear()
+      ..addAll(history.sources);
 
     loadTemplates();
   }
@@ -296,6 +305,7 @@ class FieldsInputViewModel extends BaseViewModel {
           fieldValues: fieldValues,
           singleLineValues: singleLineValues,
           result: result,
+          sources: List<SourceDocument>.from(_sources),
         );
       }),
     );
@@ -341,6 +351,7 @@ class FieldsInputViewModel extends BaseViewModel {
   void resetAll() {
     _fieldKeys.clear();
     _singleField.clear();
+    _sources.clear();
     _idsSelected.postValue([]);
     _templates.postValue([]);
     _composedTemplateUI.postValue({});
@@ -412,6 +423,16 @@ class FieldsInputViewModel extends BaseViewModel {
   Future<void> _processFileImport(File file) async {
     final extraction = await _extractTextSafely(file);
     final mappedData = await _mapFileToTemplate(file, extraction);
+
+    _sources.add(
+      SourceDocument(
+        fileName: p.basename(file.path),
+        sourceType: p.extension(file.path).replaceFirst('.', '').toLowerCase(),
+        text: extraction.text,
+        method: extraction.pdfError ? 'gemini_file' : 'gemini_text',
+        predictedValues: mappedData,
+      ),
+    );
 
     await _autoSaveAiResult(
       sourceFileName: p.basename(file.path),

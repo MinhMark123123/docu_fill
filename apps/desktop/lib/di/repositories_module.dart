@@ -31,6 +31,13 @@ void setupRepositoriesModule() {
     () => DataExtractionService(),
   );
   sl.registerLazySingleton<GeminiService>(() => GeminiService(inject()));
+  sl.registerLazySingleton<DataExportService>(
+    () => DataExportService(
+      templateRepository: inject(),
+      historyDataSource: inject(),
+      settingsRepository: inject(),
+    ),
+  );
   sl.registerLazySingleton<TemplateParsingService>(
     () => TemplateParsingService(),
   );

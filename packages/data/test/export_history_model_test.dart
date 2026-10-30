@@ -46,4 +46,45 @@ void main() {
     expect(restored.singleLineValues['note']?.label, 'Note');
     expect(restored.outputFiles, history.outputFiles);
   });
+
+  test('ExportHistoryModel keeps createdAt and source documents', () {
+    final createdAt = DateTime(2026, 10, 30, 9, 15);
+    final history = ExportHistory(
+      createdAt: createdAt,
+      baseFileName: '4310',
+      exportDirectory: '/tmp/exports',
+      status: ExportHistoryStatus.success,
+      templateIds: [1],
+      templateSnapshots: [],
+      fieldValues: {},
+      singleLineValues: {},
+      outputFiles: [],
+      documentCount: 1,
+      sources: [
+        SourceDocument(
+          fileName: 'bang_tinh.xlsx',
+          sourceType: 'xlsx',
+          text: '--- Sheet: BC ---\nToạ độ tài sản: |  | 10.93, 108.11',
+          method: 'gemini_text',
+          predictedValues: {'%%ToaDoGoogleMap%%': '10.93, 108.11'},
+        ),
+      ],
+    );
+
+    final restored = ExportHistoryModel.fromDomain(history).toDomain();
+
+    expect(restored.createdAt, createdAt);
+    expect(restored.sources, hasLength(1));
+    expect(restored.sources.first.fileName, 'bang_tinh.xlsx');
+    expect(restored.sources.first.text, contains('Toạ độ tài sản'));
+    expect(
+      restored.sources.first.predictedValues['%%ToaDoGoogleMap%%'],
+      '10.93, 108.11',
+    );
+  });
+
+  test('ExportHistoryModel without sourcesJson restores no sources', () {
+    final model = ExportHistoryModel()..sourcesJson = null;
+    expect(model.toDomain().sources, isEmpty);
+  });
 }

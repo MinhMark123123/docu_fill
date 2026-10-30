@@ -15,6 +15,29 @@ FieldValueEntry _$FieldValueEntryFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$FieldValueEntryToJson(FieldValueEntry instance) =>
     <String, dynamic>{'label': instance.label, 'value': instance.value};
 
+SourceDocument _$SourceDocumentFromJson(Map<String, dynamic> json) =>
+    SourceDocument(
+      fileName: json['fileName'] as String,
+      sourceType: json['sourceType'] as String,
+      text: json['text'] as String,
+      method: json['method'] as String,
+      predictedValues: Map<String, String>.from(json['predictedValues'] as Map),
+      importedAt:
+          json['importedAt'] == null
+              ? null
+              : DateTime.parse(json['importedAt'] as String),
+    );
+
+Map<String, dynamic> _$SourceDocumentToJson(SourceDocument instance) =>
+    <String, dynamic>{
+      'fileName': instance.fileName,
+      'sourceType': instance.sourceType,
+      'text': instance.text,
+      'method': instance.method,
+      'predictedValues': instance.predictedValues,
+      'importedAt': instance.importedAt.toIso8601String(),
+    };
+
 ExportHistory _$ExportHistoryFromJson(
   Map<String, dynamic> json,
 ) => ExportHistory(
@@ -47,6 +70,11 @@ ExportHistory _$ExportHistoryFromJson(
   caseStudyStatus:
       $enumDecodeNullable(_$CaseStudyStatusEnumMap, json['caseStudyStatus']) ??
       CaseStudyStatus.none,
+  sources:
+      (json['sources'] as List<dynamic>?)
+          ?.map((e) => SourceDocument.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      [],
 );
 
 Map<String, dynamic> _$ExportHistoryToJson(
@@ -68,6 +96,7 @@ Map<String, dynamic> _$ExportHistoryToJson(
   'errorMessage': instance.errorMessage,
   'documentCount': instance.documentCount,
   'caseStudyStatus': _$CaseStudyStatusEnumMap[instance.caseStudyStatus]!,
+  'sources': instance.sources.map((e) => e.toJson()).toList(),
 };
 
 const _$ExportHistoryStatusEnumMap = {

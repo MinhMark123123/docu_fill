@@ -22,10 +22,11 @@ class ExportHistoryModel {
   String? errorMessage;
   late int documentCount;
   late String caseStudyStatus;
+  String? sourcesJson;
 
   ExportHistoryModel({
     this.id = Isar.autoIncrement,
-    DateTime? createdAt,
+    this.createdAt,
     this.baseFileName = '',
     this.exportDirectory = '',
     this.status = 'success',
@@ -37,6 +38,7 @@ class ExportHistoryModel {
     this.errorMessage,
     this.documentCount = 0,
     this.caseStudyStatus = 'none',
+    this.sourcesJson,
   });
 
   factory ExportHistoryModel.fromDomain(ExportHistory history) {
@@ -62,6 +64,9 @@ class ExportHistoryModel {
       errorMessage: history.errorMessage,
       documentCount: history.documentCount,
       caseStudyStatus: history.caseStudyStatus.name,
+      sourcesJson: jsonEncode(
+        history.sources.map((source) => source.toJson()).toList(),
+      ),
     );
   }
 
@@ -80,7 +85,20 @@ class ExportHistoryModel {
       errorMessage: errorMessage,
       documentCount: documentCount,
       caseStudyStatus: _caseStudyStatusFromName(caseStudyStatus),
+      sources: _sources(),
     );
+  }
+
+  // Records saved before sources were tracked have no sourcesJson.
+  List<SourceDocument> _sources() {
+    final content = sourcesJson;
+    if (content == null || content.isEmpty) return [];
+    final decoded = jsonDecode(content);
+    if (decoded is! List) return [];
+    return decoded
+        .whereType<Map<String, dynamic>>()
+        .map(SourceDocument.fromJson)
+        .toList();
   }
 
   List<TemplateConfig> _templateSnapshots() {

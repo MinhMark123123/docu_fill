@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:data/data.dart';
 import 'package:docu_fill/core/core.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_annotation/maac_mvvm_annotation.dart';
@@ -16,12 +17,15 @@ part 'setting_view_model.g.dart';
 class SettingViewModel extends BaseViewModel {
   final SettingsRepository _settingsRepository;
   final GeminiService _geminiService;
+  final DataExportService _dataExportService;
 
   SettingViewModel({
     required SettingsRepository settingsRepository,
     required GeminiService geminiService,
+    required DataExportService dataExportService,
   })  : _settingsRepository = settingsRepository,
-        _geminiService = geminiService;
+        _geminiService = geminiService,
+        _dataExportService = dataExportService;
 
   @Bind()
   late final _geminiApiKey = "".mtd(this);
@@ -120,6 +124,22 @@ class SettingViewModel extends BaseViewModel {
       }
     } catch (e) {
       showSnackbar("Could not open logs folder: $e");
+    }
+  }
+
+  Future<void> exportAnalysisData() async {
+    final directory = await FilePicker.platform.getDirectoryPath();
+    if (directory == null) return;
+    try {
+      final zipPath = await loadingGuard(
+        _dataExportService.exportAll(directory),
+      );
+      showSnackbar(AppLang.settingsDataExportSuccess.tr(args: [zipPath]));
+      if (Platform.isWindows) {
+        await Process.run('explorer.exe', ['/select,', zipPath]);
+      }
+    } catch (e) {
+      showSnackbar(AppLang.settingsDataExportError.tr(args: [e.toString()]));
     }
   }
 

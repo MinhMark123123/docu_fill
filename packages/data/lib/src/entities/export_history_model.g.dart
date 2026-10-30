@@ -63,14 +63,19 @@ const ExportHistoryModelSchema = CollectionSchema(
       name: r'singleLineValuesJson',
       type: IsarType.string,
     ),
-    r'status': PropertySchema(id: 9, name: r'status', type: IsarType.string),
+    r'sourcesJson': PropertySchema(
+      id: 9,
+      name: r'sourcesJson',
+      type: IsarType.string,
+    ),
+    r'status': PropertySchema(id: 10, name: r'status', type: IsarType.string),
     r'templateIds': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'templateIds',
       type: IsarType.longList,
     ),
     r'templateSnapshotsJson': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'templateSnapshotsJson',
       type: IsarType.string,
     ),
@@ -115,6 +120,12 @@ int _exportHistoryModelEstimateSize(
     }
   }
   bytesCount += 3 + object.singleLineValuesJson.length * 3;
+  {
+    final value = object.sourcesJson;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.status.length * 3;
   bytesCount += 3 + object.templateIds.length * 8;
   bytesCount += 3 + object.templateSnapshotsJson.length * 3;
@@ -136,9 +147,10 @@ void _exportHistoryModelSerialize(
   writer.writeString(offsets[6], object.fieldValuesJson);
   writer.writeStringList(offsets[7], object.outputFiles);
   writer.writeString(offsets[8], object.singleLineValuesJson);
-  writer.writeString(offsets[9], object.status);
-  writer.writeLongList(offsets[10], object.templateIds);
-  writer.writeString(offsets[11], object.templateSnapshotsJson);
+  writer.writeString(offsets[9], object.sourcesJson);
+  writer.writeString(offsets[10], object.status);
+  writer.writeLongList(offsets[11], object.templateIds);
+  writer.writeString(offsets[12], object.templateSnapshotsJson);
 }
 
 ExportHistoryModel _exportHistoryModelDeserialize(
@@ -158,9 +170,10 @@ ExportHistoryModel _exportHistoryModelDeserialize(
     id: id,
     outputFiles: reader.readStringList(offsets[7]) ?? const [],
     singleLineValuesJson: reader.readStringOrNull(offsets[8]) ?? '{}',
-    status: reader.readStringOrNull(offsets[9]) ?? 'success',
-    templateIds: reader.readLongList(offsets[10]) ?? const [],
-    templateSnapshotsJson: reader.readStringOrNull(offsets[11]) ?? '[]',
+    sourcesJson: reader.readStringOrNull(offsets[9]),
+    status: reader.readStringOrNull(offsets[10]) ?? 'success',
+    templateIds: reader.readLongList(offsets[11]) ?? const [],
+    templateSnapshotsJson: reader.readStringOrNull(offsets[12]) ?? '[]',
   );
   return object;
 }
@@ -191,10 +204,12 @@ P _exportHistoryModelDeserializeProp<P>(
     case 8:
       return (reader.readStringOrNull(offset) ?? '{}') as P;
     case 9:
-      return (reader.readStringOrNull(offset) ?? 'success') as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 10:
-      return (reader.readLongList(offset) ?? const []) as P;
+      return (reader.readStringOrNull(offset) ?? 'success') as P;
     case 11:
+      return (reader.readLongList(offset) ?? const []) as P;
+    case 12:
       return (reader.readStringOrNull(offset) ?? '[]') as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1545,6 +1560,165 @@ extension ExportHistoryModelQueryFilter
   }
 
   QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'sourcesJson'),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'sourcesJson'),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'sourcesJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'sourcesJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'sourcesJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'sourcesJson',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'sourcesJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'sourcesJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'sourcesJson',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'sourcesJson',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'sourcesJson', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
+  sourcesJsonIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'sourcesJson', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterFilterCondition>
   statusEqualTo(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -2059,6 +2233,20 @@ extension ExportHistoryModelQuerySortBy
   }
 
   QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterSortBy>
+  sortBySourcesJson() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourcesJson', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterSortBy>
+  sortBySourcesJsonDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourcesJson', Sort.desc);
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterSortBy>
   sortByStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'status', Sort.asc);
@@ -2216,6 +2404,20 @@ extension ExportHistoryModelQuerySortThenBy
   }
 
   QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterSortBy>
+  thenBySourcesJson() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourcesJson', Sort.asc);
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterSortBy>
+  thenBySourcesJsonDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sourcesJson', Sort.desc);
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QAfterSortBy>
   thenByStatus() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'status', Sort.asc);
@@ -2322,6 +2524,13 @@ extension ExportHistoryModelQueryWhereDistinct
   }
 
   QueryBuilder<ExportHistoryModel, ExportHistoryModel, QDistinct>
+  distinctBySourcesJson({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'sourcesJson', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, ExportHistoryModel, QDistinct>
   distinctByStatus({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'status', caseSensitive: caseSensitive);
@@ -2414,6 +2623,13 @@ extension ExportHistoryModelQueryProperty
   singleLineValuesJsonProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'singleLineValuesJson');
+    });
+  }
+
+  QueryBuilder<ExportHistoryModel, String?, QQueryOperations>
+  sourcesJsonProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'sourcesJson');
     });
   }
 

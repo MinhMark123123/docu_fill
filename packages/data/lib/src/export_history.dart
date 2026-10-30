@@ -38,6 +38,41 @@ class FieldValueEntry {
   Map<String, dynamic> toJson() => _$FieldValueEntryToJson(this);
 }
 
+/// A source file imported while filling a case, kept so the field mapping can
+/// later learn from the values the user finally exported.
+@JsonSerializable(explicitToJson: true)
+class SourceDocument {
+  final String fileName;
+
+  /// File extension: docx, xlsx, xls, pdf.
+  final String sourceType;
+
+  /// Normalized extracted text (rows of " | "-separated cells). Empty when
+  /// the file was sent to the mapper as-is (e.g. scanned PDF).
+  final String text;
+
+  /// How the values were produced, e.g. "gemini_text" or "gemini_file".
+  final String method;
+
+  /// Values the mapper proposed for this file, before user edits.
+  final Map<String, String> predictedValues;
+  final DateTime importedAt;
+
+  SourceDocument({
+    required this.fileName,
+    required this.sourceType,
+    required this.text,
+    required this.method,
+    required this.predictedValues,
+    DateTime? importedAt,
+  }) : importedAt = importedAt ?? DateTime.now();
+
+  factory SourceDocument.fromJson(Map<String, dynamic> json) =>
+      _$SourceDocumentFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SourceDocumentToJson(this);
+}
+
 @JsonSerializable(explicitToJson: true)
 class ExportHistory {
   int id;
@@ -53,6 +88,8 @@ class ExportHistory {
   final String? errorMessage;
   final int documentCount;
   final CaseStudyStatus caseStudyStatus;
+  @JsonKey(defaultValue: <SourceDocument>[])
+  final List<SourceDocument> sources;
 
   ExportHistory({
     this.id = 0,
@@ -68,6 +105,7 @@ class ExportHistory {
     this.errorMessage,
     required this.documentCount,
     this.caseStudyStatus = CaseStudyStatus.none,
+    this.sources = const [],
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory ExportHistory.fromJson(Map<String, dynamic> json) =>

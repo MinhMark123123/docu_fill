@@ -187,6 +187,7 @@ class ExportHistoryViewModel extends BaseViewModel {
           fieldValues: fieldValues,
           singleLineValues: singleLineValues,
           result: result,
+          sources: history.sources,
         );
 
         if (result.issues.isEmpty) {

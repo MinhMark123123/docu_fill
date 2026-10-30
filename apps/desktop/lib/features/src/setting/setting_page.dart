@@ -1,5 +1,6 @@
 import 'package:design/ui.dart';
 import 'package:docu_fill/core/src/base_view.dart';
+import 'package:docu_fill/features/src/setting/components/data_section.dart';
 import 'package:docu_fill/features/src/setting/components/gemini_section.dart';
 import 'package:docu_fill/features/src/setting/components/general_section.dart';
 import 'package:docu_fill/features/src/setting/view_model/setting_view_model.dart';
@@ -26,6 +27,8 @@ class SettingPage extends BaseView<SettingViewModel> {
             GeneralSection(),
             Dimens.spacing.vertical(Dimens.size24),
             GeminiSection(),
+            Dimens.spacing.vertical(Dimens.size24),
+            DataSection(),
           ],
         ),
       ),

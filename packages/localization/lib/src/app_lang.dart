@@ -215,6 +215,11 @@ abstract class AppLang {
   static const String messagesUploadTemplate = "messages.upload_template";
 
   // --- Settings ---
+  static const String settingsDataDescription = "settings.data.description";
+  static const String settingsDataExport = "settings.data.export";
+  static const String settingsDataExportError = "settings.data.export_error";
+  static const String settingsDataExportSuccess = "settings.data.export_success";
+  static const String settingsDataTitle = "settings.data.title";
   static const String settingsGeminiApiKey = "settings.gemini.api_key";
   static const String settingsGeminiEnableLogging = "settings.gemini.enable_logging";
   static const String settingsGeminiModel = "settings.gemini.model";
