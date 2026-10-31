@@ -112,6 +112,8 @@ class LlmMapper:
             "Viết theo đúng định dạng của các ví dụ đã xác nhận. "
             "Nếu tài liệu không có thông tin, bỏ qua trường đó. Không tự suy đoán.\n\n"
             f"TÀI LIỆU:\n{excerpt}\n\nCÁC TRƯỜNG:\n" + "\n".join(lines) + "\n\nTrả về JSON."
+            # Qwen3 hybrid models: skip the reasoning phase (ignored by others).
+            " /no_think"
         )
         schema = {
             "type": "object",

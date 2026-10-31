@@ -56,6 +56,10 @@ MODELS = {
         "Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
         "2fde00ce69dd4899c70d020845e2638353015bba0fdf161b3eb965f2bca4464e",
     ),
+    "llm/Qwen_Qwen3-8B-Q4_K_M.gguf": (
+        f"{HF}/bartowski/Qwen_Qwen3-8B-GGUF/resolve/main/Qwen_Qwen3-8B-Q4_K_M.gguf",
+        "54fffa050078e984116639c83dfb64b5aa6d4cd474e018b076777c632bbccccd",
+    ),
 }
 
 
