@@ -1,14 +1,14 @@
 # OCR benchmark (offline)
 
-So sánh các engine OCR trên PDF scan thật, chấm điểm bằng giá trị cuối cùng người dùng đã xuất (lấy từ `tools/data_export`), không cần gõ tay đáp án.
+Compares OCR engines on real scanned PDFs, scored against the values the user finally exported (from `tools/data_export`), so no answers have to be typed by hand.
 
-## Nguyên tắc offline
+## Offline rules
 
-- `netguard.py` chặn mọi kết nối mạng; `engines.py` import nó trước mọi thư viện OCR.
-- Model chỉ nạp từ `models/` bằng đường dẫn cụ thể.
-- `fetch_models.py` là script **duy nhất** dùng mạng, chỉ chạy một lần trên máy dev. Hash SHA256 được ghim trong `models/pinned.json`.
+- `netguard.py` blocks every network connection; `engines.py` imports it before any OCR library.
+- Models are loaded only from `models/` by explicit path.
+- `fetch_models.py` is the **only** script that uses the network, run once on the dev machine. SHA256 hashes are pinned in `models/pinned.json`.
 
-## Cài đặt (máy dev)
+## Setup (dev machine)
 
 ```sh
 cd tools/ocr_bench
@@ -20,22 +20,22 @@ cp .venv/Lib/site-packages/rapidocr/models/*.onnx models/
 .venv/Scripts/python -I fetch_models.py
 ```
 
-Tesseract (chỉ để so sánh): `winget install UB-Mannheim.TesseractOCR`.
+Tesseract (comparison only): `winget install UB-Mannheim.TesseractOCR`.
 
-## Chạy
+## Run
 
-`data/` (bị gitignore vì chứa dữ liệu khách hàng) gồm:
+`data/` (gitignored: customer data) contains:
 - `cases.json`: `[{"id", "pdf_prefix", "history_id"}]`
-- `export_histories.json`, `api_logs.jsonl`: output của `tools/data_export`
+- `export_histories.json`, `api_logs.jsonl`: output of `tools/data_export`
 
 ```sh
-.venv/Scripts/python -I -X utf8 bench.py --pdf-dir <thư mục PDF> --cases data/cases.json \
+.venv/Scripts/python -I -X utf8 bench.py --pdf-dir <PDF folder> --cases data/cases.json \
   --histories data/export_histories.json --logs data/api_logs.jsonl \
   --engines rapid_v6_small,det_vietocr_s2s --dpi 200
 ```
 
-Kết quả OCR được cache trong `out/raw/`; `out/summary.csv` và `out/details.csv` chứa điểm.
+OCR results are cached in `out/raw/`; `out/summary.csv` and `out/details.csv` hold the scores.
 
-Chỉ số:
-- `pdf_*`: chỉ tính giá trị Gemini đã đọc đúng từ chính PDF đó (chắc chắn có trên trang).
-- `num_found`: trường số; chuỗi chữ số phải đúng hoàn toàn, không tính khớp gần đúng.
+Metrics:
+- `pdf_*`: only values Gemini read correctly from that PDF (certainly on the page).
+- `num_found`: numeric fields; the digit string must match exactly, no fuzzy match.

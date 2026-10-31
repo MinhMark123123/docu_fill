@@ -69,6 +69,9 @@ def _row_text(doc: RawDocument, row, prop: str | None = None) -> str:
         header = cols[c.col].text if cols and c.col in cols else ("" if cols else doc.header_of(c))
         text = c.text.replace("\n", " / ")
         parts.append(f"[{header}] {text}" if header and header != c.text else text)
+    parent = doc.table_parents.get(row[0].row) if row else None
+    if parent and parts:
+        parts.insert(0, f"(thuộc mục: {parent})")
     return " | ".join(parts)
 
 

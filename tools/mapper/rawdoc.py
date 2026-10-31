@@ -11,6 +11,7 @@ has all its separators; line breaks are kept inside the cell text.
 
 import re
 import unicodedata
+from collections import Counter
 from dataclasses import dataclass
 from functools import cached_property
 
@@ -166,6 +167,33 @@ class RawDocument:
                 current = None
                 continue
             out[i] = current
+        return out
+
+    def _table_label(self, i: int) -> str:
+        """Text of the label columns (left of the property columns) of a table row."""
+        cols = self.property_columns[i]
+        parts = [c.text for c in self.rows[i][: min(cols)] if len(c.key) >= 3 and re.search(r"[a-z]", c.key)]
+        return " ".join(parts).replace("\n", " ")
+
+    @cached_property
+    def table_parents(self) -> dict[int, str]:
+        """row -> label of the item a comparison-table row belongs to, for rows
+        whose own label does not identify it: repeated labels such as
+        "Tỷ lệ điều chỉnh" (one per adjusted item) and unlabeled continuation
+        rows ("(Ước lượng 90% giá...)" under "Giá ước tính giao dịch")."""
+        tables: dict[int, list[int]] = {}
+        for i, cols in self.property_columns.items():
+            tables.setdefault(id(cols), []).append(i)
+        out = {}
+        for rows in tables.values():
+            labels = {i: self._table_label(i) for i in rows[1:]}  # rows[0] is the header
+            counts = Counter(norm(l) for l in labels.values() if l)
+            parent = ""
+            for i, label in labels.items():
+                if label and counts[norm(label)] == 1:
+                    parent = label
+                elif parent:
+                    out[i] = parent
         return out
 
     def property_of(self, cell: Cell) -> str | None:

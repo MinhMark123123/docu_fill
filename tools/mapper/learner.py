@@ -109,7 +109,14 @@ def _split_before(before: str) -> tuple[str, int] | None:
 # Documents hash by identity, so these caches are per document object.
 def _grid_key(doc: RawDocument, cell: Cell) -> str:
     """"<row label>@<column header>", e.g. "thoidiemgiaodich@taisansosanh1"."""
-    label, header = norm(doc.row_label(cell)), norm(doc.header_of(cell))
+    cols = doc.property_columns.get(cell.row)
+    if cols:  # comparison table: generic header_of() is unreliable there
+        header = cols[cell.col].text if cell.col in cols else ""
+        parent = doc.table_parents.get(cell.row, "")
+        label = norm(parent) + "/" + norm(doc.row_label(cell)) if parent else norm(doc.row_label(cell))
+        label, header = label.strip("/"), norm(header)
+    else:
+        label, header = norm(doc.row_label(cell)), norm(doc.header_of(cell))
     return f"{label}@{header}" if label and header else ""
 
 

@@ -1,43 +1,45 @@
 # DocuFill data export
 
-Tool này lấy dữ liệu từ app DocuFill đã cài trên máy Windows để làm dữ liệu cho rule-based mapping, few-shot và bộ test (xem các file context về offline mapping).
+Collects the data of the DocuFill app installed on a Windows machine, for rule-based mapping, few-shot examples and test sets (see the offline mapping context files).
 
-## 1. Thu thập trên từng máy có cài app
+The app itself can also do this: Settings → Data → Export analysis data writes the same content as a zip, without this tool.
 
-Chép thư mục `tools/data_export` (chỉ cần 2 file `collect_docu_fill_data.bat` và `.ps1`) sang máy cần lấy dữ liệu, đóng app DocuFill rồi double-click `collect_docu_fill_data.bat`.
+## 1. Collect on each machine with the app
 
-Kết quả: file `docu_fill_data_<TÊN_MÁY>_<thời_gian>.zip` trên Desktop, gồm:
+Copy `tools/data_export` (only `collect_docu_fill_data.bat` and `.ps1` are needed) to the machine, close DocuFill and double-click `collect_docu_fill_data.bat`.
 
-| File | Nội dung |
+Result: `docu_fill_data_<MACHINE>_<time>.zip` on the Desktop, containing:
+
+| File | Content |
 |---|---|
-| `docu_fill.isar` | Database: templates (key/label/description), settings, lịch sử xuất file (giá trị cuối cùng người dùng đã xác nhận) |
-| `api_logs/` | Prompt + response của Gemini: raw text Word/Excel và JSON Gemini trả về (chỉ có khi bật API logging trong Settings) |
-| `templates/` | File template đã import |
-| `libisar.dll` | Lấy từ thư mục cài app, dùng để đọc database ở máy khác |
-| `manifest.json` | Tên máy, user, thời gian, checksum database |
+| `docu_fill.isar` | Database: templates (key/label/description), settings, export history (the values the user finally confirmed) |
+| `api_logs/` | Gemini prompts and responses: Word/Excel raw text and the JSON Gemini returned (only when API logging is on in Settings) |
+| `templates/` | Imported template files |
+| `libisar.dll` | From the install folder, to read the database on another machine |
+| `manifest.json` | Machine, user, time, database checksum |
 
-Tham số tùy chọn: `-OutputDir E:\` (ghi thẳng ra USB), `-DocumentsDir`, `-InstallDir`, `-SkipTemplates`, `-Force`.
+Options: `-OutputDir E:\` (write straight to a USB drive), `-DocumentsDir`, `-InstallDir`, `-SkipTemplates`, `-Force`.
 
-> Zip chứa dữ liệu khách hàng và Gemini API key. Chỉ chuyển qua USB hoặc kênh nội bộ.
+> The zip holds customer data and the Gemini API key. Move it by USB or internal channels only.
 
-## 2. Chuyển thành JSON trên máy dev
+## 2. Convert to JSON on the dev machine
 
 ```sh
 cd tools/data_export
 dart pub get
-dart run bin/export_dataset.dart path/to/may1.zip path/to/may2.zip --out out
+dart run bin/export_dataset.dart path/to/machine1.zip path/to/machine2.zip --out out
 ```
 
-Output trong `out/<TÊN_MÁY>/`:
+Output in `out/<MACHINE>/`:
 
-- `templates.json`, `settings.json` (API key đã che), `export_histories.json`
-- `api_logs.jsonl`: mỗi dòng là 1 lần gọi Gemini, gồm `mode` (`text` = Word/Excel, `file` = PDF/ảnh), `fields`, `rawText`, `response`
-- `dataset.jsonl`: các cặp **raw nguồn → giá trị cuối cùng**, gồm `sources[].rawText`, `sources[].geminiOutput`, `finalValues`, `fieldDescriptions`
+- `templates.json`, `settings.json` (API key redacted), `export_histories.json`
+- `api_logs.jsonl`: one Gemini call per line, with `mode` (`text` = Word/Excel, `file` = PDF/image), `fields`, `rawText`, `response`
+- `dataset.jsonl`: **raw source → final values** pairs, with `sources[].rawText`, `sources[].geminiOutput`, `finalValues`, `fieldDescriptions`
 
-`out/dataset_all.jsonl` gộp dataset của tất cả các máy.
+`out/dataset_all.jsonl` merges the datasets of all machines.
 
-## Giới hạn
+## Limitations
 
-- Log được ghép với lịch sử xuất file theo **mức trùng giá trị** (`matchScore` ≥ 0.5, tối thiểu 3 giá trị khớp). Không ghép theo thời gian được vì app không lưu `createdAt` của export history. Một số cặp có thể bị ghép sai, nên lọc theo `matchScore` khi cần độ chính xác cao.
-- Với PDF (`mode: file`), app không lưu file gốc, chỉ có tên file. Cần tự thu file PDF gốc theo `fileName` để làm OCR.
-- Log chỉ có từ lúc bật API logging trong Settings.
+- Logs are paired with export history by **value overlap** (`matchScore` ≥ 0.5, at least 3 matching values), because older app versions did not store `createdAt`. Some pairs can be wrong; filter by `matchScore` when precision matters.
+- For PDFs (`mode: file`) the app keeps only the file name, not the file. The original PDFs must be collected by `fileName` for OCR.
+- Logs exist only from the time API logging was turned on.

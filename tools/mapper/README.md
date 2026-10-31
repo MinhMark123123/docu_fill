@@ -1,15 +1,22 @@
-# Rule mapper (offline)
+# Field mapper (offline)
 
-Học luật trích xuất cho từng key từ các hồ sơ đã xuất (text nguồn + giá trị người dùng xác nhận), không dùng AI. Mỗi luật = cách tìm ô (nhãn → chính ô đó / ô bên phải / ô bên dưới) + cách cắt giá trị + cách đổi định dạng (ngày, số). Độ tin cậy = cận dưới Wilson của tỉ lệ luật cho ra đúng giá trị; dưới ngưỡng thì để trống.
+Maps a source document (Word/Excel text, or OCR via `tools/ocr_bench/layout.py`) to template keys, learning from past exports (source text + values the user confirmed). Nothing leaves the machine.
 
-- `rawdoc.py`: tài liệu nguồn dạng hàng/ô (Excel, Word, OCR qua `tools/ocr_bench/layout.py`)
-- `learner.py`: sinh luật, chấm độ tin cậy, dự đoán
-- `evaluate.py`: leave-one-out so với Gemini
+1. **Rules** (no AI): each rule = how to find the cell (label → the cell itself / right / below / table row × column) + how to cut the value + how to format it (date, number). Confidence is the Wilson lower bound of the rule's hit rate; below the threshold the key is left empty.
+2. **Local LLM** (llama.cpp, GGUF) for the keys the rules leave empty. Keys of one comparable property are asked together and only see that property's column; every number in an answer must exist in the shown cells, and answers are conformed to the format of the confirmed values.
+
+- `rawdoc.py`: source document as rows/cells, comparison-table columns and row parents
+- `learner.py`: rule induction, confidence, prediction
+- `llm_mapper.py`: retrieval, prompt, grounding and format checks
+- `evaluate.py`: leave-one-out of the rules against Gemini
+- `evaluate_llm.py`: leave-one-out of rules + LLM
 
 ```sh
 ../ocr_bench/.venv/Scripts/python -I -X utf8 evaluate.py data/dataset.jsonl
+../ocr_bench/.venv/Scripts/python -I -X utf8 evaluate_llm.py data/dataset.jsonl \
+  --model ../ocr_bench/models/llm/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf --cases 2
 ```
 
-`data/dataset.jsonl` là output của `tools/data_export` (bị gitignore vì chứa dữ liệu khách hàng).
+`data/dataset.jsonl` is the output of `tools/data_export` (gitignored: customer data).
 
-Kết quả hiện tại (30 hồ sơ Word/Excel): đúng 24.3% (Gemini 59.1%), chính xác khi điền ~77%. Đường cong học đi ngang từ ~15 hồ sơ, nên bước tiếp theo là LLM chạy trên máy cho các trường văn bản tự do.
+Current results: rules alone 33.3% correct on 30 Word/Excel cases (Gemini 59.1%), ~78% precision when filled. Rules + Qwen3-4B on 2 cases: ~50% correct (Gemini 67.6%), ~6 min per case on the dev CPU.

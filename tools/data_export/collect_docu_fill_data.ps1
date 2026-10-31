@@ -1,31 +1,31 @@
 <#
 .SYNOPSIS
-  Thu thap du lieu cua app DocuFill da cai tren may Windows thanh 1 file zip.
+  Collects the data of the DocuFill app installed on this Windows machine into one zip.
 
 .DESCRIPTION
-  Gom cac file sau vao zip:
-    - docu_fill.isar     : database Isar (templates, settings, lich su xuat file)
-    - api_logs\          : log prompt/response Gemini (raw text Word/Excel + JSON ket qua)
-    - templates\         : file template .docx/.xlsx da import
-    - libisar.dll        : thu vien Isar lay tu thu muc cai app (de doc database tren may khac)
-    - manifest.json      : thong tin may, thoi diem thu thap, so luong file, checksum
+  The zip contains:
+    - docu_fill.isar     : Isar database (templates, settings, export history)
+    - api_logs\          : Gemini prompt/response logs (Word/Excel raw text + JSON result)
+    - templates\         : imported .docx/.xlsx templates
+    - libisar.dll        : Isar library from the install folder (to read the database elsewhere)
+    - manifest.json      : machine, collection time, file counts, checksum
 
-  Zip nay chua du lieu khach hang va Gemini API key. Chi chuyen qua USB/kenh noi bo.
+  The zip holds customer data and the Gemini API key. Move it by USB or internal channels only.
 
 .EXAMPLE
   powershell -NoProfile -ExecutionPolicy Bypass -File collect_docu_fill_data.ps1
   powershell -NoProfile -ExecutionPolicy Bypass -File collect_docu_fill_data.ps1 -OutputDir E:\
 #>
 param(
-  # Thu muc chua file zip ket qua. Mac dinh: Desktop.
+  # Folder for the resulting zip. Default: Desktop.
   [string]$OutputDir = [Environment]::GetFolderPath('Desktop'),
-  # Thu muc Documents ma app dung. Mac dinh: Documents cua user hien tai (ke ca khi bi OneDrive chuyen huong).
+  # Documents folder the app uses. Default: the current user's Documents (also when redirected by OneDrive).
   [string]$DocumentsDir = [Environment]::GetFolderPath('MyDocuments'),
-  # Thu muc cai app. Mac dinh: tim trong registry, sau do C:\Program Files\DocuFill.
+  # App install folder. Default: from the registry, then C:\Program Files\DocuFill.
   [string]$InstallDir,
-  # Bo qua thu muc templates (giam dung luong zip).
+  # Skip the templates folder (smaller zip).
   [switch]$SkipTemplates,
-  # Khong hoi khi app dang chay.
+  # Do not ask when the app is running.
   [switch]$Force
 )
 
@@ -55,21 +55,21 @@ function Get-FolderStats([string]$path) {
   return @{ files = $m.Count; bytes = [long]($m.Sum) }
 }
 
-Write-Host '=== Thu thap du lieu DocuFill ===' -ForegroundColor Cyan
+Write-Host '=== DocuFill data collection ===' -ForegroundColor Cyan
 
 $dbFile = Join-Path $DocumentsDir 'docu_fill.isar'
 if (-not (Test-Path $dbFile)) {
-  Write-Host "Khong tim thay database: $dbFile" -ForegroundColor Red
-  Write-Host 'Neu app luu o thu muc Documents khac, chay lai voi -DocumentsDir <duong_dan>.'
+  Write-Host "Database not found: $dbFile" -ForegroundColor Red
+  Write-Host 'If the app uses another Documents folder, run again with -DocumentsDir <path>.'
   exit 1
 }
 Write-Host "Documents : $DocumentsDir"
 
-# Copy database khi app dang ghi co the cho ra file loi -> yeu cau dong app.
+# Copying the database while the app writes to it can corrupt the copy, so ask to close the app.
 $running = Get-Process -Name 'docu_fill' -ErrorAction SilentlyContinue
 while ($running -and -not $Force) {
-  Write-Host 'App DocuFill dang chay. Hay dong app de database khong bi ghi do.' -ForegroundColor Yellow
-  $answer = Read-Host 'Nhan Enter sau khi dong app (hoac go "skip" de van tiep tuc)'
+  Write-Host 'DocuFill is running. Close it so the database is not copied mid-write.' -ForegroundColor Yellow
+  $answer = Read-Host 'Press Enter after closing the app (or type "skip" to continue anyway)'
   if ($answer -eq 'skip') { break }
   $running = Get-Process -Name 'docu_fill' -ErrorAction SilentlyContinue
 }
@@ -83,7 +83,7 @@ if ($InstallDir) {
 if ($isarLib) {
   Write-Host "App       : $InstallDir"
 } else {
-  Write-Host 'Khong tim thay libisar.dll trong thu muc cai app. Van tiep tuc, nhung khi doc database can chi dinh --isar-lib.' -ForegroundColor Yellow
+  Write-Host 'libisar.dll not found in the install folder. Continuing; pass --isar-lib when reading the database.' -ForegroundColor Yellow
 }
 
 $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
@@ -99,7 +99,7 @@ try {
   if (Test-Path $logsDir) {
     Copy-Item $logsDir (Join-Path $staging 'api_logs') -Recurse
   } else {
-    Write-Host 'Khong co thu muc api_logs (co the chua bat "API logging" trong Settings).' -ForegroundColor Yellow
+    Write-Host 'No api_logs folder ("API logging" may be off in Settings).' -ForegroundColor Yellow
   }
 
   $templatesDir = Join-Path $DocumentsDir 'templates'
@@ -138,10 +138,10 @@ try {
   [System.IO.Compression.ZipFile]::CreateFromDirectory($staging, $zipPath, [System.IO.Compression.CompressionLevel]::Optimal, $false)
 
   Write-Host ''
-  Write-Host "Xong: $zipPath" -ForegroundColor Green
+  Write-Host "Done: $zipPath" -ForegroundColor Green
   Write-Host ("  api_logs : {0} file" -f $manifest.apiLogs.files)
   Write-Host ("  templates: {0} file" -f $manifest.templates.files)
-  Write-Host 'Luu y: zip chua du lieu khach hang va Gemini API key, chi chuyen qua USB/kenh noi bo.' -ForegroundColor Yellow
+  Write-Host 'Note: the zip holds customer data and the Gemini API key. Move it by USB or internal channels only.' -ForegroundColor Yellow
 } finally {
   Remove-Item $staging -Recurse -Force -ErrorAction SilentlyContinue
 }
