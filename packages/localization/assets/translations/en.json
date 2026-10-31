@@ -240,7 +240,10 @@
       "use_llm": "Use the local AI for empty fields",
       "use_llm_description": "Slow (a few minutes per document). Values from the AI are marked for review.",
       "open_cases_folder": "Open shared cases folder",
-      "cases_folder_description": "Copy export_histories.json (from \"Export analysis data\" on another computer) into this folder to also learn from that computer's cases."
+      "cases_folder_description": "Import learning cases: export_histories.json (from \"Export analysis data\" on another computer) or dataset.jsonl. Files stay on this computer and are not synced to OneDrive.",
+      "import_cases": "Import learning cases...",
+      "import_cases_success": "Imported {} learning cases. The engine learns from them at the next file import.",
+      "import_cases_invalid": "Not a learning-cases file (dataset.jsonl or export_histories.json)."
     }
   },
   "engine": {
@@ -250,12 +253,70 @@
       "learn_rules": "Learning from {} exported cases (only once after each export)...",
       "apply_rules": "Filling in values...",
       "load_llm": "Loading the local AI...",
-      "llm": "Local AI is reading the document for {} empty fields (may take a few minutes)..."
+      "llm": "Local AI is reading the document for {} empty fields (may take a few minutes)...",
+      "llm_fields": "Local AI: {}/{} fields done"
     },
     "not_installed": "The offline engine is not installed. Install the DocuFill build with the offline engine or choose Gemini in Settings.",
     "import_result": "Filled {} fields, {} to check (yellow border).",
     "review_rule": "Filled from past cases with limited confidence: please check",
     "review_llm": "Suggested by the local AI: please check before exporting",
-    "review_number": "Contains an uncertain number (⁇): compare with the document"
+    "review_number": "Contains an uncertain number (⁇): compare with the document",
+    "cancel": "Cancel",
+    "cancelled": "Processing cancelled."
+  },
+  "guide": {
+    "title": "User guide",
+    "open": "Help",
+    "intro": "Common situations when filling values from Excel, Word and PDF files. Tap an item to see what to do.",
+    "items": {
+      "how_it_works": {
+        "title": "How does the app fill in values?",
+        "body": "When you tap \"Import data\" and pick a file, the app reads it (scanned PDFs through OCR) and fills in two steps:\n1. Rules learned from your exported cases: fast and very accurate for fields at a fixed place. Uncertain fields stay empty.\n2. The local AI (if turned on in Settings): suggests values for the remaining empty fields.\nEverything runs on this computer; no data leaves it (unless Gemini is chosen in Settings)."
+      },
+      "yellow": {
+        "title": "What does a yellow border mean?",
+        "body": "The app filled the value, but you should check it before exporting. The text under the field gives the reason:\n- \"Filled from past cases with limited confidence\": the rules are not sure.\n- \"Suggested by the local AI\": proposed by the AI, more often wrong, check carefully.\n- \"Contains an uncertain number (⁇)\": see below.\nThe border disappears once you edit the field. Fields without a border come from confident rules, but important numbers are still worth a look."
+      },
+      "question_marks": {
+        "title": "Values with ⁇",
+        "body": "When reading a scanned PDF, every number is read by two different readers. If they disagree, the number is replaced by ⁇ so that no wrong number is filled in. Open the PDF, read the number and type it in place of ⁇."
+      },
+      "empty": {
+        "title": "Many fields stay empty",
+        "body": "The app only fills a value when it is confident enough; empty fields are for you to type. Common causes:\n- No or few cases to learn from yet (see \"First use\").\n- The document is laid out differently from earlier cases.\n- The information is not in the document (e.g. the report date or a number you assign).\nAfter you fill and export, the app learns from this case for next time."
+      },
+      "first_use": {
+        "title": "First use / no cases to learn from",
+        "body": "The app learns from cases exported with this version. Cases exported with older versions have no source text, so they cannot be used.\nTo get learning cases right away: Settings → Data processing → \"Import learning cases...\" and pick a dataset.jsonl or export_histories.json file (copied by USB).\nFrom about 15 cases on, filling is stable."
+      },
+      "slow": {
+        "title": "Processing takes very long or seems stuck",
+        "body": "Typical times (office computer):\n- Reading a scanned PDF: about 5–10 seconds per page.\n- First import after each export: 1–2 extra minutes to re-learn.\n- Local AI: about 5–15 minutes per document.\nThe text under the spinner shows the current step. During \"Local AI\" the app is still working, just slowly. You can tap \"Cancel\" and turn off \"Use the local AI\" in Settings to use only the rules (a few seconds)."
+      },
+      "cancel": {
+        "title": "What happens when I tap Cancel?",
+        "body": "Reading the file stops at once; what is already on the form is kept and nothing more is filled in. You can import the file again at any time."
+      },
+      "wrong": {
+        "title": "A filled value is wrong",
+        "body": "Correct it in the field and export as usual. The app records your correction and learns from it next time. If a field is often wrong, report it so the way documents present it can be checked."
+      },
+      "pdf_quality": {
+        "title": "Poor results on a scanned PDF",
+        "body": "Results depend on scan quality: scan at 200–300 dpi, straight pages, no blur or shadows. Phone photos, tilted pages or handwriting read worse. Pages with only pictures (property photos) have no text to read."
+      },
+      "other_machine": {
+        "title": "Learning cases from another computer",
+        "body": "On the computer with the cases: Settings → Analysis data → \"Export analysis data\", and take export_histories.json from the zip.\nCopy it by USB to the other computer, then Settings → Data processing → \"Import learning cases...\" and pick that file.\nThe file holds customer data: move it by USB or internal channels only, never by email or chat apps."
+      },
+      "not_installed": {
+        "title": "\"The offline engine is not installed\"",
+        "body": "This installation has no offline processing. Install the DocuFill build with the offline engine (its setup file name contains \"offline\"), or choose Gemini in Settings for now if Internet use is allowed."
+      },
+      "privacy": {
+        "title": "Is any data sent outside?",
+        "body": "In Offline mode: no. Reading files and filling values run entirely on this computer, and the processing part is blocked from the network. Learning cases are stored on this computer and not synced to OneDrive.\nOnly when Gemini is chosen in Settings is the document content sent to Google for processing."
+      }
+    }
   }
 }

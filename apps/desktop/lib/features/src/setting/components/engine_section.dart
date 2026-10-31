@@ -1,5 +1,6 @@
 import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/setting/view_model/setting_view_model.dart';
+import 'package:docu_fill/features/src/help/user_guide_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:localization/localization.dart';
 import 'package:maac_mvvm_with_get_it/maac_mvvm_with_get_it.dart';
@@ -93,10 +94,32 @@ class EngineSection extends StatelessWidget {
             Dimens.spacing.vertical(Dimens.size8),
             SizedBox(
               width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: viewModel.importLearningCases,
+                icon: const Icon(Icons.upload_file),
+                label: Text(AppLang.settingsEngineImportCases.tr()),
+                style: OutlinedButton.styleFrom(
+                  padding: EdgeInsets.all(Dimens.size16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: Dimens.radii.borderMedium(),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: double.infinity,
               child: TextButton.icon(
                 onPressed: viewModel.openSharedCasesFolder,
                 icon: const Icon(Icons.folder_shared_outlined),
                 label: Text(AppLang.settingsEngineOpenCasesFolder.tr()),
+              ),
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton.icon(
+                onPressed: () => UserGuideDialog.show(context),
+                icon: const Icon(Icons.help_outline),
+                label: Text(AppLang.guideTitle.tr()),
               ),
             ),
           ],

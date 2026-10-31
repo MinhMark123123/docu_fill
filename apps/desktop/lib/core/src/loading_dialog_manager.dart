@@ -16,6 +16,9 @@ class LoadingDialogManager {
   /// Optional status line under the spinner, for long tasks such as OCR.
   final message = ValueNotifier<String?>(null);
 
+  /// Optional cancel button under the spinner (label, action).
+  final cancel = ValueNotifier<({String label, VoidCallback onPressed})?>(null);
+
   final Set<String> _tasks = {};
   Timer? _safetyTimer;
 
@@ -43,7 +46,10 @@ class LoadingDialogManager {
   }
 
   void _updateState() {
-    if (_tasks.isEmpty) message.value = null;
+    if (_tasks.isEmpty) {
+      message.value = null;
+      cancel.value = null;
+    }
     _loadingController.add(_tasks.isNotEmpty);
   }
 
@@ -95,16 +101,23 @@ class _LoadingWrapperState extends State<LoadingWrapper> {
           initialData: false,
           builder: (context, snapshot) {
             if (snapshot.data == true) {
-              return AbsorbPointer(
-                child: Container(
-                  color: Colors.black26,
-                  child: Center(
+              final manager = LoadingDialogManager();
+              return Stack(
+                children: [
+                  // Blocks the app below; the cancel button sits above it.
+                  const AbsorbPointer(
+                    child: ColoredBox(
+                      color: Colors.black26,
+                      child: SizedBox.expand(),
+                    ),
+                  ),
+                  Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const CircularProgressIndicator(),
                         ValueListenableBuilder<String?>(
-                          valueListenable: LoadingDialogManager().message,
+                          valueListenable: manager.message,
                           builder:
                               (context, message, _) =>
                                   message == null
@@ -123,10 +136,25 @@ class _LoadingWrapperState extends State<LoadingWrapper> {
                                         ),
                                       ),
                         ),
+                        ValueListenableBuilder(
+                          valueListenable: manager.cancel,
+                          builder:
+                              (context, cancel, _) =>
+                                  cancel == null
+                                      ? const SizedBox.shrink()
+                                      : Padding(
+                                        padding: const EdgeInsets.only(top: 16),
+                                        child: ElevatedButton.icon(
+                                          onPressed: cancel.onPressed,
+                                          icon: const Icon(Icons.close),
+                                          label: Text(cancel.label),
+                                        ),
+                                      ),
+                        ),
                       ],
                     ),
                   ),
-                ),
+                ],
               );
             }
             return const SizedBox.shrink();

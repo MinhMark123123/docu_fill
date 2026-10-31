@@ -130,11 +130,27 @@ class SettingViewModel extends BaseViewModel {
     await _settingsRepository.saveUseLocalLlm(enabled);
   }
 
+  Future<void> importLearningCases() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json', 'jsonl'],
+    );
+    final path = result?.files.single.path;
+    if (path == null) return;
+    try {
+      final count = await loadingGuard(
+        _offlineEngineService.importCaseFile(File(path)),
+      );
+      showSnackbar(AppLang.settingsEngineImportCasesSuccess.tr(args: ['$count']));
+    } on FormatException {
+      showSnackbar(AppLang.settingsEngineImportCasesInvalid.tr());
+    }
+  }
+
   Future<void> openSharedCasesFolder() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final path = p.join(directory.path, OfflineEngineService.sharedCasesFolder);
-    await Directory(path).create(recursive: true);
-    if (Platform.isWindows) await Process.run('explorer.exe', [path]);
+    final dir = _offlineEngineService.sharedCasesDirectory;
+    await dir.create(recursive: true);
+    if (Platform.isWindows) await Process.run('explorer.exe', [dir.path]);
   }
 
   Future<void> onToggleApiLogging(bool enabled) async {

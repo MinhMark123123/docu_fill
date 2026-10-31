@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:data/data.dart';
 import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 /// Progress line of the engine ("PROGRESS {...}" on stderr).
 class EngineProgress {
@@ -15,6 +14,15 @@ class EngineProgress {
   final int total;
 
   const EngineProgress(this.stage, this.done, this.total);
+}
+
+/// Thrown by [OfflineEngineService] calls stopped with
+/// [OfflineEngineService.cancel].
+class EngineCancelledException implements Exception {
+  const EngineCancelledException();
+
+  @override
+  String toString() => 'Offline engine was cancelled';
 }
 
 /// One value proposed by the offline engine.
@@ -54,21 +62,114 @@ class EngineValue {
 /// DOCUFILL_PYTHON to the Python of `tools/ocr_bench/.venv`.
 class OfflineEngineService {
   final ExportHistoryRepository _historyRepository;
-  final Future<Directory> Function() _documentsDirectory;
+  final Directory _sharedCasesDirectory;
   final List<String>? _engineCommand;
+
+  /// Engine process of the call in progress, killed by [cancel].
+  Process? _running;
+  bool _cancelled = false;
 
   OfflineEngineService(
     this._historyRepository, {
-    Future<Directory> Function()? documentsDirectory,
+    Directory? sharedCasesDirectory,
     List<String>? engineCommand,
-  }) : _documentsDirectory =
-           documentsDirectory ?? getApplicationDocumentsDirectory,
+  }) : _sharedCasesDirectory =
+           sharedCasesDirectory ?? defaultSharedCasesDirectory(),
        _engineCommand = engineCommand;
 
-  /// Folder where cases from other machines (dataset.jsonl from
-  /// tools/data_export, or export_histories.json from the in-app data export)
-  /// can be dropped to learn from them too.
-  static const sharedCasesFolder = 'engine_cases';
+  /// Where cases from other machines (export_histories.json of the in-app
+  /// data export, or dataset.jsonl of tools/data_export) are dropped so the
+  /// engine also learns from them: %LOCALAPPDATA%\DocuFill\engine_cases.
+  /// Not under Documents, which OneDrive may sync to the cloud: these files
+  /// hold customer data.
+  static Directory defaultSharedCasesDirectory() {
+    final base =
+        Platform.environment['LOCALAPPDATA'] ??
+        Platform.environment['HOME'] ??
+        Directory.systemTemp.path;
+    return Directory(p.join(base, 'DocuFill', 'engine_cases'));
+  }
+
+  Directory get sharedCasesDirectory => _sharedCasesDirectory;
+
+  /// Copies a cases file (dataset.jsonl of tools/data_export, or
+  /// export_histories.json of the in-app data export) into
+  /// [sharedCasesDirectory]. Returns the number of cases with source text;
+  /// throws [FormatException] when the file holds none.
+  Future<int> importCaseFile(File source) async {
+    final content = await source.readAsString();
+    final count =
+        source.path.toLowerCase().endsWith('.jsonl')
+            ? _countDatasetCases(content)
+            : _countHistoryCases(content);
+    if (count == 0) {
+      throw const FormatException('No learning cases in the file');
+    }
+    await _sharedCasesDirectory.create(recursive: true);
+    var target = File(
+      p.join(_sharedCasesDirectory.path, p.basename(source.path)),
+    );
+    // Keep earlier imports: export_histories.json from two machines has the
+    // same name.
+    for (var n = 2; await target.exists(); n++) {
+      target = File(
+        p.join(
+          _sharedCasesDirectory.path,
+          '${p.basenameWithoutExtension(source.path)}_$n${p.extension(source.path)}',
+        ),
+      );
+    }
+    await source.copy(target.path);
+    return count;
+  }
+
+  static bool _hasText(Object? sources, String textKey) =>
+      sources is List &&
+      sources.any(
+        (s) =>
+            s is Map &&
+            s[textKey] is String &&
+            (s[textKey] as String).isNotEmpty,
+      );
+
+  static int _countDatasetCases(String content) {
+    var count = 0;
+    for (final line in const LineSplitter().convert(content)) {
+      if (line.trim().isEmpty) continue;
+      try {
+        final pair = jsonDecode(line);
+        if (pair is Map &&
+            pair['finalValues'] is Map &&
+            _hasText(pair['sources'], 'rawText')) {
+          count++;
+        }
+      } on FormatException {
+        return 0;
+      }
+    }
+    return count;
+  }
+
+  static int _countHistoryCases(String content) {
+    try {
+      final histories = jsonDecode(content);
+      if (histories is! List) return 0;
+      return histories
+          .where((h) => h is Map && _hasText(h['sources'], 'text'))
+          .length;
+    } on FormatException {
+      return 0;
+    }
+  }
+
+  /// Stops the engine call in progress; that call throws
+  /// [EngineCancelledException].
+  void cancel() {
+    final process = _running;
+    if (process == null) return;
+    _cancelled = true;
+    process.kill();
+  }
 
   List<String>? _command() {
     if (_engineCommand != null) return _engineCommand;
@@ -95,10 +196,11 @@ class OfflineEngineService {
     File pdf, {
     void Function(EngineProgress)? onProgress,
   }) async {
-    final result = await _run(
-      ['ocr', '--input', pdf.path],
-      onProgress: onProgress,
-    );
+    final result = await _run([
+      'ocr',
+      '--input',
+      pdf.path,
+    ], onProgress: onProgress);
     return result['text'] as String;
   }
 
@@ -157,8 +259,7 @@ class OfflineEngineService {
   }
 
   Future<List<String>> _sharedCaseFiles() async {
-    final docs = await _documentsDirectory();
-    final dir = Directory(p.join(docs.path, sharedCasesFolder));
+    final dir = _sharedCasesDirectory;
     if (!await dir.exists()) return [];
     return dir
         .listSync()
@@ -184,42 +285,47 @@ class OfflineEngineService {
     final dir = temp ?? await _tempDir();
     final output = File(p.join(dir.path, 'result.json'));
     try {
-      final process = await Process.start(command.first, [
-        ...command.skip(1),
-        ...args,
-        '--output',
-        output.path,
-      ], environment: {'PYTHONIOENCODING': 'utf-8'});
+      final process = await Process.start(
+        command.first,
+        [...command.skip(1), ...args, '--output', output.path],
+        environment: {'PYTHONIOENCODING': 'utf-8'},
+      );
+      _running = process;
+      _cancelled = false;
       // stdout is unused; drain it so the child never blocks on a full pipe.
       unawaited(process.stdout.drain<void>());
       String? error;
-      final stderrDone = process.stderr
-          .transform(utf8.decoder)
-          .transform(const LineSplitter())
-          .listen((line) {
-            if (line.startsWith('PROGRESS ')) {
-              final json = jsonDecode(line.substring(9)) as Map<String, dynamic>;
-              onProgress?.call(
-                EngineProgress(
-                  json['stage'] as String,
-                  json['done'] as int,
-                  json['total'] as int,
-                ),
-              );
-            } else if (line.startsWith('ERROR ')) {
-              error = line.substring(6);
-            } else {
-              debugPrint('engine: $line');
-            }
-          })
-          .asFuture<void>();
+      final stderrDone =
+          process.stderr
+              .transform(utf8.decoder)
+              .transform(const LineSplitter())
+              .listen((line) {
+                if (line.startsWith('PROGRESS ')) {
+                  final json =
+                      jsonDecode(line.substring(9)) as Map<String, dynamic>;
+                  onProgress?.call(
+                    EngineProgress(
+                      json['stage'] as String,
+                      json['done'] as int,
+                      json['total'] as int,
+                    ),
+                  );
+                } else if (line.startsWith('ERROR ')) {
+                  error = line.substring(6);
+                } else {
+                  debugPrint('engine: $line');
+                }
+              })
+              .asFuture<void>();
       final exitCode = await process.exitCode;
       await stderrDone;
+      if (_cancelled) throw const EngineCancelledException();
       if (exitCode != 0 || !await output.exists()) {
         throw Exception(error ?? 'Offline engine failed (exit code $exitCode)');
       }
       return jsonDecode(await output.readAsString()) as Map<String, dynamic>;
     } finally {
+      _running = null;
       if (ownTemp) await _deleteQuietly(dir);
     }
   }

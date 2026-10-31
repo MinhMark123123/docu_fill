@@ -474,6 +474,11 @@ class FieldsInputViewModel extends BaseViewModel {
   /// optionally the local LLM). Nothing leaves the machine.
   Future<void> _processFileOffline(File file, {required bool useLlm}) async {
     final isPdf = p.extension(file.path).toLowerCase() == '.pdf';
+    final loading = LoadingDialogManager();
+    loading.cancel.value = (
+      label: AppLang.engineCancel.tr(),
+      onPressed: _offlineEngineService.cancel,
+    );
     try {
       final text =
           isPdf
@@ -534,8 +539,11 @@ class FieldsInputViewModel extends BaseViewModel {
           ],
         ),
       );
+    } on EngineCancelledException {
+      showSnackbar(AppLang.engineCancelled.tr());
     } finally {
-      LoadingDialogManager().message.value = null;
+      loading.message.value = null;
+      loading.cancel.value = null;
     }
   }
 
@@ -554,7 +562,13 @@ class FieldsInputViewModel extends BaseViewModel {
       ),
       'apply_rules' => AppLang.engineProgressApplyRules.tr(),
       'load_llm' => AppLang.engineProgressLoadLlm.tr(),
-      'llm' => AppLang.engineProgressLlm.tr(args: ['${progress.total}']),
+      // done = 0 while the model reads the document (can take minutes).
+      'llm' =>
+        progress.done == 0
+            ? AppLang.engineProgressLlm.tr(args: ['${progress.total}'])
+            : AppLang.engineProgressLlmFields.tr(
+              args: ['${progress.done}', '${progress.total}'],
+            ),
       _ => null,
     };
     LoadingDialogManager().message.value = message;

@@ -49,7 +49,7 @@ import netguard  # noqa: E402,F401  (blocks the network before anything else loa
 
 # Part of the rule cache key: bump it with every change to the mapper code
 # (tools/mapper), so rules learned by an older version are not reused.
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 LLM_FILE = "llm/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 OCR_DPI = 200
 AUTO_CONFIDENCE = 0.9  # rule values at or above this are not flagged for review
@@ -186,16 +186,21 @@ def cmd_map(args) -> dict:
                 }
     stats["rules"] = len(values)
 
-    missing = [k for k in fields if k not in values]
+    # The LLM only gets keys that have confirmed values in past cases: without
+    # an example it is slow (every key costs generation time) and mostly wrong,
+    # and a key nobody ever filled is usually meant to stay empty.
+    mapper = LlmMapper(None).fit(list(zip(docs, (v for _, v in cases))))
+    missing = [k for k in fields if k not in values and k in mapper.confirmed]
+    stats["llm_skipped_no_example"] = sum(1 for k in fields if k not in values and k not in mapper.confirmed)
     if args.llm and missing:
         from llama_cpp import Llama
 
         progress("load_llm")
         threads = max(1, (os.cpu_count() or 2) * 3 // 4)
-        llm = Llama(model_path=str(MODELS / LLM_FILE), n_ctx=8192, n_threads=threads, verbose=False)
+        mapper.llm = Llama(model_path=str(MODELS / LLM_FILE), n_ctx=8192, n_threads=threads, verbose=False)
         progress("llm", 0, len(missing))
-        preds, usage = LlmMapper(llm).fit(list(zip(docs, (v for _, v in cases)))).predict(
-            doc, missing, fields
+        preds, usage = mapper.predict(
+            doc, missing, fields, on_progress=lambda done, total: progress("llm", done, total)
         )
         for key, pred in preds.items():
             if pred.grounded:

@@ -80,17 +80,49 @@ abstract class AppLang {
   static const String actionsYes = "actions.yes";
 
   // --- Engine ---
+  static const String engineCancel = "engine.cancel";
+  static const String engineCancelled = "engine.cancelled";
   static const String engineImportResult = "engine.import_result";
   static const String engineNotInstalled = "engine.not_installed";
   static const String engineProgressApplyRules = "engine.progress.apply_rules";
   static const String engineProgressLearnRules = "engine.progress.learn_rules";
   static const String engineProgressLlm = "engine.progress.llm";
+  static const String engineProgressLlmFields = "engine.progress.llm_fields";
   static const String engineProgressLoadLlm = "engine.progress.load_llm";
   static const String engineProgressLoadOcr = "engine.progress.load_ocr";
   static const String engineProgressOcrPage = "engine.progress.ocr_page";
   static const String engineReviewLlm = "engine.review_llm";
   static const String engineReviewNumber = "engine.review_number";
   static const String engineReviewRule = "engine.review_rule";
+
+  // --- Guide ---
+  static const String guideIntro = "guide.intro";
+  static const String guideItemsCancelBody = "guide.items.cancel.body";
+  static const String guideItemsCancelTitle = "guide.items.cancel.title";
+  static const String guideItemsEmptyBody = "guide.items.empty.body";
+  static const String guideItemsEmptyTitle = "guide.items.empty.title";
+  static const String guideItemsFirstUseBody = "guide.items.first_use.body";
+  static const String guideItemsFirstUseTitle = "guide.items.first_use.title";
+  static const String guideItemsHowItWorksBody = "guide.items.how_it_works.body";
+  static const String guideItemsHowItWorksTitle = "guide.items.how_it_works.title";
+  static const String guideItemsNotInstalledBody = "guide.items.not_installed.body";
+  static const String guideItemsNotInstalledTitle = "guide.items.not_installed.title";
+  static const String guideItemsOtherMachineBody = "guide.items.other_machine.body";
+  static const String guideItemsOtherMachineTitle = "guide.items.other_machine.title";
+  static const String guideItemsPdfQualityBody = "guide.items.pdf_quality.body";
+  static const String guideItemsPdfQualityTitle = "guide.items.pdf_quality.title";
+  static const String guideItemsPrivacyBody = "guide.items.privacy.body";
+  static const String guideItemsPrivacyTitle = "guide.items.privacy.title";
+  static const String guideItemsQuestionMarksBody = "guide.items.question_marks.body";
+  static const String guideItemsQuestionMarksTitle = "guide.items.question_marks.title";
+  static const String guideItemsSlowBody = "guide.items.slow.body";
+  static const String guideItemsSlowTitle = "guide.items.slow.title";
+  static const String guideItemsWrongBody = "guide.items.wrong.body";
+  static const String guideItemsWrongTitle = "guide.items.wrong.title";
+  static const String guideItemsYellowBody = "guide.items.yellow.body";
+  static const String guideItemsYellowTitle = "guide.items.yellow.title";
+  static const String guideOpen = "guide.open";
+  static const String guideTitle = "guide.title";
 
   // --- Labels ---
   static const String labelsActions = "labels.actions";
@@ -236,6 +268,9 @@ abstract class AppLang {
   static const String settingsEngineCasesFolderDescription = "settings.engine.cases_folder_description";
   static const String settingsEngineDescription = "settings.engine.description";
   static const String settingsEngineGemini = "settings.engine.gemini";
+  static const String settingsEngineImportCases = "settings.engine.import_cases";
+  static const String settingsEngineImportCasesInvalid = "settings.engine.import_cases_invalid";
+  static const String settingsEngineImportCasesSuccess = "settings.engine.import_cases_success";
   static const String settingsEngineNotInstalled = "settings.engine.not_installed";
   static const String settingsEngineOffline = "settings.engine.offline";
   static const String settingsEngineOpenCasesFolder = "settings.engine.open_cases_folder";

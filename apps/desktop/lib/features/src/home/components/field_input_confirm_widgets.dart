@@ -2,6 +2,7 @@ import 'package:design/ui.dart';
 import 'package:docu_fill/features/src/home/view_model/fields_input_view_model.dart';
 import 'package:docu_fill/features/src/home/components/ai_result_selector_dialog.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
+import 'package:docu_fill/features/src/help/user_guide_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:localization/localization.dart';
@@ -73,6 +74,11 @@ class QuickActionsRow extends StatelessWidget {
           onPressed: () => viewModel.importFromFile(),
           icon: Icons.auto_awesome,
           label: AppLang.actionsImportData.tr(),
+        ),
+        _ActionButton(
+          onPressed: () => UserGuideDialog.show(context),
+          icon: Icons.help_outline,
+          label: AppLang.guideOpen.tr(),
         ),
       ],
     );

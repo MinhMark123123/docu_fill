@@ -188,7 +188,9 @@ class LlmMapper:
                 picked.add(i)
         return sorted(picked)[:MAX_ROWS]
 
-    def _ask(self, doc: RawDocument, keys: list[str], prop: str | None, descriptions):
+    def _ask(self, doc: RawDocument, keys: list[str], prop: str | None, descriptions, on_answer=None):
+        """One prompt for `keys`. `on_answer(n)` is called whenever the model
+        has started its n-th answer, so a long prompt still shows progress."""
         rows = self._retrieve(doc, keys, prop)
         if not rows:
             return {}, {"rows": 0}
@@ -217,14 +219,24 @@ class LlmMapper:
             " /no_think"
         )
         schema = {"type": "object", "properties": {a: {"type": "string"} for a in alias}}
-        out = self.llm.create_chat_completion(
+        stream = self.llm.create_chat_completion(
             messages=[{"role": "user", "content": prompt}],
             response_format={"type": "json_object", "schema": schema},
             temperature=0,
             max_tokens=40 * len(keys) + 50,
+            stream=True,
         )
+        text, chunks, answered = "", 0, 0
+        for chunk in stream:
+            text += chunk["choices"][0]["delta"].get("content") or ""
+            chunks += 1
+            # Each answer starts with its alias: {"k1": "...", "k2": ...
+            started = len(re.findall(r'"k\d+"\s*:', text))
+            if on_answer and started != answered:
+                answered = started
+                on_answer(answered)
         try:
-            answer = json.loads(out["choices"][0]["message"]["content"])
+            answer = json.loads(text)
         except json.JSONDecodeError:
             answer = {}
 
@@ -237,15 +249,31 @@ class LlmMapper:
             ok = grounded(raw, shown)
             value = conform(raw, self.confirmed.get(key, [])) if ok else raw
             result[key] = LlmPrediction(value, ok, raw)
-        return result, {"rows": len(rows), **out["usage"]}
+        usage = {
+            "rows": len(rows),
+            "prompt_tokens": len(self.llm.tokenize(prompt.encode("utf-8"))),
+            "completion_tokens": chunks,
+        }
+        return result, usage
 
-    def predict(self, doc: RawDocument, keys: list[str], descriptions: dict[str, str] | None = None):
+    def predict(self, doc: RawDocument, keys: list[str], descriptions: dict[str, str] | None = None,
+                on_progress=None):
+        """`on_progress(done, total)` reports keys the model has got to so far
+        (answered or skipped), across all prompts."""
         groups: dict[str | None, list[str]] = defaultdict(list)
         for key in keys:
             groups[_key_property(key)].append(key)
         result, stats = {}, Counter()
+        done = 0
         for prop, group in groups.items():
-            preds, usage = self._ask(doc, group, prop, descriptions)
+            def on_answer(n, base=done, size=len(group)):
+                if on_progress:
+                    on_progress(base + min(n, size), len(keys))
+
+            preds, usage = self._ask(doc, group, prop, descriptions, on_answer)
+            done += len(group)
+            if on_progress:
+                on_progress(done, len(keys))
             result.update(preds)
             stats.update({k: v for k, v in usage.items() if isinstance(v, int)})
         stats["prompts"] = len(groups)

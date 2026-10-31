@@ -44,7 +44,8 @@ ExportHistory _history({required List<SourceDocument> sources}) =>
     );
 
 /// Stand-in for docufill_engine: keeps a copy of the request next to itself
-/// (last_request.json), prints progress, fails when the text is "fail".
+/// (last_request.json), prints progress, fails when the text is "fail",
+/// hangs when it is "slow".
 const _fakeEngine = r'''
 import 'dart:convert';
 import 'dart:io';
@@ -61,6 +62,7 @@ void main(List<String> args) {
     File.fromUri(Platform.script).parent.path + '/last_request.json',
   );
   final request = jsonDecode(requestFile.readAsStringSync());
+  if (request['text'] == 'slow') sleep(const Duration(seconds: 30));
   if (request['text'] == 'fail') {
     stderr.writeln('ERROR ValueError: bad request');
     exit(1);
@@ -86,15 +88,13 @@ void main() {
     temp = await Directory.systemTemp.createTemp('engine_test_');
     final script = File(p.join(temp.path, 'fake_engine.dart'));
     await script.writeAsString(_fakeEngine);
-    final shared = Directory(
-      p.join(temp.path, OfflineEngineService.sharedCasesFolder),
-    );
+    final shared = Directory(p.join(temp.path, 'engine_cases'));
     await shared.create();
     await File(p.join(shared.path, 'other_machine.json')).writeAsString('[]');
     await File(p.join(shared.path, 'notes.txt')).writeAsString('ignored');
     service = OfflineEngineService(
       _FakeHistories(),
-      documentsDirectory: () async => temp,
+      sharedCasesDirectory: shared,
       engineCommand: [_dart(), 'run', script.path],
     );
   });
@@ -153,6 +153,43 @@ void main() {
         ),
       ),
     );
+  });
+
+  test('cancel stops the engine', () async {
+    final call = service.mapText(text: 'slow', fields: {}, useLlm: false);
+    await Future<void>.delayed(const Duration(seconds: 3));
+    final stopwatch = Stopwatch()..start();
+    service.cancel();
+    await expectLater(call, throwsA(isA<EngineCancelledException>()));
+    expect(stopwatch.elapsed, lessThan(const Duration(seconds: 10)));
+  });
+
+  test('importCaseFile counts cases and keeps earlier imports', () async {
+    final source = File(p.join(temp.path, 'export_histories.json'));
+    await source.writeAsString(
+      jsonEncode([
+        {
+          'sources': [
+            {'text': 'Số | 1'},
+          ],
+        },
+        {'sources': []},
+      ]),
+    );
+    expect(await service.importCaseFile(source), 1);
+    expect(await service.importCaseFile(source), 1);
+    final names =
+        service.sharedCasesDirectory
+            .listSync()
+            .map((f) => p.basename(f.path))
+            .toSet();
+    expect(names, containsAll(['export_histories.json', 'export_histories_2.json']));
+  });
+
+  test('importCaseFile rejects files without cases', () async {
+    final source = File(p.join(temp.path, 'other.jsonl'));
+    await source.writeAsString('{"a": 1}\nnot json\n');
+    expect(service.importCaseFile(source), throwsFormatException);
   });
 
   test('temporary request files are deleted', () async {

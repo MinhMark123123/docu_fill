@@ -240,7 +240,10 @@
       "use_llm": "Dùng AI cục bộ cho trường còn trống",
       "use_llm_description": "Chậm (vài phút mỗi tài liệu). Giá trị AI điền sẽ được đánh dấu để kiểm tra.",
       "open_cases_folder": "Mở thư mục hồ sơ dùng chung",
-      "cases_folder_description": "Chép file export_histories.json (từ \"Xuất dữ liệu phân tích\" của máy khác) vào thư mục này để học thêm từ hồ sơ của máy đó."
+      "cases_folder_description": "Nhập file hồ sơ học: export_histories.json (lấy từ \"Xuất dữ liệu phân tích\" của máy khác) hoặc dataset.jsonl. File được lưu trong máy, không đồng bộ lên OneDrive.",
+      "import_cases": "Nhập hồ sơ học...",
+      "import_cases_success": "Đã nhập {} hồ sơ học. Engine sẽ học thêm ở lần nhập file tiếp theo.",
+      "import_cases_invalid": "File không đúng định dạng hồ sơ học (dataset.jsonl hoặc export_histories.json)."
     }
   },
   "engine": {
@@ -250,12 +253,70 @@
       "learn_rules": "Đang học từ {} hồ sơ đã xuất (chỉ lần đầu sau mỗi lần xuất)...",
       "apply_rules": "Đang điền dữ liệu...",
       "load_llm": "Đang nạp AI cục bộ...",
-      "llm": "AI cục bộ đang đọc tài liệu cho {} trường còn trống (có thể mất vài phút)..."
+      "llm": "AI cục bộ đang đọc tài liệu cho {} trường còn trống (có thể mất vài phút)...",
+      "llm_fields": "AI cục bộ: đã xong {}/{} trường"
     },
     "not_installed": "Chưa cài engine offline. Hãy cài bản DocuFill có engine offline hoặc chọn Gemini trong Cài đặt.",
     "import_result": "Đã điền {} trường, {} trường cần kiểm tra (viền vàng).",
     "review_rule": "Tự điền theo hồ sơ cũ, độ tin cậy chưa cao: hãy kiểm tra",
     "review_llm": "Gợi ý của AI cục bộ: hãy kiểm tra trước khi xuất",
-    "review_number": "Có số đọc chưa chắc chắn (⁇): hãy đối chiếu với tài liệu"
+    "review_number": "Có số đọc chưa chắc chắn (⁇): hãy đối chiếu với tài liệu",
+    "cancel": "Huỷ",
+    "cancelled": "Đã huỷ xử lý."
+  },
+  "guide": {
+    "title": "Hướng dẫn sử dụng",
+    "open": "Hướng dẫn",
+    "intro": "Các tình huống thường gặp khi tự điền dữ liệu từ file Excel, Word, PDF. Bấm vào từng mục để xem cách xử lý.",
+    "items": {
+      "how_it_works": {
+        "title": "App tự điền dữ liệu như thế nào?",
+        "body": "Khi bấm \"Nhập dữ liệu\" và chọn file, app đọc file (PDF scan được đọc bằng OCR) rồi điền theo 2 bước:\n1. Bộ luật học từ các hồ sơ đã xuất: nhanh, rất chính xác với trường có vị trí cố định. Trường không chắc chắn sẽ để trống.\n2. AI cục bộ (nếu bật trong Cài đặt): gợi ý thêm cho các trường còn trống.\nTất cả chạy trên máy này, không gửi dữ liệu ra ngoài (trừ khi chọn Gemini trong Cài đặt)."
+      },
+      "yellow": {
+        "title": "Ô có viền vàng nghĩa là gì?",
+        "body": "Đó là giá trị app tự điền nhưng cần bạn kiểm tra trước khi xuất. Dòng chữ dưới ô cho biết lý do:\n- \"Tự điền theo hồ sơ cũ, độ tin cậy chưa cao\": bộ luật chưa chắc chắn.\n- \"Gợi ý của AI cục bộ\": do AI đề xuất, hay sai hơn, cần đối chiếu kỹ.\n- \"Có số đọc chưa chắc chắn (⁇)\": xem mục bên dưới.\nViền vàng tự mất khi bạn sửa ô. Ô không có viền vàng là giá trị bộ luật rất chắc chắn, nhưng vẫn nên xem lại các con số quan trọng."
+      },
+      "question_marks": {
+        "title": "Giá trị có ký hiệu ⁇",
+        "body": "Khi đọc PDF scan, mỗi con số được hai bộ đọc khác nhau cùng đọc. Nếu hai bộ đọc không khớp, con số được thay bằng ⁇ để không điền nhầm số. Hãy mở PDF, đọc con số đúng và gõ thay vào chỗ ⁇."
+      },
+      "empty": {
+        "title": "Nhiều trường bị để trống",
+        "body": "App chỉ điền khi đủ chắc chắn; trường trống là trường bạn cần tự nhập. Nguyên nhân thường gặp:\n- Chưa có hoặc có ít hồ sơ để học (xem mục \"Lần đầu sử dụng\").\n- Tài liệu có cách trình bày khác các hồ sơ trước.\n- Thông tin không có trong tài liệu (ví dụ ngày lập, số thông báo do bạn tự đặt).\nSau khi bạn nhập và xuất file, app sẽ học từ hồ sơ này cho các lần sau."
+      },
+      "first_use": {
+        "title": "Lần đầu sử dụng / chưa có hồ sơ để học",
+        "body": "App học từ các hồ sơ đã xuất bằng phiên bản này. Hồ sơ xuất bằng phiên bản cũ không có văn bản nguồn nên không dùng để học được.\nĐể có ngay hồ sơ học: Cài đặt → Xử lý dữ liệu → \"Nhập hồ sơ học...\" và chọn file dataset.jsonl hoặc export_histories.json (chép qua USB).\nTừ khoảng 15 hồ sơ trở lên, kết quả tự điền ổn định."
+      },
+      "slow": {
+        "title": "Xử lý rất lâu hoặc tưởng như bị treo",
+        "body": "Thời gian thường gặp (máy văn phòng):\n- Đọc PDF scan: khoảng 5–10 giây mỗi trang.\n- Lần nhập đầu tiên sau mỗi lần xuất file: thêm 1–2 phút để học lại.\n- AI cục bộ: khoảng 5–15 phút mỗi tài liệu.\nDòng chữ dưới vòng xoay cho biết đang ở bước nào. Nếu đang \"AI cục bộ\" thì app vẫn chạy, chỉ là chậm. Có thể bấm \"Huỷ\" để dừng, rồi tắt \"Dùng AI cục bộ\" trong Cài đặt để chỉ dùng bộ luật (vài giây)."
+      },
+      "cancel": {
+        "title": "Bấm Huỷ thì sao?",
+        "body": "Việc đọc file dừng ngay, dữ liệu đã nhập trên form không bị mất và không có gì được điền thêm. Bạn có thể nhập lại file bất cứ lúc nào."
+      },
+      "wrong": {
+        "title": "Giá trị tự điền bị sai",
+        "body": "Sửa trực tiếp vào ô rồi xuất file như bình thường. App ghi nhận giá trị bạn đã sửa và lần sau sẽ học theo. Nếu một trường thường xuyên sai, hãy báo lại để kiểm tra cách tài liệu trình bày trường đó."
+      },
+      "pdf_quality": {
+        "title": "PDF scan đọc kém",
+        "body": "Kết quả phụ thuộc chất lượng bản scan: nên scan 200–300 dpi, trang thẳng, không bị mờ hay đổ bóng. Ảnh chụp bằng điện thoại, trang nghiêng hoặc chữ viết tay sẽ đọc kém hơn. Trang chỉ có ảnh (ảnh hiện trạng tài sản) không có chữ để đọc."
+      },
+      "other_machine": {
+        "title": "Dùng hồ sơ học từ máy khác",
+        "body": "Trên máy có hồ sơ: Cài đặt → Dữ liệu phân tích → \"Xuất dữ liệu phân tích\", lấy file export_histories.json trong file zip.\nChép qua USB sang máy cần dùng, rồi vào Cài đặt → Xử lý dữ liệu → \"Nhập hồ sơ học...\" và chọn file đó.\nFile chứa dữ liệu khách hàng: chỉ chuyển qua USB hoặc kênh nội bộ, không gửi qua email hay mạng xã hội."
+      },
+      "not_installed": {
+        "title": "Báo \"Chưa cài engine offline\"",
+        "body": "Bản cài đặt trên máy không có phần xử lý offline. Hãy cài bản DocuFill có engine offline (file cài đặt có chữ \"offline\"), hoặc tạm chọn Gemini trong Cài đặt nếu được phép dùng Internet."
+      },
+      "privacy": {
+        "title": "Dữ liệu có bị gửi ra ngoài không?",
+        "body": "Ở chế độ Offline: không. Việc đọc file và điền dữ liệu chạy hoàn toàn trên máy này, phần xử lý bị chặn kết nối mạng. Hồ sơ học được lưu trong máy, không đồng bộ lên OneDrive.\nChỉ khi chọn Gemini trong Cài đặt thì nội dung tài liệu mới được gửi lên Google để xử lý."
+      }
+    }
   }
 }
