@@ -55,7 +55,7 @@ def main() -> None:
                     "case": case["id"], "key": key, "gold": gold, "value": value, "source": source,
                     "ok": same_value(value, gold) if value else False,
                     "near": near_value(value, gold),
-                    "llm_raw": lp.value if lp else "", "llm_grounded": lp.grounded if lp else "",
+                    "llm_raw": lp.raw if lp else "", "llm_grounded": lp.grounded if lp else "",
                     "gemini_ok": same_value(case["gemini"].get(key), gold),
                     "gemini_near": near_value(case["gemini"].get(key), gold),
                 }

@@ -19,6 +19,9 @@ SEP = " | "
 HEADER_MIN_CELLS = 3
 HEADER_MAX_LEN = 40
 HEADER_MAX_DISTANCE = 80  # rows a column header applies to
+# "Tài sản thẩm định" -> "0", "Tài sản so sánh 2" -> "2"
+PROPERTY_HEADER = re.compile(r"^taisan(?:sosanh([1-9])|(thamdinh))$")
+SECTION_TITLE_LEN = 15
 
 
 def norm(s: str) -> str:
@@ -136,6 +139,43 @@ class RawDocument:
                 return ""
             return row[cell.col].text
         return ""
+
+    @cached_property
+    def property_columns(self) -> dict[int, dict[int, Cell]]:
+        """row -> {col: header cell} for rows of a comparison table
+        ("Nội dung | Tài sản thẩm định | Tài sản so sánh 1 | ..."). The generic
+        header_of() is unreliable there: data rows such as "12 | 10 | 15" look
+        like headers too. A table ends at a section title (one long cell left
+        of the property columns) or at the end of the sheet."""
+        out: dict[int, dict[int, Cell]] = {}
+        current, sheet = None, None
+        for i, row in enumerate(self.rows):
+            cols = {c.col: c for c in row if PROPERTY_HEADER.match(c.key)}
+            if len(cols) >= 2:
+                current, sheet = cols, row[0].sheet
+                out[i] = current
+                continue
+            if current is None:
+                continue
+            filled = [c for c in row if c.text]
+            if row[0].sheet != sheet or (
+                len(filled) == 1
+                and filled[0].col < min(current)
+                and len(filled[0].text) > SECTION_TITLE_LEN
+            ):
+                current = None
+                continue
+            out[i] = current
+        return out
+
+    def property_of(self, cell: Cell) -> str | None:
+        """"0" (appraised property) or "1".."9" (comparable) when the cell sits
+        in that column of a comparison table, else None."""
+        header = self.property_columns.get(cell.row, {}).get(cell.col)
+        if header is None:
+            return None
+        m = PROPERTY_HEADER.match(header.key)
+        return m.group(1) or "0"
 
     def row_label(self, cell: Cell) -> str:
         """Left-most cell of the row that reads as a label (has letters, not a
