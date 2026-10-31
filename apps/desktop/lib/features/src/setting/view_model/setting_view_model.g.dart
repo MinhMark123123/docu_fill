@@ -8,6 +8,14 @@ part of 'setting_view_model.dart';
 
 extension $SettingViewModel on SettingViewModel {
   /// This getter is used to access the stream of data
+  /// associated with the private field _mappingEngine.
+  StreamData<String> get mappingEngine => _mappingEngine.streamData;
+
+  /// This getter is used to access the stream of data
+  /// associated with the private field _useLocalLlm.
+  StreamData<bool> get useLocalLlm => _useLocalLlm.streamData;
+
+  /// This getter is used to access the stream of data
   /// associated with the private field _geminiApiKey.
   StreamData<String> get geminiApiKey => _geminiApiKey.streamData;
 

@@ -230,6 +230,32 @@
       "export": "Export analysis data",
       "export_success": "Data exported: {}",
       "export_error": "Could not export data: {}"
+    },
+    "engine": {
+      "title": "Data processing",
+      "description": "Offline: reads PDFs and fills values on this computer; no data leaves it. The engine learns from exported cases and improves with use.",
+      "offline": "Offline (on this computer)",
+      "gemini": "Gemini (needs Internet)",
+      "not_installed": "The offline engine is not installed on this computer.",
+      "use_llm": "Use the local AI for empty fields",
+      "use_llm_description": "Slow (a few minutes per document). Values from the AI are marked for review.",
+      "open_cases_folder": "Open shared cases folder",
+      "cases_folder_description": "Copy export_histories.json (from \"Export analysis data\" on another computer) into this folder to also learn from that computer's cases."
     }
+  },
+  "engine": {
+    "progress": {
+      "load_ocr": "Loading the PDF reader...",
+      "ocr_page": "Reading page {}/{}",
+      "learn_rules": "Learning from {} exported cases (only once after each export)...",
+      "apply_rules": "Filling in values...",
+      "load_llm": "Loading the local AI...",
+      "llm": "Local AI is reading the document for {} empty fields (may take a few minutes)..."
+    },
+    "not_installed": "The offline engine is not installed. Install the DocuFill build with the offline engine or choose Gemini in Settings.",
+    "import_result": "Filled {} fields, {} to check (yellow border).",
+    "review_rule": "Filled from past cases with limited confidence: please check",
+    "review_llm": "Suggested by the local AI: please check before exporting",
+    "review_number": "Contains an uncertain number (⁇): compare with the document"
   }
 }

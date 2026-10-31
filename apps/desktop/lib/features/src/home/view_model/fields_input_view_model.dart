@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:data/data.dart';
 import 'package:docu_fill/core/core.dart';
+import 'package:docu_fill/core/src/loading_dialog_manager.dart';
 import 'package:docu_fill/core/src/events.dart';
 import 'package:docu_fill/features/src/home/view_model/home_view_model.dart';
 import 'package:docu_fill/route/src/routes_path.dart';
@@ -23,6 +24,8 @@ class FieldsInputViewModel extends BaseViewModel {
   final ExportHistoryService _exportHistoryService;
   final DataExtractionService _dataExtractionService;
   final GeminiService _geminiService;
+  final OfflineEngineService _offlineEngineService;
+  final SettingsRepository _settingsRepository;
 
   FieldsInputViewModel({
     required TemplateRepository templateRepository,
@@ -30,11 +33,15 @@ class FieldsInputViewModel extends BaseViewModel {
     required ExportHistoryService exportHistoryService,
     required DataExtractionService dataExtractionService,
     required GeminiService geminiService,
+    required OfflineEngineService offlineEngineService,
+    required SettingsRepository settingsRepository,
   }) : _templateRepository = templateRepository,
        _templateService = templateService,
        _exportHistoryService = exportHistoryService,
        _dataExtractionService = dataExtractionService,
-       _geminiService = geminiService;
+       _geminiService = geminiService,
+       _offlineEngineService = offlineEngineService,
+       _settingsRepository = settingsRepository;
 
   @Bind()
   late final _templates = List<TemplateConfig>.empty().mtd(this);
@@ -129,6 +136,12 @@ class FieldsInputViewModel extends BaseViewModel {
   /// can learn from what the user finally exported.
   final _sources = <SourceDocument>[];
 
+  /// Fields filled by the offline engine that the user should check, with
+  /// the reason shown under the field. Cleared when the user edits the field.
+  final _reviewNotes = <String, String>{};
+
+  String? reviewNote(String key) => _reviewNotes[key];
+
   String? getInitValue({required TemplateField e}) {
     if (e.type == FieldType.selection) {
       return _fieldKeys[e.key] ?? e.options?.firstOrNull;
@@ -142,6 +155,7 @@ class FieldsInputViewModel extends BaseViewModel {
   void performInit(List<int>? ids) {
     _isExportSuccess.postValue(false);
     _sources.clear();
+    _reviewNotes.clear();
     _idsSelected.postValue(ids ?? []);
     loadTemplates();
   }
@@ -171,6 +185,7 @@ class FieldsInputViewModel extends BaseViewModel {
     _sources
       ..clear()
       ..addAll(history.sources);
+    _reviewNotes.clear();
 
     loadTemplates();
   }
@@ -253,6 +268,7 @@ class FieldsInputViewModel extends BaseViewModel {
     required String? value,
     bool shouldCheckValidate = true,
   }) {
+    _reviewNotes.remove(field.key);
     if (field.type == FieldType.singleLine) {
       _singleField[field.key] = value;
     } else {
@@ -352,6 +368,7 @@ class FieldsInputViewModel extends BaseViewModel {
     _fieldKeys.clear();
     _singleField.clear();
     _sources.clear();
+    _reviewNotes.clear();
     _idsSelected.postValue([]);
     _templates.postValue([]);
     _composedTemplateUI.postValue({});
@@ -421,6 +438,16 @@ class FieldsInputViewModel extends BaseViewModel {
   }
 
   Future<void> _processFileImport(File file) async {
+    final settings = await _settingsRepository.getSettings();
+    final engine = settings?.mappingEngine;
+    if (engine == 'offline' && !_offlineEngineService.isInstalled) {
+      throw Exception(AppLang.engineNotInstalled.tr());
+    }
+    if (engine != 'gemini' && _offlineEngineService.isInstalled) {
+      await _processFileOffline(file, useLlm: settings?.useLocalLlm ?? false);
+      return;
+    }
+
     final extraction = await _extractTextSafely(file);
     final mappedData = await _mapFileToTemplate(file, extraction);
 
@@ -441,6 +468,105 @@ class FieldsInputViewModel extends BaseViewModel {
 
     _applyAiDataToForm(mappedData);
     showSnackbar(AppLang.messagesImportFromFileSuccess.tr());
+  }
+
+  /// Offline path: OCR for PDFs, then rules learned from past exports (and
+  /// optionally the local LLM). Nothing leaves the machine.
+  Future<void> _processFileOffline(File file, {required bool useLlm}) async {
+    final isPdf = p.extension(file.path).toLowerCase() == '.pdf';
+    try {
+      final text =
+          isPdf
+              ? await _offlineEngineService.ocrPdf(
+                file,
+                onProgress: _showEngineProgress,
+              )
+              : await _dataExtractionService.extractText(file);
+      if (text.trim().isEmpty) {
+        throw Exception(AppLang.messagesExtractNoText.tr());
+      }
+
+      final fields = {
+        for (final f in _templates.data.expand((t) => t.fields))
+          if (f.type != FieldType.image) f.key: f.description,
+      };
+      final result = await _offlineEngineService.mapText(
+        text: text,
+        fields: fields,
+        useLlm: useLlm,
+        onProgress: _showEngineProgress,
+      );
+      final mappedData = result.map((k, v) => MapEntry(k, v.value));
+
+      _sources.add(
+        SourceDocument(
+          fileName: p.basename(file.path),
+          sourceType: p.extension(file.path).replaceFirst('.', '').toLowerCase(),
+          text: text,
+          method: isPdf ? 'offline_ocr' : 'offline_text',
+          predictedValues: mappedData,
+        ),
+      );
+      await _autoSaveAiResult(
+        sourceFileName: p.basename(file.path),
+        resultData: mappedData,
+      );
+
+      _applyAiDataToForm(mappedData);
+      result.forEach((key, value) {
+        if (!value.review) {
+          _reviewNotes.remove(key);
+        } else if (value.value.contains('⁇')) {
+          _reviewNotes[key] = AppLang.engineReviewNumber.tr();
+        } else {
+          _reviewNotes[key] =
+              value.source == 'llm'
+                  ? AppLang.engineReviewLlm.tr()
+                  : AppLang.engineReviewRule.tr();
+        }
+      });
+      _refreshForm();
+      showSnackbar(
+        AppLang.engineImportResult.tr(
+          args: [
+            '${result.length}',
+            '${result.values.where((v) => v.review).length}',
+          ],
+        ),
+      );
+    } finally {
+      LoadingDialogManager().message.value = null;
+    }
+  }
+
+  void _showEngineProgress(EngineProgress progress) {
+    final message = switch (progress.stage) {
+      'load_ocr' => AppLang.engineProgressLoadOcr.tr(),
+      // `done` pages are finished, so the page being read is done + 1.
+      'ocr_page' => AppLang.engineProgressOcrPage.tr(
+        args: [
+          '${(progress.done + 1).clamp(1, progress.total)}',
+          '${progress.total}',
+        ],
+      ),
+      'learn_rules' => AppLang.engineProgressLearnRules.tr(
+        args: ['${progress.total}'],
+      ),
+      'apply_rules' => AppLang.engineProgressApplyRules.tr(),
+      'load_llm' => AppLang.engineProgressLoadLlm.tr(),
+      'llm' => AppLang.engineProgressLlm.tr(args: ['${progress.total}']),
+      _ => null,
+    };
+    LoadingDialogManager().message.value = message;
+  }
+
+  /// Rebuilds the field widgets so they pick up values and review notes.
+  void _refreshForm() {
+    final cloned = Map<String, List<TemplateField>>.from(
+      _composedTemplateUI.data,
+    );
+    _composedTemplateUI.postValue(<String, List<TemplateField>>{});
+    _composedTemplateUI.postValue(cloned);
   }
 
   Future<({String text, bool pdfError})> _extractTextSafely(File file) async {

@@ -13,6 +13,9 @@ class LoadingDialogManager {
   final _loadingController = StreamController<bool>.broadcast();
   Stream<bool> get loadingStream => _loadingController.stream;
 
+  /// Optional status line under the spinner, for long tasks such as OCR.
+  final message = ValueNotifier<String?>(null);
+
   final Set<String> _tasks = {};
   Timer? _safetyTimer;
 
@@ -40,6 +43,7 @@ class LoadingDialogManager {
   }
 
   void _updateState() {
+    if (_tasks.isEmpty) message.value = null;
     _loadingController.add(_tasks.isNotEmpty);
   }
 
@@ -94,7 +98,34 @@ class _LoadingWrapperState extends State<LoadingWrapper> {
               return AbsorbPointer(
                 child: Container(
                   color: Colors.black26,
-                  child: const Center(child: CircularProgressIndicator()),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const CircularProgressIndicator(),
+                        ValueListenableBuilder<String?>(
+                          valueListenable: LoadingDialogManager().message,
+                          builder:
+                              (context, message, _) =>
+                                  message == null
+                                      ? const SizedBox.shrink()
+                                      : Padding(
+                                        padding: const EdgeInsets.only(top: 16),
+                                        child: Material(
+                                          color: Colors.transparent,
+                                          child: Text(
+                                            message,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             }

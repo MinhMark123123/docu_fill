@@ -95,20 +95,33 @@ class _FieldTitle extends StatelessWidget {
   }
 }
 
-class TextInputFieldItem extends StatelessWidget {
+class TextInputFieldItem extends StatefulWidget {
   final TemplateField field;
 
   const TextInputFieldItem({super.key, required this.field});
 
   @override
+  State<TextInputFieldItem> createState() => _TextInputFieldItemState();
+}
+
+class _TextInputFieldItemState extends State<TextInputFieldItem> {
+  final _viewModel = getViewModel<FieldsInputViewModel>();
+
+  /// Why the offline engine wants this value checked; gone once edited.
+  late String? _reviewNote = _viewModel.reviewNote(widget.field.key);
+
+  @override
   Widget build(BuildContext context) {
-    final viewModel = getViewModel<FieldsInputViewModel>();
+    final field = widget.field;
+    final reviewBorder = OutlineInputBorder(
+      borderSide: BorderSide(color: Colors.amber.shade700, width: 2),
+    );
     return FieldItemContainer(
       title: field.label,
       isRequired: field.required,
       child: ReactiveTextFormField(
         key: Key(field.key),
-        initialValue: viewModel.getInitValue(e: field),
+        initialValue: _viewModel.getInitValue(e: field),
         maxLines: 8,
         minLines: 1,
         decoration: InputDecoration(
@@ -116,8 +129,15 @@ class TextInputFieldItem extends StatelessWidget {
               field.type == FieldType.text
                   ? AppLang.messagesInputTextHint.tr()
                   : AppLang.messagesSingleLineTextHint.tr(),
+          helperText: _reviewNote,
+          helperStyle: TextStyle(color: Colors.amber.shade800),
+          enabledBorder: _reviewNote != null ? reviewBorder : null,
+          focusedBorder: _reviewNote != null ? reviewBorder : null,
         ),
-        onChanged: (value) => viewModel.setValue(field: field, value: value),
+        onChanged: (value) {
+          if (_reviewNote != null) setState(() => _reviewNote = null);
+          _viewModel.setValue(field: field, value: value);
+        },
       ),
     );
   }

@@ -17,6 +17,7 @@ export 'src/services/data_export_service.dart';
 export 'src/services/data_extraction_service.dart';
 export 'src/services/export_history_service.dart';
 export 'src/services/gemini_service.dart';
+export 'src/services/offline_engine_service.dart';
 export 'src/services/template_parsing_service.dart';
 export 'src/services/template_service.dart';
 export 'src/template_config.dart';

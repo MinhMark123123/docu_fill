@@ -10,6 +10,8 @@ abstract class SettingsRepository {
   Future<void> saveGeminiTrainingData({String? studyData, String? sampleResult});
   Future<void> saveApiLoggingSetting(bool enabled);
   Future<void> saveLocale(String languageCode, String countryCode);
+  Future<void> saveMappingEngine(String engine);
+  Future<void> saveUseLocalLlm(bool enabled);
 }
 
 class SettingsRepositoryImpl implements SettingsRepository {
@@ -66,6 +68,20 @@ class SettingsRepositoryImpl implements SettingsRepository {
     final settings = await getSettings() ?? AppSettingsModel();
     settings.languageCode = languageCode;
     settings.countryCode = countryCode;
+    await saveSettings(settings);
+  }
+
+  @override
+  Future<void> saveMappingEngine(String engine) async {
+    final settings = await getSettings() ?? AppSettingsModel();
+    settings.mappingEngine = engine;
+    await saveSettings(settings);
+  }
+
+  @override
+  Future<void> saveUseLocalLlm(bool enabled) async {
+    final settings = await getSettings() ?? AppSettingsModel();
+    settings.useLocalLlm = enabled;
     await saveSettings(settings);
   }
 }

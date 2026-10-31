@@ -18,14 +18,26 @@ class SettingViewModel extends BaseViewModel {
   final SettingsRepository _settingsRepository;
   final GeminiService _geminiService;
   final DataExportService _dataExportService;
+  final OfflineEngineService _offlineEngineService;
 
   SettingViewModel({
     required SettingsRepository settingsRepository,
     required GeminiService geminiService,
     required DataExportService dataExportService,
+    required OfflineEngineService offlineEngineService,
   })  : _settingsRepository = settingsRepository,
         _geminiService = geminiService,
-        _dataExportService = dataExportService;
+        _dataExportService = dataExportService,
+        _offlineEngineService = offlineEngineService;
+
+  bool get offlineEngineInstalled => _offlineEngineService.isInstalled;
+
+  /// "offline" or "gemini".
+  @Bind()
+  late final _mappingEngine = "offline".mtd(this);
+
+  @Bind()
+  late final _useLocalLlm = false.mtd(this);
 
   @Bind()
   late final _geminiApiKey = "".mtd(this);
@@ -80,6 +92,11 @@ class SettingViewModel extends BaseViewModel {
     _enableApiLogging.postValue(isLogging);
     _geminiStudyData.postValue(studyData);
     _geminiSampleResult.postValue(sampleResult);
+    _mappingEngine.postValue(
+      settings?.mappingEngine ??
+          (_offlineEngineService.isInstalled ? 'offline' : 'gemini'),
+    );
+    _useLocalLlm.postValue(settings?.useLocalLlm ?? false);
 
     apiKeyController.text = key;
     studyDataController.text = studyData;
@@ -100,6 +117,24 @@ class SettingViewModel extends BaseViewModel {
     if (model == null) return;
     _selectedModel.postValue(model);
     await _settingsRepository.saveGeminiModel(model);
+  }
+
+  Future<void> onMappingEngineSelected(String? engine) async {
+    if (engine == null) return;
+    _mappingEngine.postValue(engine);
+    await _settingsRepository.saveMappingEngine(engine);
+  }
+
+  Future<void> onToggleLocalLlm(bool enabled) async {
+    _useLocalLlm.postValue(enabled);
+    await _settingsRepository.saveUseLocalLlm(enabled);
+  }
+
+  Future<void> openSharedCasesFolder() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final path = p.join(directory.path, OfflineEngineService.sharedCasesFolder);
+    await Directory(path).create(recursive: true);
+    if (Platform.isWindows) await Process.run('explorer.exe', [path]);
   }
 
   Future<void> onToggleApiLogging(bool enabled) async {

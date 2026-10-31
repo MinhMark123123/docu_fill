@@ -14,5 +14,11 @@ class AppSettingsModel {
   String? languageCode;
   String? countryCode;
 
+  /// "offline" or "gemini"; null = offline when the engine is installed.
+  String? mappingEngine;
+
+  /// Ask the local LLM for fields the learned rules leave empty (slow on CPU).
+  bool useLocalLlm = false;
+
   // You can add more settings here in the future
 }

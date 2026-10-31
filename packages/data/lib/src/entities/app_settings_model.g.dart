@@ -52,6 +52,16 @@ const AppSettingsModelSchema = CollectionSchema(
       name: r'languageCode',
       type: IsarType.string,
     ),
+    r'mappingEngine': PropertySchema(
+      id: 7,
+      name: r'mappingEngine',
+      type: IsarType.string,
+    ),
+    r'useLocalLlm': PropertySchema(
+      id: 8,
+      name: r'useLocalLlm',
+      type: IsarType.bool,
+    ),
   },
 
   estimateSize: _appSettingsModelEstimateSize,
@@ -111,6 +121,12 @@ int _appSettingsModelEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  {
+    final value = object.mappingEngine;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -127,6 +143,8 @@ void _appSettingsModelSerialize(
   writer.writeString(offsets[4], object.geminiSampleResult);
   writer.writeString(offsets[5], object.geminiStudyData);
   writer.writeString(offsets[6], object.languageCode);
+  writer.writeString(offsets[7], object.mappingEngine);
+  writer.writeBool(offsets[8], object.useLocalLlm);
 }
 
 AppSettingsModel _appSettingsModelDeserialize(
@@ -144,6 +162,8 @@ AppSettingsModel _appSettingsModelDeserialize(
   object.geminiStudyData = reader.readStringOrNull(offsets[5]);
   object.id = id;
   object.languageCode = reader.readStringOrNull(offsets[6]);
+  object.mappingEngine = reader.readStringOrNull(offsets[7]);
+  object.useLocalLlm = reader.readBool(offsets[8]);
   return object;
 }
 
@@ -168,6 +188,10 @@ P _appSettingsModelDeserializeProp<P>(
       return (reader.readStringOrNull(offset)) as P;
     case 6:
       return (reader.readStringOrNull(offset)) as P;
+    case 7:
+      return (reader.readStringOrNull(offset)) as P;
+    case 8:
+      return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -1287,6 +1311,174 @@ extension AppSettingsModelQueryFilter
       );
     });
   }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'mappingEngine'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'mappingEngine'),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'mappingEngine',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'mappingEngine',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'mappingEngine',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'mappingEngine',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'mappingEngine',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'mappingEngine',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'mappingEngine',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'mappingEngine',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'mappingEngine', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  mappingEngineIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'mappingEngine', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterFilterCondition>
+  useLocalLlmEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'useLocalLlm', value: value),
+      );
+    });
+  }
 }
 
 extension AppSettingsModelQueryObject
@@ -1392,6 +1584,34 @@ extension AppSettingsModelQuerySortBy
   sortByLanguageCodeDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'languageCode', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByMappingEngine() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mappingEngine', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByMappingEngineDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mappingEngine', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByUseLocalLlm() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useLocalLlm', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  sortByUseLocalLlmDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useLocalLlm', Sort.desc);
     });
   }
 }
@@ -1508,6 +1728,34 @@ extension AppSettingsModelQuerySortThenBy
       return query.addSortBy(r'languageCode', Sort.desc);
     });
   }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByMappingEngine() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mappingEngine', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByMappingEngineDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'mappingEngine', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByUseLocalLlm() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useLocalLlm', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QAfterSortBy>
+  thenByUseLocalLlmDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'useLocalLlm', Sort.desc);
+    });
+  }
 }
 
 extension AppSettingsModelQueryWhereDistinct
@@ -1566,6 +1814,23 @@ extension AppSettingsModelQueryWhereDistinct
       return query.addDistinctBy(r'languageCode', caseSensitive: caseSensitive);
     });
   }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
+  distinctByMappingEngine({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(
+        r'mappingEngine',
+        caseSensitive: caseSensitive,
+      );
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, AppSettingsModel, QDistinct>
+  distinctByUseLocalLlm() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'useLocalLlm');
+    });
+  }
 }
 
 extension AppSettingsModelQueryProperty
@@ -1622,6 +1887,19 @@ extension AppSettingsModelQueryProperty
   languageCodeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'languageCode');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, String?, QQueryOperations>
+  mappingEngineProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'mappingEngine');
+    });
+  }
+
+  QueryBuilder<AppSettingsModel, bool, QQueryOperations> useLocalLlmProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'useLocalLlm');
     });
   }
 }

@@ -79,6 +79,19 @@ abstract class AppLang {
   static const String actionsView = "actions.view";
   static const String actionsYes = "actions.yes";
 
+  // --- Engine ---
+  static const String engineImportResult = "engine.import_result";
+  static const String engineNotInstalled = "engine.not_installed";
+  static const String engineProgressApplyRules = "engine.progress.apply_rules";
+  static const String engineProgressLearnRules = "engine.progress.learn_rules";
+  static const String engineProgressLlm = "engine.progress.llm";
+  static const String engineProgressLoadLlm = "engine.progress.load_llm";
+  static const String engineProgressLoadOcr = "engine.progress.load_ocr";
+  static const String engineProgressOcrPage = "engine.progress.ocr_page";
+  static const String engineReviewLlm = "engine.review_llm";
+  static const String engineReviewNumber = "engine.review_number";
+  static const String engineReviewRule = "engine.review_rule";
+
   // --- Labels ---
   static const String labelsActions = "labels.actions";
   static const String labelsAll = "labels.all";
@@ -220,6 +233,15 @@ abstract class AppLang {
   static const String settingsDataExportError = "settings.data.export_error";
   static const String settingsDataExportSuccess = "settings.data.export_success";
   static const String settingsDataTitle = "settings.data.title";
+  static const String settingsEngineCasesFolderDescription = "settings.engine.cases_folder_description";
+  static const String settingsEngineDescription = "settings.engine.description";
+  static const String settingsEngineGemini = "settings.engine.gemini";
+  static const String settingsEngineNotInstalled = "settings.engine.not_installed";
+  static const String settingsEngineOffline = "settings.engine.offline";
+  static const String settingsEngineOpenCasesFolder = "settings.engine.open_cases_folder";
+  static const String settingsEngineTitle = "settings.engine.title";
+  static const String settingsEngineUseLlm = "settings.engine.use_llm";
+  static const String settingsEngineUseLlmDescription = "settings.engine.use_llm_description";
   static const String settingsGeminiApiKey = "settings.gemini.api_key";
   static const String settingsGeminiEnableLogging = "settings.gemini.enable_logging";
   static const String settingsGeminiModel = "settings.gemini.model";

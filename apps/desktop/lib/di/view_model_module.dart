@@ -19,6 +19,7 @@ void setupViewModelModule() {
       settingsRepository: inject(),
       geminiService: inject(),
       dataExportService: inject(),
+      offlineEngineService: inject(),
     ),
   );
   registerViewModel(() => UploadViewModel());
@@ -35,6 +36,8 @@ void setupViewModelModule() {
       exportHistoryService: inject(),
       dataExtractionService: inject(),
       geminiService: inject(),
+      offlineEngineService: inject(),
+      settingsRepository: inject(),
     ),
   );
   registerViewModel(() => LogHistoryViewModel());
