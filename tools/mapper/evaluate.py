@@ -17,7 +17,7 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from learner import Mapper, same_value  # noqa: E402
+from learner import Mapper, near_value, same_value  # noqa: E402
 from rawdoc import RawDocument  # noqa: E402
 
 # Image paths are not text values.
@@ -69,8 +69,10 @@ def main() -> None:
                     "rule_value": pred.value if pred else "",
                     "rule_conf": round(pred.confidence, 3) if pred else 0,
                     "rule_ok": same_value(pred.value, gold) if pred else False,
+                    "rule_near": near_value(pred.value, gold) if pred else False,
                     "gemini_value": case["gemini"].get(key, ""),
                     "gemini_ok": same_value(case["gemini"].get(key), gold),
+                    "gemini_near": near_value(case["gemini"].get(key), gold),
                 }
             )
         print(f"  {i + 1}/{len(cases)} {case['id']}", flush=True)
@@ -90,6 +92,8 @@ def main() -> None:
     print(f"  Rules auto (conf>={args.auto}): coverage {len(auto) / n:.1%}, "
           f"precision {auto_ok / max(len(auto), 1):.1%}")
     print(f"  Rules or Gemini     : {either / n:.1%}")
+    print(f"  Near (small edit)   : Gemini {sum(r['gemini_near'] for r in rows) / n:.1%}, "
+          f"Rules {sum(r['rule_near'] for r in rows) / n:.1%}")
 
     per_key = Counter()
     per_key_ok = Counter()

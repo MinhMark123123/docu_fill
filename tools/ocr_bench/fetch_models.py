@@ -15,6 +15,7 @@ import json
 RAPID = "https://www.modelscope.cn/models/RapidAI/RapidOCR/resolve/v3.10.0/onnx"
 VIETOCR = "https://vocr.vn/data/vietocr"
 TESSDATA = "https://github.com/tesseract-ocr"
+HF = "https://huggingface.co"
 
 # relative target -> (url, sha256). RapidOCR hashes come from
 # rapidocr/default_models.yaml v3.10.0; None means "pin on first download"
@@ -48,6 +49,12 @@ MODELS = {
     "tessdata_fast/vie.traineddata": (
         f"{TESSDATA}/tessdata_fast/raw/main/vie.traineddata",
         None,
+    ),
+    # Local LLM for field mapping (GGUF holds weights only, no executable code).
+    "llm/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf": (
+        f"{HF}/bartowski/Qwen_Qwen3-4B-Instruct-2507-GGUF/resolve/main/"
+        "Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+        "2fde00ce69dd4899c70d020845e2638353015bba0fdf161b3eb965f2bca4464e",
     ),
 }
 

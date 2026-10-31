@@ -2,8 +2,9 @@
 
 A rule = locator + extractor + transform:
   locator   : how to find the target cell from an anchor label
-              ("self": the label's own cell, "right": next cell to the right,
-               "below": next cell below), plus which occurrence of the label
+              ("self": the label's own cell, "grid": table cell by row label and
+               column header, "right": next cell to the right, "below": next
+               cell below), plus which occurrence of the label
   extractor : whole cell, or the text after a prefix up to a tail word
   transform : output format learned from the confirmed value (e.g. dates)
 
@@ -25,7 +26,7 @@ MAX_PREFIX_WORDS = 3
 
 @dataclass(frozen=True)
 class Rule:
-    locator: str  # self | right | below
+    locator: str  # self | grid | right | below
     anchor: str  # normalized label text
     nth: int  # occurrence of the anchor in the document
     prefix: str  # normalized text before the value inside the target cell ("" = start)
@@ -78,6 +79,8 @@ def _tail(after: str) -> str:
         return ""
     if not after[0].isspace() and not after[0].isalnum():
         return f"char:{after[0]}"
+    if after[0].isalpha():  # glued unit, e.g. "677,7" in "677,7m2"
+        return f"char:{re.match(r'[^\W\d_]+', after).group()}"
     word = next((w for w in re.split(r"\s+", after) if norm(w)), "")
     # A following number (phone, area...) changes per document: stop at
     # "the next word containing a digit" instead of that literal word.
@@ -104,10 +107,18 @@ def _split_before(before: str) -> tuple[str, int] | None:
 
 
 # Documents hash by identity, so these caches are per document object.
+def _grid_key(doc: RawDocument, cell: Cell) -> str:
+    """"<row label>@<column header>", e.g. "thoidiemgiaodich@taisansosanh1"."""
+    label, header = norm(doc.row_label(cell)), norm(doc.header_of(cell))
+    return f"{label}@{header}" if label and header else ""
+
+
 @lru_cache(maxsize=None)
 def _anchor_cells(doc: RawDocument, anchor: str, locator: str) -> tuple[Cell, ...]:
     if locator == "self":
         return tuple(c for c in doc.cells if anchor in c.key)
+    if locator == "grid":
+        return tuple(c for c in doc.cells if _grid_key(doc, c) == anchor)
     return tuple(c for c in doc.cells if c.key == anchor)
 
 
@@ -120,7 +131,9 @@ def _extract(cell: Cell, prefix: str, tail: str, seg: int = 0) -> str | None:
             return None
         end_of_prefix = idx[pos + len(prefix) - 1] + 1
         text = text[end_of_prefix:]
-    text = text.lstrip(" :.-–—\t")
+    text = text.lstrip(" :.-–—\t\n")
+    # A value does not run over a line break inside the cell.
+    text = text.split("\n", 1)[0]
     if seg:
         token = text.split()[0] if text.split() else ""
         separators = list(SEGMENT.finditer(token))
@@ -156,6 +169,7 @@ def apply_rule(doc: RawDocument, rule: Rule) -> str | None:
     anchor = anchors[rule.nth]
     target = {
         "self": lambda c: c,
+        "grid": lambda c: c,
         "right": doc.right_of,
         "below": doc.below,
     }[rule.locator](anchor)
@@ -188,6 +202,13 @@ def candidate_rules(doc: RawDocument, value: str) -> frozenset[Rule]:
         if prefix:
             occurrences = _anchor_cells(doc, prefix, "self")
             rules.add(Rule("self", prefix, occurrences.index(cell), prefix, tail, seg))
+
+        # Table cell addressed by row label x column header, e.g.
+        # "Thời điểm giao dịch" x "Tài sản so sánh 2".
+        grid = _grid_key(doc, cell)
+        if grid:
+            occurrences = _anchor_cells(doc, grid, "grid")
+            rules.add(Rule("grid", grid, occurrences.index(cell), prefix, tail, seg))
 
         # Label in the cell to the left / above.
         for locator, neighbour in (("right", doc.left_of(cell)), ("below", doc.above(cell))):
@@ -288,6 +309,20 @@ def same_value(a: str | None, b: str | None) -> bool:
     if a is None or b is None:
         return False
     return re.sub(r"\s+", "", clean(a).lower()) == re.sub(r"\s+", "", clean(b).lower())
+
+
+def near_value(a: str | None, b: str | None, min_ratio: float = 85) -> bool:
+    """Needs only a small text edit: identical digits (numbers must be exact)
+    and >= min_ratio% similar text, e.g. "(nay là ...)" vs "(Địa chỉ mới: ...)"."""
+    from rapidfuzz import fuzz
+
+    if not a or not b:
+        return False
+    if same_value(a, b):
+        return True
+    if re.sub(r"\D", "", a) != re.sub(r"\D", "", b):
+        return False
+    return fuzz.ratio(clean(a).lower(), clean(b).lower()) >= min_ratio
 
 
 def wilson_lower_bound(correct: int, total: int, z: float = 1.64) -> float:
