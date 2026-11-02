@@ -270,5 +270,5 @@ ENGINES = {
     "tess_fast": lambda: TesseractEngine("fast"),
     "det_vietocr_s2s": lambda: DetVietOcrEngine("vgg_seq2seq"),
     "det_vietocr_tf": lambda: DetVietOcrEngine("vgg_transformer"),
-    "hybrid_s2s": lambda: HybridEngine("vgg_seq2seq"),
+    "hybrid_s2s": lambda: HybridEngine(),
 }
