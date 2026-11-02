@@ -18,7 +18,7 @@ map request:
    "known_values": {"%%Key%%": ["confirmed value of a past export without source text"]},
    "case_files": ["<dataset.jsonl of tools/data_export or export_histories.json of the in-app export>", ...]}
 map result:
-  {"values": {"%%Key%%": {"value", "source": "rule"|"llm", "confidence", "review", "accent_fixed"}},
+  {"values": {"%%Key%%": {"value", "source": "rule"|"llm", "confidence", "review", "accent_fixed", "identity"}},
    "stats": {...}}
 """
 
@@ -26,6 +26,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 import traceback
@@ -52,16 +53,19 @@ import netguard  # noqa: E402,F401  (blocks the network before anything else loa
 
 # Part of the rule cache key: bump it with every change to the mapper code
 # (tools/mapper), so rules learned by an older version are not reused.
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 LLM_FILE = "llm/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 # Learning time grows with the cases and runs after every export, while accuracy
 # flattened after ~15 cases in evaluation. Older cases still confirm spellings.
 MAX_LEARNING_CASES = 60
 OCR_DPI = 200
-OCR_FORMAT = 1  # bump when OCR output changes, so cached results are not reused
+OCR_FORMAT = 2  # bump when OCR output changes, so cached results are not reused
 OCR_CACHE_FILES = 20  # results kept; they hold customer text, so not forever
 AUTO_CONFIDENCE = 0.9  # rule values at or above this are not flagged for review
 MASK = "⁇"  # OCR number the two recognizers disagree on
+# People and their identifiers: another person named in the dossier is a
+# plausible but serious mistake when these are read from a scan.
+IDENTITY_KEY = re.compile(r"TenKhachHang|DiaChiKhachHang|MaDinhDanh|CCCD|CMND|NguoiBan|SoDienThoai", re.I)
 
 
 def progress(stage: str, done: int = 0, total: int = 0) -> None:
@@ -202,6 +206,7 @@ def cmd_map(args) -> dict:
     from accents import fix_accents
     from llm_mapper import LlmMapper
     from rawdoc import RawDocument
+    from shapes import plausible
 
     request = json.loads(Path(args.request).read_text(encoding="utf-8"))
     fields: dict[str, str] = request["fields"]
@@ -210,12 +215,19 @@ def cmd_map(args) -> dict:
     docs = [RawDocument(t) for t, _ in cases]
     doc = RawDocument(request["text"])
 
-    values, stats = {}, {"cases": len(cases), "cases_available": len(all_cases)}
+    known = defaultdict(list, {k: list(v) for k, v in request.get("known_values", {}).items()})
+    for _, confirmed in all_cases:
+        for key, value in confirmed.items():
+            known[key].append(value)
+
+    values, stats = {}, {"cases": len(cases), "cases_available": len(all_cases), "implausible": 0}
     if cases:
         mapper = _fit_rules(cases, docs)
         progress("apply_rules")
         for key, pred in mapper.predict(doc).items():
-            if key in fields:
+            if key in fields and not plausible(pred.value, known[key]):
+                stats["implausible"] += 1  # left to the LLM or the user
+            elif key in fields:
                 values[key] = {
                     "value": pred.value,
                     "source": "rule",
@@ -241,19 +253,20 @@ def cmd_map(args) -> dict:
             doc, missing, fields, on_progress=lambda done, total: progress("llm", done, total)
         )
         for key, pred in preds.items():
-            if pred.grounded:
+            if pred.grounded and not plausible(pred.value, known[key]):
+                stats["implausible"] += 1
+            elif pred.grounded:
                 values[key] = {"value": pred.value, "source": "llm", "confidence": 0.0, "review": True}
         stats["llm"] = sum(1 for v in values.values() if v["source"] == "llm")
         stats["llm_usage"] = usage
     if request.get("ocr"):
-        known = defaultdict(list, {k: list(v) for k, v in request.get("known_values", {}).items()})
-        for _, confirmed in all_cases:
-            for key, value in confirmed.items():
-                known[key].append(value)
         for key, item in values.items():
+            # A scan can go wrong in ways confidence does not show (a learned
+            # rule landing on another cell), so nothing from OCR is auto-accepted.
+            item.update(review=True, identity=bool(IDENTITY_KEY.search(key)))
             fixed = fix_accents(item["value"], known[key])
             if fixed != item["value"]:
-                item.update(value=fixed, review=True, accent_fixed=True)
+                item.update(value=fixed, accent_fixed=True)
         stats["accent_fixed"] = sum(1 for v in values.values() if v.get("accent_fixed"))
     return {"values": values, "stats": stats}
 

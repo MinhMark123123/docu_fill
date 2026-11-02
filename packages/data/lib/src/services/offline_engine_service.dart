@@ -39,12 +39,16 @@ class EngineValue {
   /// OCR accents were repaired from a value the user confirmed for this field.
   final bool accentFixed;
 
+  /// A person or their identifier read from a scan: check it against the file.
+  final bool identity;
+
   const EngineValue({
     required this.value,
     required this.source,
     required this.confidence,
     required this.review,
     this.accentFixed = false,
+    this.identity = false,
   });
 
   factory EngineValue.fromJson(Map<String, dynamic> json) => EngineValue(
@@ -53,6 +57,7 @@ class EngineValue {
     confidence: (json['confidence'] as num).toDouble(),
     review: json['review'] as bool,
     accentFixed: json['accent_fixed'] as bool? ?? false,
+    identity: json['identity'] as bool? ?? false,
   );
 }
 

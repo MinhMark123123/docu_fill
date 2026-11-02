@@ -263,7 +263,9 @@
     "review_number": "Contains an uncertain number (⁇): compare with the document",
     "cancel": "Cancel",
     "cancelled": "Processing cancelled.",
-    "review_accent": "Accents corrected from a value confirmed earlier for this field: please check"
+    "review_accent": "Accents corrected from a value confirmed earlier for this field: please check",
+    "review_pdf": "Read from a PDF: compare with the document",
+    "review_identity": "Name, ID or phone number read from a PDF: check it is the right person for this case"
   },
   "guide": {
     "title": "User guide",
@@ -276,7 +278,7 @@
       },
       "yellow": {
         "title": "What does a yellow border mean?",
-        "body": "The app filled the value, but you should check it before exporting. The text under the field gives the reason:\n- \"Filled from past cases with limited confidence\": the rules are not sure.\n- \"Suggested by the local AI\": proposed by the AI, more often wrong, check carefully.\n- \"Contains an uncertain number (⁇)\": see below.\n- \"Accents corrected from a value confirmed earlier\": text read from the PDF had its accents corrected to match a value confirmed earlier for this field; numbers are never changed. Check it fits this case, names above all.\nThe border disappears once you edit the field. Fields without a border come from confident rules, but important numbers are still worth a look."
+        "body": "The app filled the value, but you should check it before exporting. The text under the field gives the reason:\n- \"Filled from past cases with limited confidence\": the rules are not sure.\n- \"Suggested by the local AI\": proposed by the AI, more often wrong, check carefully.\n- \"Contains an uncertain number (⁇)\": see below.\n- \"Accents corrected from a value confirmed earlier\": text read from the PDF had its accents corrected to match a value confirmed earlier for this field; numbers are never changed. Check it fits this case, names above all.\nThe border disappears once you edit the field. For Word/Excel files, fields without a border come from confident rules, but important numbers are still worth a look. For scanned PDFs, every value the app fills has a border and needs comparing; check above all that names, ID and phone numbers belong to the right person for this case."
       },
       "question_marks": {
         "title": "Values with ⁇",

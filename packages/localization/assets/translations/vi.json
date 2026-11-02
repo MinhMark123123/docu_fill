@@ -263,7 +263,9 @@
     "review_number": "Có số đọc chưa chắc chắn (⁇): hãy đối chiếu với tài liệu",
     "cancel": "Huỷ",
     "cancelled": "Đã huỷ xử lý.",
-    "review_accent": "Đã sửa dấu theo giá trị từng xác nhận của trường này: hãy kiểm tra"
+    "review_accent": "Đã sửa dấu theo giá trị từng xác nhận của trường này: hãy kiểm tra",
+    "review_pdf": "Đọc từ PDF: hãy đối chiếu với tài liệu",
+    "review_identity": "Tên, số giấy tờ hoặc điện thoại đọc từ PDF: kiểm tra đúng người trong hồ sơ này"
   },
   "guide": {
     "title": "Hướng dẫn sử dụng",
@@ -276,7 +278,7 @@
       },
       "yellow": {
         "title": "Ô có viền vàng nghĩa là gì?",
-        "body": "Đó là giá trị app tự điền nhưng cần bạn kiểm tra trước khi xuất. Dòng chữ dưới ô cho biết lý do:\n- \"Tự điền theo hồ sơ cũ, độ tin cậy chưa cao\": bộ luật chưa chắc chắn.\n- \"Gợi ý của AI cục bộ\": do AI đề xuất, hay sai hơn, cần đối chiếu kỹ.\n- \"Có số đọc chưa chắc chắn (⁇)\": xem mục bên dưới.\n- \"Đã sửa dấu theo giá trị từng xác nhận\": chữ đọc từ PDF được sửa dấu cho giống giá trị đã xác nhận trước đây của trường này; số không bị đổi. Hãy xem giá trị có đúng với hồ sơ này không, nhất là tên người.\nViền vàng tự mất khi bạn sửa ô. Ô không có viền vàng là giá trị bộ luật rất chắc chắn, nhưng vẫn nên xem lại các con số quan trọng."
+        "body": "Đó là giá trị app tự điền nhưng cần bạn kiểm tra trước khi xuất. Dòng chữ dưới ô cho biết lý do:\n- \"Tự điền theo hồ sơ cũ, độ tin cậy chưa cao\": bộ luật chưa chắc chắn.\n- \"Gợi ý của AI cục bộ\": do AI đề xuất, hay sai hơn, cần đối chiếu kỹ.\n- \"Có số đọc chưa chắc chắn (⁇)\": xem mục bên dưới.\n- \"Đã sửa dấu theo giá trị từng xác nhận\": chữ đọc từ PDF được sửa dấu cho giống giá trị đã xác nhận trước đây của trường này; số không bị đổi. Hãy xem giá trị có đúng với hồ sơ này không, nhất là tên người.\nViền vàng tự mất khi bạn sửa ô. Với file Word/Excel, ô không có viền vàng là giá trị bộ luật rất chắc chắn, nhưng vẫn nên xem lại các con số quan trọng. Với PDF scan, mọi ô app tự điền đều có viền vàng và cần đối chiếu; đặc biệt kiểm tra tên, số giấy tờ và số điện thoại có đúng người trong hồ sơ này không."
       },
       "question_marks": {
         "title": "Giá trị có ký hiệu ⁇",

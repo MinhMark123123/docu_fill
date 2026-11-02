@@ -9,9 +9,13 @@ Text outside tables is grouped into rows by vertical overlap.
 """
 
 from dataclasses import dataclass
+from statistics import median
 
 import cv2
 import numpy as np
+
+
+COLUMN_TOLERANCE = 12  # pixels at 200 dpi between left edges of one column
 
 
 @dataclass
@@ -96,9 +100,22 @@ def _rows(items: list, rect_of) -> list[list]:
     return rows
 
 
+def _column_starts(cells: list[Rect]) -> list[float]:
+    """Left edge of every table column, from the left edges of all its cells."""
+    groups: list[list[float]] = []
+    for x in sorted(c.x0 for c in cells):
+        if groups and x - groups[-1][-1] <= COLUMN_TOLERANCE:
+            groups[-1].append(x)
+        else:
+            groups.append([x])
+    return [median(g) for g in groups]
+
+
 def page_text(lines: list[dict], img: np.ndarray) -> str:
     """Page text in reading order. Table rows are rendered as
-    "cell | cell | cell" with each cell's wrapped lines joined."""
+    "cell | cell | cell" with each cell's wrapped lines joined. Empty cells are
+    kept, so that a cell's position always tells its column: in "Giá | | 100"
+    the 100 belongs to the third column, not the second."""
     lines = [l for l in lines if l["text"].strip()]
     tables = detect_cells(img)
 
@@ -124,8 +141,17 @@ def page_text(lines: list[dict], img: np.ndarray) -> str:
         for i in used:
             in_cell = _rows(cell_lines[(t, i)], line_rect)
             texts[i] = " ".join(l["text"] for row in in_cell for l in row)
-        table_rows = _rows(used, lambda i: cells[i])
-        body = "\n".join(" | ".join(texts[i] for i in row) for row in table_rows)
+        starts = _column_starts(cells)
+        rendered = []
+        for row in _rows(used, lambda i: cells[i]):
+            slots = [""] * len(starts)
+            for i in row:
+                column = min(range(len(starts)), key=lambda c: abs(starts[c] - cells[i].x0))
+                slots[column] = f"{slots[column]} {texts[i]}".strip()
+            while not slots[-1]:
+                slots.pop()
+            rendered.append(" | ".join(slots))
+        body = "\n".join(rendered)
         segments.append((min(cells[i].y0 for i in used), body))
     for row in _rows(free, line_rect):
         segments.append((line_rect(row[0]).y0, " ".join(l["text"] for l in row)))

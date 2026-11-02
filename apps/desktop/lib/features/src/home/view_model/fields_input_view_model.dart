@@ -525,12 +525,16 @@ class FieldsInputViewModel extends BaseViewModel {
           _reviewNotes.remove(key);
         } else if (value.value.contains('⁇')) {
           _reviewNotes[key] = AppLang.engineReviewNumber.tr();
+        } else if (value.identity) {
+          _reviewNotes[key] = AppLang.engineReviewIdentity.tr();
         } else if (value.accentFixed) {
           _reviewNotes[key] = AppLang.engineReviewAccent.tr();
+        } else if (value.source == 'llm') {
+          _reviewNotes[key] = AppLang.engineReviewLlm.tr();
         } else {
           _reviewNotes[key] =
-              value.source == 'llm'
-                  ? AppLang.engineReviewLlm.tr()
+              isPdf
+                  ? AppLang.engineReviewPdf.tr()
                   : AppLang.engineReviewRule.tr();
         }
       });

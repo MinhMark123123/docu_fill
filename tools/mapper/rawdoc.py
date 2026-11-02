@@ -20,8 +20,8 @@ SEP = " | "
 HEADER_MIN_CELLS = 3
 HEADER_MAX_LEN = 40
 HEADER_MAX_DISTANCE = 80  # rows a column header applies to
-# "Tài sản thẩm định" -> "0", "Tài sản so sánh 2" -> "2"
-PROPERTY_HEADER = re.compile(r"^taisan(?:sosanh([1-9])|(thamdinh))$")
+# "Tài sản (cần) thẩm định" -> "0", "Tài sản so sánh 2" -> "2"
+PROPERTY_HEADER = re.compile(r"^taisan(?:sosanh([1-9])|(?:can)?(thamdinh))$")
 SECTION_TITLE_LEN = 15
 
 

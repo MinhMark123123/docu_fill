@@ -16,7 +16,6 @@ Three safeguards against the errors seen in evaluation:
   -> "650m" when no confirmed value has a leading word).
 """
 
-import json
 import math
 import re
 from collections import Counter, defaultdict
@@ -33,6 +32,7 @@ MAX_UNIT_LEN = 4
 
 KEY_PROPERTY = re.compile(r"(?:TaiSan|NguoiBan)([1-9])")
 NUMBER = re.compile(r"\d+(?:[.,]\d+)*")
+ANSWER_LINE = re.compile(r"^[^\w\n]*(k\d+)[^\w\n]*?[:=][ \t]*(.*)$", re.MULTILINE)
 
 
 def _words(text: str) -> list[str]:
@@ -96,6 +96,17 @@ def grounded(value: str, shown: list[str]) -> bool:
     if re.search(r"[^\W\d_]", value):
         return norm(value) in norm(" ".join(shown))
     return bool(nums)
+
+
+def parse_answer(text: str) -> dict[str, str]:
+    """{"k1": value} from "k1: value" lines, ignoring anything else the model
+    writes. A damaged or cut-off line only loses that line, and the first
+    answer of a key wins if the model repeats itself."""
+    answer: dict[str, str] = {}
+    for alias, value in ANSWER_LINE.findall(text):
+        quoted = re.fullmatch(r'"(.*)",?', value.strip())
+        answer.setdefault(alias, quoted.group(1) if quoted else value.strip())
+    return answer
 
 
 def _unit(value: str) -> str | None:
@@ -213,15 +224,14 @@ class LlmMapper:
             "Với mỗi trường, tìm giá trị trong tài liệu và chép nguyên văn. "
             "Viết theo đúng định dạng của các ví dụ đã xác nhận. "
             "Nếu tài liệu không có thông tin, bỏ qua trường đó. Không tự suy đoán.\n"
+            "Trả lời mỗi trường một dòng theo mẫu \"k1: giá trị\", không giải thích gì thêm.\n"
             "Tài liệu gồm các dòng trích, ô cách nhau bằng ' | '.\n\n"
-            f"TÀI LIỆU:\n{excerpt}\n\n{scope}CÁC TRƯỜNG:\n" + "\n".join(lines) + "\n\nTrả về JSON."
+            f"TÀI LIỆU:\n{excerpt}\n\n{scope}CÁC TRƯỜNG:\n" + "\n".join(lines) + "\n\nCÂU TRẢ LỜI:"
             # Qwen3 hybrid models: skip the reasoning phase (ignored by others).
             " /no_think"
         )
-        schema = {"type": "object", "properties": {a: {"type": "string"} for a in alias}}
         stream = self.llm.create_chat_completion(
             messages=[{"role": "user", "content": prompt}],
-            response_format={"type": "json_object", "schema": schema},
             temperature=0,
             max_tokens=40 * len(keys) + 50,
             stream=True,
@@ -230,18 +240,12 @@ class LlmMapper:
         for chunk in stream:
             text += chunk["choices"][0]["delta"].get("content") or ""
             chunks += 1
-            # Each answer starts with its alias: {"k1": "...", "k2": ...
-            started = len(re.findall(r'"k\d+"\s*:', text))
+            started = len(ANSWER_LINE.findall(text))
             if on_answer and started != answered:
                 answered = started
                 on_answer(answered)
-        try:
-            answer = json.loads(text)
-        except json.JSONDecodeError:
-            answer = {}
-
         result = {}
-        for a, raw in answer.items():
+        for a, raw in parse_answer(text).items():
             key = alias.get(a)
             raw = clean(str(raw))
             if not key or not norm(raw):
