@@ -14,9 +14,11 @@ map request:
   {"text": "<source text, rows of ' | ' cells>",
    "fields": {"%%Key%%": "description", ...},
    "cases": [{"text": "...", "values": {"%%Key%%": "confirmed value"}}],
+   "ocr": true when the text comes from OCR (repairs accents of its values),
+   "known_values": {"%%Key%%": ["confirmed value of a past export without source text"]},
    "case_files": ["<dataset.jsonl of tools/data_export or export_histories.json of the in-app export>", ...]}
 map result:
-  {"values": {"%%Key%%": {"value", "source": "rule"|"llm", "confidence", "review"}},
+  {"values": {"%%Key%%": {"value", "source": "rule"|"llm", "confidence", "review", "accent_fixed"}},
    "stats": {...}}
 """
 
@@ -27,6 +29,7 @@ import os
 import sys
 import time
 import traceback
+from collections import defaultdict
 from dataclasses import asdict
 from pathlib import Path
 
@@ -52,6 +55,8 @@ import netguard  # noqa: E402,F401  (blocks the network before anything else loa
 VERSION = "0.1.1"
 LLM_FILE = "llm/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 OCR_DPI = 200
+OCR_FORMAT = 1  # bump when OCR output changes, so cached results are not reused
+OCR_CACHE_FILES = 20  # results kept; they hold customer text, so not forever
 AUTO_CONFIDENCE = 0.9  # rule values at or above this are not flagged for review
 MASK = "⁇"  # OCR number the two recognizers disagree on
 
@@ -69,7 +74,35 @@ def write_json(path: str, data) -> None:
 
 # --- OCR ---------------------------------------------------------------------
 
+def _ocr_cache_file(pdf: str) -> Path:
+    digest = hashlib.sha256(f"{OCR_FORMAT}:{OCR_DPI}:".encode())
+    with open(pdf, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            digest.update(chunk)
+    return _cache_dir() / f"ocr_{digest.hexdigest()[:32]}.json"
+
+
+def _prune_ocr_cache() -> None:
+    files = sorted(_cache_dir().glob("ocr_*.json"), key=lambda f: f.stat().st_mtime, reverse=True)
+    for old in files[OCR_CACHE_FILES:]:
+        old.unlink(missing_ok=True)
+
+
 def cmd_ocr(args) -> dict:
+    """OCR of one PDF. The result is cached by file content: the same file costs
+    no OCR when it is imported again."""
+    cache = _ocr_cache_file(args.input)
+    if cache.exists():
+        result = json.loads(cache.read_text(encoding="utf-8"))
+        cache.touch()  # the pruning keeps the most recently used results
+        return {**result, "cached": True}
+    result = _run_ocr(args.input)
+    write_json(str(cache), result)
+    _prune_ocr_cache()
+    return result
+
+
+def _run_ocr(pdf: str) -> dict:
     import engines
     import layout
 
@@ -78,9 +111,9 @@ def cmd_ocr(args) -> dict:
     engine = engines.HybridEngine()
     import pymupdf
 
-    total = len(pymupdf.open(args.input))
+    total = len(pymupdf.open(pdf))
     pages, conflicts, start = [], 0, time.perf_counter()
-    for index, img in engines.render_pages(args.input, OCR_DPI):
+    for index, img in engines.render_pages(pdf, OCR_DPI):
         progress("ocr_page", index, total)
         lines = engine(img)
         conflicts += sum(1 for l in lines if l.flag == "digits_conflict")
@@ -163,6 +196,7 @@ def _fit_rules(cases, docs):
 
 
 def cmd_map(args) -> dict:
+    from accents import fix_accents
     from llm_mapper import LlmMapper
     from rawdoc import RawDocument
 
@@ -207,6 +241,16 @@ def cmd_map(args) -> dict:
                 values[key] = {"value": pred.value, "source": "llm", "confidence": 0.0, "review": True}
         stats["llm"] = sum(1 for v in values.values() if v["source"] == "llm")
         stats["llm_usage"] = usage
+    if request.get("ocr"):
+        known = defaultdict(list, {k: list(v) for k, v in request.get("known_values", {}).items()})
+        for _, confirmed in cases:
+            for key, value in confirmed.items():
+                known[key].append(value)
+        for key, item in values.items():
+            fixed = fix_accents(item["value"], known[key])
+            if fixed != item["value"]:
+                item.update(value=fixed, review=True, accent_fixed=True)
+        stats["accent_fixed"] = sum(1 for v in values.values() if v.get("accent_fixed"))
     return {"values": values, "stats": stats}
 
 

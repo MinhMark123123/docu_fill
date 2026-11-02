@@ -36,11 +36,15 @@ class EngineValue {
   /// The user should check this value before exporting.
   final bool review;
 
+  /// OCR accents were repaired from a value the user confirmed for this field.
+  final bool accentFixed;
+
   const EngineValue({
     required this.value,
     required this.source,
     required this.confidence,
     required this.review,
+    this.accentFixed = false,
   });
 
   factory EngineValue.fromJson(Map<String, dynamic> json) => EngineValue(
@@ -48,6 +52,7 @@ class EngineValue {
     source: json['source'] as String,
     confidence: (json['confidence'] as num).toDouble(),
     review: json['review'] as bool,
+    accentFixed: json['accent_fixed'] as bool? ?? false,
   );
 }
 
@@ -210,12 +215,16 @@ class OfflineEngineService {
     required String text,
     required Map<String, String?> fields,
     required bool useLlm,
+    bool fromOcr = false,
     void Function(EngineProgress)? onProgress,
   }) async {
+    final histories = await _historyRepository.getAllHistories();
     final request = {
       'text': text,
       'fields': fields.map((k, v) => MapEntry(k, v ?? '')),
-      'cases': await _localCases(),
+      'ocr': fromOcr,
+      'cases': _localCases(histories),
+      'known_values': _knownValues(histories),
       'case_files': await _sharedCaseFiles(),
     };
     final temp = await _tempDir();
@@ -236,9 +245,26 @@ class OfflineEngineService {
     }
   }
 
+  /// Confirmed values of past exports without source text: too little to learn
+  /// rules from, but they still confirm how a field's value is spelled.
+  Map<String, List<String>> _knownValues(List<ExportHistory> histories) {
+    final known = <String, Set<String>>{};
+    for (final history in histories) {
+      if (history.sources.any((s) => s.text.isNotEmpty)) continue;
+      for (final entries in [history.fieldValues, history.singleLineValues]) {
+        entries.forEach((key, entry) {
+          final value = entry.value;
+          if (value != null && value.isNotEmpty) {
+            (known[key] ??= {}).add(value);
+          }
+        });
+      }
+    }
+    return known.map((k, v) => MapEntry(k, v.toList()));
+  }
+
   /// Past exports of this machine with their source text.
-  Future<List<Map<String, dynamic>>> _localCases() async {
-    final histories = await _historyRepository.getAllHistories();
+  List<Map<String, dynamic>> _localCases(List<ExportHistory> histories) {
     final cases = <Map<String, dynamic>>[];
     for (final history in histories) {
       final text = history.sources

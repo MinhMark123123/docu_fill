@@ -499,6 +499,7 @@ class FieldsInputViewModel extends BaseViewModel {
         text: text,
         fields: fields,
         useLlm: useLlm,
+        fromOcr: isPdf,
         onProgress: _showEngineProgress,
       );
       final mappedData = result.map((k, v) => MapEntry(k, v.value));
@@ -523,6 +524,8 @@ class FieldsInputViewModel extends BaseViewModel {
           _reviewNotes.remove(key);
         } else if (value.value.contains('⁇')) {
           _reviewNotes[key] = AppLang.engineReviewNumber.tr();
+        } else if (value.accentFixed) {
+          _reviewNotes[key] = AppLang.engineReviewAccent.tr();
         } else {
           _reviewNotes[key] =
               value.source == 'llm'

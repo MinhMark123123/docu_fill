@@ -91,6 +91,7 @@ abstract class AppLang {
   static const String engineProgressLoadLlm = "engine.progress.load_llm";
   static const String engineProgressLoadOcr = "engine.progress.load_ocr";
   static const String engineProgressOcrPage = "engine.progress.ocr_page";
+  static const String engineReviewAccent = "engine.review_accent";
   static const String engineReviewLlm = "engine.review_llm";
   static const String engineReviewNumber = "engine.review_number";
   static const String engineReviewRule = "engine.review_rule";

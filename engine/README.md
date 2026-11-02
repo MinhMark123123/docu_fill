@@ -5,6 +5,7 @@ PDF OCR and field mapping for the desktop app, without any network access. The a
 - **OCR**: PP-OCRv6 detection + VietOCR and PP-OCRv6 recognition; numbers the two recognizers disagree on are masked (`⁇`) so the value goes to review (`tools/ocr_bench`).
 - **Mapping**: rules learned from the user's past exports, then optionally the local LLM (Qwen3-4B, llama.cpp) for empty fields (`tools/mapper`). Values below the auto-accept confidence, from the LLM, or with a masked number are returned with `review: true`; the app shows them with a yellow border.
 - **Learning**: the app sends its export history (source text + confirmed values). Cases from another machine are read from `%LOCALAPPDATA%\DocuFill\engine_cases\`, not Documents, which OneDrive may sync to the cloud (`export_histories.json` of the in-app data export, or `dataset.jsonl` of `tools/data_export`). Learned rules are cached in `%LOCALAPPDATA%\DocuFill\engine_cache`.
+- **OCR cache**: results are cached by file content in the same folder (`ocr_*.json`, the 20 most recently used), so importing the same PDF again costs no OCR. They hold customer text; delete the folder to clear them.
 - **No network**: `netguard` replaces the socket functions before any library loads; models are loaded only from `engine\models\`.
 
 ## Build

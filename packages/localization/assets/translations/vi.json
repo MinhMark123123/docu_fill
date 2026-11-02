@@ -262,7 +262,8 @@
     "review_llm": "Gợi ý của AI cục bộ: hãy kiểm tra trước khi xuất",
     "review_number": "Có số đọc chưa chắc chắn (⁇): hãy đối chiếu với tài liệu",
     "cancel": "Huỷ",
-    "cancelled": "Đã huỷ xử lý."
+    "cancelled": "Đã huỷ xử lý.",
+    "review_accent": "Đã sửa dấu theo giá trị từng xác nhận của trường này: hãy kiểm tra"
   },
   "guide": {
     "title": "Hướng dẫn sử dụng",
@@ -275,7 +276,7 @@
       },
       "yellow": {
         "title": "Ô có viền vàng nghĩa là gì?",
-        "body": "Đó là giá trị app tự điền nhưng cần bạn kiểm tra trước khi xuất. Dòng chữ dưới ô cho biết lý do:\n- \"Tự điền theo hồ sơ cũ, độ tin cậy chưa cao\": bộ luật chưa chắc chắn.\n- \"Gợi ý của AI cục bộ\": do AI đề xuất, hay sai hơn, cần đối chiếu kỹ.\n- \"Có số đọc chưa chắc chắn (⁇)\": xem mục bên dưới.\nViền vàng tự mất khi bạn sửa ô. Ô không có viền vàng là giá trị bộ luật rất chắc chắn, nhưng vẫn nên xem lại các con số quan trọng."
+        "body": "Đó là giá trị app tự điền nhưng cần bạn kiểm tra trước khi xuất. Dòng chữ dưới ô cho biết lý do:\n- \"Tự điền theo hồ sơ cũ, độ tin cậy chưa cao\": bộ luật chưa chắc chắn.\n- \"Gợi ý của AI cục bộ\": do AI đề xuất, hay sai hơn, cần đối chiếu kỹ.\n- \"Có số đọc chưa chắc chắn (⁇)\": xem mục bên dưới.\n- \"Đã sửa dấu theo giá trị từng xác nhận\": chữ đọc từ PDF được sửa dấu cho giống giá trị đã xác nhận trước đây của trường này; số không bị đổi. Hãy xem giá trị có đúng với hồ sơ này không, nhất là tên người.\nViền vàng tự mất khi bạn sửa ô. Ô không có viền vàng là giá trị bộ luật rất chắc chắn, nhưng vẫn nên xem lại các con số quan trọng."
       },
       "question_marks": {
         "title": "Giá trị có ký hiệu ⁇",
@@ -291,7 +292,7 @@
       },
       "slow": {
         "title": "Xử lý rất lâu hoặc tưởng như bị treo",
-        "body": "Thời gian thường gặp (máy văn phòng):\n- Đọc PDF scan: khoảng 5–10 giây mỗi trang.\n- Lần nhập đầu tiên sau mỗi lần xuất file: thêm 1–2 phút để học lại.\n- AI cục bộ: khoảng 5–15 phút mỗi tài liệu.\nDòng chữ dưới vòng xoay cho biết đang ở bước nào. Nếu đang \"AI cục bộ\" thì app vẫn chạy, chỉ là chậm. Có thể bấm \"Huỷ\" để dừng, rồi tắt \"Dùng AI cục bộ\" trong Cài đặt để chỉ dùng bộ luật (vài giây)."
+        "body": "Thời gian thường gặp (máy văn phòng):\n- Đọc PDF scan: khoảng 5–30 giây mỗi trang tùy máy (máy 2 nhân có thể tới 30 giây, bộ 30 trang khoảng 15 phút). Nhập lại đúng file đã đọc thì có kết quả ngay.\n- Lần nhập đầu tiên sau mỗi lần xuất file: thêm 1–2 phút để học lại.\n- AI cục bộ: khoảng 5–15 phút mỗi tài liệu, lâu hơn nhiều nếu máy thiếu RAM (cần khoảng 5,5 GB trống).\nDòng chữ dưới vòng xoay cho biết đang ở bước nào. Nếu đang \"AI cục bộ\" thì app vẫn chạy, chỉ là chậm. Có thể bấm \"Huỷ\" để dừng, rồi tắt \"Dùng AI cục bộ\" trong Cài đặt để chỉ dùng bộ luật (vài giây)."
       },
       "cancel": {
         "title": "Bấm Huỷ thì sao?",

@@ -132,6 +132,11 @@ void main() {
         'values': {'%%So%%': '4310'},
       },
     ]);
+    expect(request['ocr'], false);
+    // The export without source text still confirms its values.
+    expect(request['known_values'], {
+      '%%So%%': ['4310'],
+    });
     expect(
       (request['case_files'] as List).map((f) => p.basename(f as String)),
       ['other_machine.json'],

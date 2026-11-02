@@ -262,7 +262,8 @@
     "review_llm": "Suggested by the local AI: please check before exporting",
     "review_number": "Contains an uncertain number (⁇): compare with the document",
     "cancel": "Cancel",
-    "cancelled": "Processing cancelled."
+    "cancelled": "Processing cancelled.",
+    "review_accent": "Accents corrected from a value confirmed earlier for this field: please check"
   },
   "guide": {
     "title": "User guide",
@@ -275,7 +276,7 @@
       },
       "yellow": {
         "title": "What does a yellow border mean?",
-        "body": "The app filled the value, but you should check it before exporting. The text under the field gives the reason:\n- \"Filled from past cases with limited confidence\": the rules are not sure.\n- \"Suggested by the local AI\": proposed by the AI, more often wrong, check carefully.\n- \"Contains an uncertain number (⁇)\": see below.\nThe border disappears once you edit the field. Fields without a border come from confident rules, but important numbers are still worth a look."
+        "body": "The app filled the value, but you should check it before exporting. The text under the field gives the reason:\n- \"Filled from past cases with limited confidence\": the rules are not sure.\n- \"Suggested by the local AI\": proposed by the AI, more often wrong, check carefully.\n- \"Contains an uncertain number (⁇)\": see below.\n- \"Accents corrected from a value confirmed earlier\": text read from the PDF had its accents corrected to match a value confirmed earlier for this field; numbers are never changed. Check it fits this case, names above all.\nThe border disappears once you edit the field. Fields without a border come from confident rules, but important numbers are still worth a look."
       },
       "question_marks": {
         "title": "Values with ⁇",
@@ -291,7 +292,7 @@
       },
       "slow": {
         "title": "Processing takes very long or seems stuck",
-        "body": "Typical times (office computer):\n- Reading a scanned PDF: about 5–10 seconds per page.\n- First import after each export: 1–2 extra minutes to re-learn.\n- Local AI: about 5–15 minutes per document.\nThe text under the spinner shows the current step. During \"Local AI\" the app is still working, just slowly. You can tap \"Cancel\" and turn off \"Use the local AI\" in Settings to use only the rules (a few seconds)."
+        "body": "Typical times (office computer):\n- Reading a scanned PDF: about 5–30 seconds per page depending on the computer (up to 30 on a 2-core one, about 15 minutes for 30 pages). Importing a file that was already read is instant.\n- First import after each export: 1–2 extra minutes to re-learn.\n- Local AI: about 5–15 minutes per document, much longer when RAM is short (needs about 5.5 GB free).\nThe text under the spinner shows the current step. During \"Local AI\" the app is still working, just slowly. You can tap \"Cancel\" and turn off \"Use the local AI\" in Settings to use only the rules (a few seconds)."
       },
       "cancel": {
         "title": "What happens when I tap Cancel?",
