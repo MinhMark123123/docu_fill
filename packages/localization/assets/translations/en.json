@@ -294,7 +294,7 @@
       },
       "slow": {
         "title": "Processing takes very long or seems stuck",
-        "body": "Typical times (office computer):\n- Reading a scanned PDF: about 5–30 seconds per page depending on the computer (up to 30 on a 2-core one, about 15 minutes for 30 pages). Importing a file that was already read is instant.\n- First import after each export: 1–2 extra minutes to re-learn.\n- Local AI: about 5–15 minutes per document, much longer when RAM is short (needs about 5.5 GB free).\nThe text under the spinner shows the current step. During \"Local AI\" the app is still working, just slowly. You can tap \"Cancel\" and turn off \"Use the local AI\" in Settings to use only the rules (a few seconds)."
+        "body": "Typical times (office computer):\n- Reading a scanned PDF: about 5–15 seconds per page depending on the computer (3–7 minutes for 30 pages). Importing a file that was already read is instant.\n- First import after each export: 1–2 extra minutes to re-learn.\n- Local AI: about 5–15 minutes per document, much longer when RAM is short (needs about 5.5 GB free).\nThe text under the spinner shows the current step. During \"Local AI\" the app is still working, just slowly. You can tap \"Cancel\" and turn off \"Use the local AI\" in Settings to use only the rules (a few seconds)."
       },
       "cancel": {
         "title": "What happens when I tap Cancel?",

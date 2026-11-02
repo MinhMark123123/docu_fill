@@ -5,7 +5,7 @@
   as "engine\".
 
 .DESCRIPTION
-  Uses the dev venv of tools\ocr_bench (torch CPU, rapidocr, vietocr,
+  Uses the dev venv of tools\ocr_bench (rapidocr, onnxruntime,
   llama-cpp-python, pyinstaller) and the models fetched by
   tools\ocr_bench\fetch_models.py. Nothing is downloaded here.
 
@@ -26,10 +26,6 @@ $models = Join-Path $repo 'tools\ocr_bench\models'
 $build = Join-Path $engineDir 'build'
 $dist = Join-Path $build 'dist\docufill_engine'
 
-# torchvision loads its native ops from its own folder by path; PyInstaller
-# does not collect these .pyd files on its own.
-$torchvision = Join-Path $repo 'tools\ocr_bench\.venv\Lib\site-packages\torchvision'
-
 # --windowed: the app starts the engine as a child process; a console build
 # would pop up a console window over the app. stderr still reaches the app
 # through the pipe it passes.
@@ -43,11 +39,11 @@ $torchvision = Join-Path $repo 'tools\ocr_bench\.venv\Lib\site-packages\torchvis
   --collect-all llama_cpp `
   --collect-data rapidocr `
   --collect-data pymupdf `
-  --collect-submodules vietocr `
-  --copy-metadata gdown `
-  --add-binary "$torchvision\_C_stable.pyd;torchvision" `
-  --add-binary "$torchvision\image_stable.pyd;torchvision" `
   --exclude-module tkinter `
+  --exclude-module torch `
+  --exclude-module torchvision `
+  --exclude-module vietocr `
+  --exclude-module gdown `
   --exclude-module matplotlib `
   (Join-Path $engineDir 'docufill_engine.py')
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller failed ($LASTEXITCODE)" }
@@ -57,9 +53,10 @@ $needed = @(
   'PP-OCRv6_det_small.onnx',
   'PP-OCRv6_rec_small.onnx',
   'ch_ppocr_mobile_v2.0_cls_mobile.onnx',
-  'vietocr\base.yml',
-  'vietocr\vgg-seq2seq.yml',
-  'vietocr\vgg_seq2seq.pth'
+  'vietocr_onnx\cnn.onnx',
+  'vietocr_onnx\encoder.onnx',
+  'vietocr_onnx\decoder.onnx',
+  'vietocr_onnx\vocab.txt'
 )
 if (-not $SkipLlm) { $needed += 'llm\Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf' }
 foreach ($name in $needed) {

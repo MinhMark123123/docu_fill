@@ -39,7 +39,10 @@ def render_pages(pdf_path: str, dpi: int):
 def _rapid(det: str, rec: str | None, version, det_type, rec_type, lang=None, text_score=0.5):
     from rapidocr import RapidOCR
 
+    from vietocr_onnx import ocr_threads
+
     params = {
+        "EngineConfig.onnxruntime.intra_op_num_threads": ocr_threads(),
         "Global.log_level": "warning",
         "Global.text_score": text_score,
         "Global.max_side_len": 4000,
@@ -177,15 +180,18 @@ class HybridEngine:
     of being trusted.
     """
 
-    def __init__(self, model: str = "vgg_seq2seq"):
+    def __init__(self):
         from rapidocr.utils.typings import ModelType, OCRVersion
+        from vietocr_onnx import VietOcrOnnx
 
         v6, small = OCRVersion.PPOCRV6, ModelType.SMALL
         # text_score=0 keeps every detected line; filtering is done downstream.
         self._paddle = _rapid(
             "PP-OCRv6_det_small.onnx", "PP-OCRv6_rec_small.onnx", v6, small, small, text_score=0
         )
-        self._rec = _vietocr(model)
+        # vgg_seq2seq from export_vietocr_onnx.py: same text as the torch model on
+        # all 4350 lines of the benchmark PDFs, faster, and no pickled weights.
+        self._rec = VietOcrOnnx(MODELS / "vietocr_onnx")
 
     def __call__(self, img: np.ndarray) -> list[Line]:
         out = self._paddle(img)

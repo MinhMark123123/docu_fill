@@ -294,7 +294,7 @@
       },
       "slow": {
         "title": "Xử lý rất lâu hoặc tưởng như bị treo",
-        "body": "Thời gian thường gặp (máy văn phòng):\n- Đọc PDF scan: khoảng 5–30 giây mỗi trang tùy máy (máy 2 nhân có thể tới 30 giây, bộ 30 trang khoảng 15 phút). Nhập lại đúng file đã đọc thì có kết quả ngay.\n- Lần nhập đầu tiên sau mỗi lần xuất file: thêm 1–2 phút để học lại.\n- AI cục bộ: khoảng 5–15 phút mỗi tài liệu, lâu hơn nhiều nếu máy thiếu RAM (cần khoảng 5,5 GB trống).\nDòng chữ dưới vòng xoay cho biết đang ở bước nào. Nếu đang \"AI cục bộ\" thì app vẫn chạy, chỉ là chậm. Có thể bấm \"Huỷ\" để dừng, rồi tắt \"Dùng AI cục bộ\" trong Cài đặt để chỉ dùng bộ luật (vài giây)."
+        "body": "Thời gian thường gặp (máy văn phòng):\n- Đọc PDF scan: khoảng 5–15 giây mỗi trang tùy máy (bộ 30 trang khoảng 3–7 phút). Nhập lại đúng file đã đọc thì có kết quả ngay.\n- Lần nhập đầu tiên sau mỗi lần xuất file: thêm 1–2 phút để học lại.\n- AI cục bộ: khoảng 5–15 phút mỗi tài liệu, lâu hơn nhiều nếu máy thiếu RAM (cần khoảng 5,5 GB trống).\nDòng chữ dưới vòng xoay cho biết đang ở bước nào. Nếu đang \"AI cục bộ\" thì app vẫn chạy, chỉ là chậm. Có thể bấm \"Huỷ\" để dừng, rồi tắt \"Dùng AI cục bộ\" trong Cài đặt để chỉ dùng bộ luật (vài giây)."
       },
       "cancel": {
         "title": "Bấm Huỷ thì sao?",

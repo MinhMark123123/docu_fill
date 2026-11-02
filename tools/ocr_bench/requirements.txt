@@ -2,6 +2,7 @@
 #   pip install torch==2.15.0 torchvision==0.29.2 --index-url https://download.pytorch.org/whl/cpu
 # vietocr is installed with --no-deps (its pinned deps are training-only):
 #   pip install vietocr==0.3.13 --no-deps
+# export_vietocr_onnx.py also needs: pip install onnx onnxscript (dev machine only)
 einops==0.8.2
 gdown==6.5.1
 numpy==2.5.4

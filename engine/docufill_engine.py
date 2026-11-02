@@ -275,7 +275,7 @@ def cmd_info(args) -> dict:
     return {
         "version": VERSION,
         "ocr_models": (MODELS / "PP-OCRv6_det_small.onnx").exists()
-        and (MODELS / "vietocr" / "vgg_seq2seq.pth").exists(),
+        and (MODELS / "vietocr_onnx" / "decoder.onnx").exists(),
         "llm_model": (MODELS / LLM_FILE).exists(),
     }
 
