@@ -54,6 +54,9 @@ import netguard  # noqa: E402,F401  (blocks the network before anything else loa
 # (tools/mapper), so rules learned by an older version are not reused.
 VERSION = "0.1.1"
 LLM_FILE = "llm/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+# Learning time grows with the cases and runs after every export, while accuracy
+# flattened after ~15 cases in evaluation. Older cases still confirm spellings.
+MAX_LEARNING_CASES = 60
 OCR_DPI = 200
 OCR_FORMAT = 1  # bump when OCR output changes, so cached results are not reused
 OCR_CACHE_FILES = 20  # results kept; they hold customer text, so not forever
@@ -202,11 +205,12 @@ def cmd_map(args) -> dict:
 
     request = json.loads(Path(args.request).read_text(encoding="utf-8"))
     fields: dict[str, str] = request["fields"]
-    cases = _load_cases(request)
+    all_cases = _load_cases(request)  # this machine's newest exports first
+    cases = all_cases[:MAX_LEARNING_CASES]
     docs = [RawDocument(t) for t, _ in cases]
     doc = RawDocument(request["text"])
 
-    values, stats = {}, {"cases": len(cases)}
+    values, stats = {}, {"cases": len(cases), "cases_available": len(all_cases)}
     if cases:
         mapper = _fit_rules(cases, docs)
         progress("apply_rules")
@@ -243,7 +247,7 @@ def cmd_map(args) -> dict:
         stats["llm_usage"] = usage
     if request.get("ocr"):
         known = defaultdict(list, {k: list(v) for k, v in request.get("known_values", {}).items()})
-        for _, confirmed in cases:
+        for _, confirmed in all_cases:
             for key, value in confirmed.items():
                 known[key].append(value)
         for key, item in values.items():

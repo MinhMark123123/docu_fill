@@ -263,10 +263,13 @@ class OfflineEngineService {
     return known.map((k, v) => MapEntry(k, v.toList()));
   }
 
-  /// Past exports of this machine with their source text.
+  /// Past exports of this machine with their source text, newest first: the
+  /// engine learns from the most recent ones.
   List<Map<String, dynamic>> _localCases(List<ExportHistory> histories) {
     final cases = <Map<String, dynamic>>[];
-    for (final history in histories) {
+    final newestFirst = [...histories]
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    for (final history in newestFirst) {
       final text = history.sources
           .map((s) => s.text)
           .where((t) => t.isNotEmpty)

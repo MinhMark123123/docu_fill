@@ -511,6 +511,7 @@ class FieldsInputViewModel extends BaseViewModel {
           text: text,
           method: isPdf ? 'offline_ocr' : 'offline_text',
           predictedValues: mappedData,
+          predictedSources: result.map((k, v) => MapEntry(k, v.source)),
         ),
       );
       await _autoSaveAiResult(

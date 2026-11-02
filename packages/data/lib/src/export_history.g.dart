@@ -22,6 +22,11 @@ SourceDocument _$SourceDocumentFromJson(Map<String, dynamic> json) =>
       text: json['text'] as String,
       method: json['method'] as String,
       predictedValues: Map<String, String>.from(json['predictedValues'] as Map),
+      predictedSources:
+          (json['predictedSources'] as Map<String, dynamic>?)?.map(
+            (k, e) => MapEntry(k, e as String),
+          ) ??
+          {},
       importedAt:
           json['importedAt'] == null
               ? null
@@ -35,6 +40,7 @@ Map<String, dynamic> _$SourceDocumentToJson(SourceDocument instance) =>
       'text': instance.text,
       'method': instance.method,
       'predictedValues': instance.predictedValues,
+      'predictedSources': instance.predictedSources,
       'importedAt': instance.importedAt.toIso8601String(),
     };
 
