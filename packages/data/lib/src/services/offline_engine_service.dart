@@ -29,8 +29,9 @@ class EngineCancelledException implements Exception {
 class EngineValue {
   final String value;
 
-  /// "form" (read from the structure of the appraisal form), "rule" (learned
-  /// from past exports) or "llm" (local model).
+  /// "form" (read from the structure of the appraisal form), "certificate"
+  /// (read from the certificate scanned in the PDF), "rule" (learned from past
+  /// exports) or "llm" (local model).
   final String source;
   final double confidence;
 
@@ -43,6 +44,9 @@ class EngineValue {
   /// A person or their identifier read from a scan: check it against the file.
   final bool identity;
 
+  /// What the certificate scanned in the PDF says, when it differs from [value].
+  final String? certificateValue;
+
   const EngineValue({
     required this.value,
     required this.source,
@@ -50,6 +54,7 @@ class EngineValue {
     required this.review,
     this.accentFixed = false,
     this.identity = false,
+    this.certificateValue,
   });
 
   factory EngineValue.fromJson(Map<String, dynamic> json) => EngineValue(
@@ -59,6 +64,7 @@ class EngineValue {
     review: json['review'] as bool,
     accentFixed: json['accent_fixed'] as bool? ?? false,
     identity: json['identity'] as bool? ?? false,
+    certificateValue: json['certificate'] as String?,
   );
 }
 

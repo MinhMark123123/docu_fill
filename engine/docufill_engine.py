@@ -20,7 +20,8 @@ map request:
    "known_values": {"%%Key%%": ["confirmed value of a past export without source text"]},
    "case_files": ["<dataset.jsonl of tools/data_export or export_histories.json of the in-app export>", ...]}
 map result:
-  {"values": {"%%Key%%": {"value", "source": "form"|"rule"|"llm", "confidence", "review", "accent_fixed", "identity"}},
+  {"values": {"%%Key%%": {"value", "source": "form"|"certificate"|"rule"|"llm", "confidence", "review",
+                          "accent_fixed", "identity", "certificate": "what the scanned certificate says, if different"}},
    "stats": {...}}
 """
 
@@ -56,7 +57,7 @@ import netguard  # noqa: E402,F401  (blocks the network before anything else loa
 
 # Part of the rule cache key: bump it with every change to the mapper code
 # (tools/mapper), so rules learned by an older version are not reused.
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 LLM_FILE = "llm/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 # Learning time grows with the cases and runs after every export, while accuracy
 # flattened after ~15 cases in evaluation. Older cases still confirm spellings.
@@ -220,6 +221,7 @@ def _fit_rules(cases, docs):
 
 def cmd_map(args) -> dict:
     from accents import fix_accents
+    from certificate import compare, papers_from_report, read_certificates
     from domain import branch_values, extract
     from llm_mapper import LlmMapper
     from rawdoc import RawDocument
@@ -272,6 +274,19 @@ def cmd_map(args) -> dict:
     stats["form"] = sum(1 for v in values.values() if v["source"] == "form")
     stats["form_empty"] = len(form.empty)
 
+    # A scanned dossier also holds the certificate and lists the legal papers.
+    certificates = []
+    if ocr:
+        certificates = read_certificates(request["text"])
+        for key, value in papers_from_report(request["text"]).items():
+            if key in fields:
+                values[key] = {"value": value, "source": "form", "confidence": 1.0, "review": True}
+        filled, _ = compare({k: v["value"] for k, v in values.items()}, certificates)
+        for key, value in filled.items():
+            if key in fields:
+                values[key] = {"value": value, "source": "certificate", "confidence": 1.0, "review": True}
+    stats["certificates"] = len(certificates)
+
     # The LLM only gets keys that have confirmed values in past cases: without
     # an example it is slow (every key costs generation time) and mostly wrong,
     # and a key nobody ever filled is usually meant to stay empty.
@@ -296,6 +311,10 @@ def cmd_map(args) -> dict:
         stats["llm"] = sum(1 for v in values.values() if v["source"] == "llm")
         stats["llm_usage"] = usage
     if ocr:
+        _, differs = compare({k: v["value"] for k, v in values.items()}, certificates)
+        stats["certificate_differs"] = len(differs)
+        for key, said in differs.items():
+            values[key]["certificate"] = said
         for key, item in values.items():
             # A scan can go wrong in ways confidence does not show (a learned
             # rule landing on another cell), so nothing from OCR is auto-accepted.

@@ -7,6 +7,7 @@ Maps a source document (Word/Excel text, or OCR via `tools/ocr_bench/layout.py`)
 2. **Local LLM** (llama.cpp, GGUF) for the keys the rules leave empty. Keys of one comparable property are asked together and only see that property's column; every number in an answer must exist in the shown cells, and answers are conformed to the format of the confirmed values.
 
 - `domain.py`: fields read from the structure of the form
+- `certificate.py`: certificates scanned in a PDF, compared with the report
 - `reviewed.py`: tells exports the user checked from those exported as proposed, which are not learned from (under 3% of the proposed values changed)
 - `rawdoc.py`: source document as rows/cells, comparison-table columns and row parents
 - `learner.py`: rule induction, confidence, prediction

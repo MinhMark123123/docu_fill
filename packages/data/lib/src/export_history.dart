@@ -57,7 +57,7 @@ class SourceDocument {
   /// Values the mapper proposed for this file, before user edits.
   final Map<String, String> predictedValues;
 
-  /// What produced each predicted value: "form", "rule" or "llm". Compared with the
+  /// What produced each predicted value: "form", "certificate", "rule" or "llm". Compared with the
   /// exported values, this shows which mapper to trust for each field.
   @JsonKey(defaultValue: <String, String>{})
   final Map<String, String> predictedSources;

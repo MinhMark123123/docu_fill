@@ -116,6 +116,20 @@ void main() {
     expect(progress.single.total, 2);
   });
 
+  test('a value carries what the scanned certificate says', () {
+    const base = {
+      'value': '480',
+      'source': 'rule',
+      'confidence': 0.9,
+      'review': true,
+    };
+    expect(EngineValue.fromJson(base).certificateValue, isNull);
+    expect(
+      EngineValue.fromJson({...base, 'certificate': '408'}).certificateValue,
+      '408',
+    );
+  });
+
   test('request holds only cases with source text and filled values', () async {
     await service.mapText(
       text: 'Số | 4312',

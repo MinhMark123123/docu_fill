@@ -258,6 +258,7 @@
     },
     "not_installed": "Chưa cài engine offline. Hãy cài bản DocuFill có engine offline hoặc chọn Gemini trong Cài đặt.",
     "import_result": "Đã điền {} trường, {} trường cần kiểm tra (viền vàng).",
+    "review_certificate": "Giấy chứng nhận trong PDF ghi {}: hãy đối chiếu trước khi xuất",
     "review_rule": "Tự điền theo hồ sơ cũ, độ tin cậy chưa cao: hãy kiểm tra",
     "review_llm": "Gợi ý của AI cục bộ: hãy kiểm tra trước khi xuất",
     "review_number": "Có số đọc chưa chắc chắn (⁇): hãy đối chiếu với tài liệu",

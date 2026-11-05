@@ -258,6 +258,7 @@
     },
     "not_installed": "The offline engine is not installed. Install the DocuFill build with the offline engine or choose Gemini in Settings.",
     "import_result": "Filled {} fields, {} to check (yellow border).",
+    "review_certificate": "The certificate in the PDF says {}: compare before exporting",
     "review_rule": "Filled from past cases with limited confidence: please check",
     "review_llm": "Suggested by the local AI: please check before exporting",
     "review_number": "Contains an uncertain number (⁇): compare with the document",

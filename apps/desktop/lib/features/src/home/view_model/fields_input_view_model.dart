@@ -523,6 +523,10 @@ class FieldsInputViewModel extends BaseViewModel {
       result.forEach((key, value) {
         if (!value.review) {
           _reviewNotes.remove(key);
+        } else if (value.certificateValue != null) {
+          _reviewNotes[key] = AppLang.engineReviewCertificate.tr(
+            args: [value.certificateValue!],
+          );
         } else if (value.value.contains('⁇')) {
           _reviewNotes[key] = AppLang.engineReviewNumber.tr();
         } else if (value.identity) {
