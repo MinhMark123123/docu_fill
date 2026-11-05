@@ -47,6 +47,21 @@ def _norm_index(text: str) -> tuple[str, list[int]]:
     return "".join(out), idx
 
 
+def _word_end(text: str, label: str) -> int | None:
+    """End (in `text`) of the first occurrence of the normalized `label` that
+    is made of whole words, so that the label "Mái" does not match in the name
+    "Hoàng Mai"; a digit may follow, as in "Số12". None when there is none."""
+    text_norm, idx = _norm_index(text)
+    pos = text_norm.find(label)
+    while pos >= 0:
+        start, end = idx[pos], idx[pos + len(label) - 1] + 1
+        before_ok = start == 0 or not text[start - 1].isalpha()
+        if before_ok and (end == len(text) or not text[end].isalpha()):
+            return end
+        pos = text_norm.find(label, pos + 1)
+    return None
+
+
 def _span(cell_text: str, value: str) -> tuple[int, int] | None:
     """Character span of `value` inside `cell_text`, matched on normalized text."""
     target = norm(value)
@@ -123,7 +138,7 @@ def _grid_key(doc: RawDocument, cell: Cell) -> str:
 @lru_cache(maxsize=None)
 def _anchor_cells(doc: RawDocument, anchor: str, locator: str) -> tuple[Cell, ...]:
     if locator == "self":
-        return tuple(c for c in doc.cells if anchor in c.key)
+        return tuple(c for c in doc.cells if _word_end(c.text, anchor) is not None)
     if locator == "grid":
         return tuple(c for c in doc.cells if _grid_key(doc, c) == anchor)
     return tuple(c for c in doc.cells if c.key == anchor)
@@ -132,11 +147,9 @@ def _anchor_cells(doc: RawDocument, anchor: str, locator: str) -> tuple[Cell, ..
 def _extract(cell: Cell, prefix: str, tail: str, seg: int = 0) -> str | None:
     text = cell.text
     if prefix:
-        text_norm, idx = _norm_index(text)
-        pos = text_norm.find(prefix)
-        if pos < 0:
+        end_of_prefix = _word_end(text, prefix)
+        if end_of_prefix is None:
             return None
-        end_of_prefix = idx[pos + len(prefix) - 1] + 1
         text = text[end_of_prefix:]
     text = text.lstrip(" :.-–—\t\n")
     # A value does not run over a line break inside the cell.
@@ -208,7 +221,8 @@ def candidate_rules(doc: RawDocument, value: str) -> frozenset[Rule]:
         # Label inside the same cell, e.g. "Số: 494/2026/BCĐG".
         if prefix:
             occurrences = _anchor_cells(doc, prefix, "self")
-            rules.add(Rule("self", prefix, occurrences.index(cell), prefix, tail, seg))
+            if cell in occurrences:
+                rules.add(Rule("self", prefix, occurrences.index(cell), prefix, tail, seg))
 
         # Table cell addressed by row label x column header, e.g.
         # "Thời điểm giao dịch" x "Tài sản so sánh 2".

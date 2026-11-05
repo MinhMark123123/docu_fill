@@ -13,12 +13,14 @@ console encoding does not matter.
 map request:
   {"text": "<source text, rows of ' | ' cells>",
    "fields": {"%%Key%%": "description", ...},
-   "cases": [{"text": "...", "values": {"%%Key%%": "confirmed value"}}],
+   "cases": [{"text": "...", "values": {"%%Key%%": "exported value"},
+              "predicted": {"%%Key%%": "value proposed at import"}}],
+     (exports where the user changed almost nothing are not learned from)
    "ocr": true when the text comes from OCR (repairs accents of its values),
    "known_values": {"%%Key%%": ["confirmed value of a past export without source text"]},
    "case_files": ["<dataset.jsonl of tools/data_export or export_histories.json of the in-app export>", ...]}
 map result:
-  {"values": {"%%Key%%": {"value", "source": "rule"|"llm", "confidence", "review", "accent_fixed", "identity"}},
+  {"values": {"%%Key%%": {"value", "source": "form"|"rule"|"llm", "confidence", "review", "accent_fixed", "identity"}},
    "stats": {...}}
 """
 
@@ -32,6 +34,7 @@ import time
 import traceback
 from collections import defaultdict
 from dataclasses import asdict
+from datetime import date
 from pathlib import Path
 
 # Windowed build started without pipes (e.g. double-clicked): no stderr.
@@ -53,7 +56,7 @@ import netguard  # noqa: E402,F401  (blocks the network before anything else loa
 
 # Part of the rule cache key: bump it with every change to the mapper code
 # (tools/mapper), so rules learned by an older version are not reused.
-VERSION = "0.1.2"
+VERSION = "0.2.0"
 LLM_FILE = "llm/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 # Learning time grows with the cases and runs after every export, while accuracy
 # flattened after ~15 cases in evaluation. Older cases still confirm spellings.
@@ -140,15 +143,28 @@ def _run_ocr(pdf: str) -> dict:
 
 # --- Mapping -----------------------------------------------------------------
 
-def _load_cases(request: dict) -> list[tuple[str, dict[str, str]]]:
-    cases = [(c["text"], c["values"]) for c in request.get("cases", []) if c.get("text")]
+def _load_cases(request: dict) -> tuple[list[tuple[str, dict[str, str]]], int]:
+    """(learning cases, exports left out because the user did not review them)."""
+    from reviewed import is_reviewed, was_reviewed
+
+    unreviewed = 0
+    cases = []
+    for c in request.get("cases", []):
+        if not c.get("text"):
+            continue
+        if was_reviewed(c.get("predicted") or {}, c["values"]):
+            cases.append((c["text"], c["values"]))
+        else:
+            unreviewed += 1
     for path in request.get("case_files", []):
         if not Path(path).exists():
             continue
         if path.endswith(".json"):  # export_histories.json of the in-app data export
             for history in json.loads(Path(path).read_text(encoding="utf-8")):
                 text = "\n".join(s["text"] for s in history.get("sources", []) if s.get("text"))
-                if text:
+                if text and not is_reviewed(history):
+                    unreviewed += 1
+                elif text:
                     values = {
                         k: e.get("value")
                         for group in ("fieldValues", "singleLineValues")
@@ -166,7 +182,7 @@ def _load_cases(request: dict) -> list[tuple[str, dict[str, str]]]:
                     cases.append(("\n".join(texts), pair["finalValues"]))
             elif pair.get("text"):
                 cases.append((pair["text"], pair["values"]))
-    return [(t, {k: v for k, v in vals.items() if v}) for t, vals in cases]
+    return [(t, {k: v for k, v in vals.items() if v}) for t, vals in cases], unreviewed
 
 
 def _cache_dir() -> Path:
@@ -204,13 +220,14 @@ def _fit_rules(cases, docs):
 
 def cmd_map(args) -> dict:
     from accents import fix_accents
+    from domain import branch_values, extract
     from llm_mapper import LlmMapper
     from rawdoc import RawDocument
     from shapes import plausible
 
     request = json.loads(Path(args.request).read_text(encoding="utf-8"))
     fields: dict[str, str] = request["fields"]
-    all_cases = _load_cases(request)  # this machine's newest exports first
+    all_cases, unreviewed = _load_cases(request)  # this machine's newest exports first
     cases = all_cases[:MAX_LEARNING_CASES]
     docs = [RawDocument(t) for t, _ in cases]
     doc = RawDocument(request["text"])
@@ -220,7 +237,10 @@ def cmd_map(args) -> dict:
         for key, value in confirmed.items():
             known[key].append(value)
 
-    values, stats = {}, {"cases": len(cases), "cases_available": len(all_cases), "implausible": 0}
+    values, stats = {}, {
+        "cases": len(cases), "cases_available": len(all_cases),
+        "cases_unreviewed": unreviewed, "implausible": 0,
+    }
     if cases:
         mapper = _fit_rules(cases, docs)
         progress("apply_rules")
@@ -236,11 +256,27 @@ def cmd_map(args) -> dict:
                 }
     stats["rules"] = len(values)
 
+    # What the form itself states replaces what rules found; keys the form shows
+    # to be empty stay empty, whatever rules or the LLM would make of them.
+    ocr = bool(request.get("ocr"))
+    form = extract(doc, date.today(), ocr=ocr)
+    for key in form.empty:
+        values.pop(key, None)
+    for key, value in form.values.items():
+        if key in fields:
+            values[key] = {"value": value, "source": "form", "confidence": 1.0, "review": key in form.check}
+    branch = (values.get("%%TenChiNhanh%%") or {}).get("value")
+    for key, value in branch_values(all_cases, branch).items():
+        if key in fields and key not in values:
+            values[key] = {"value": value, "source": "form", "confidence": 1.0, "review": True}
+    stats["form"] = sum(1 for v in values.values() if v["source"] == "form")
+    stats["form_empty"] = len(form.empty)
+
     # The LLM only gets keys that have confirmed values in past cases: without
     # an example it is slow (every key costs generation time) and mostly wrong,
     # and a key nobody ever filled is usually meant to stay empty.
-    mapper = LlmMapper(None).fit(list(zip(docs, (v for _, v in cases))))
-    missing = [k for k in fields if k not in values and k in mapper.confirmed]
+    mapper = LlmMapper(None, ocr=ocr).fit(list(zip(docs, (v for _, v in cases))))
+    missing = [k for k in fields if k not in values and k not in form.empty and k in mapper.confirmed]
     stats["llm_skipped_no_example"] = sum(1 for k in fields if k not in values and k not in mapper.confirmed)
     if args.llm and missing:
         from llama_cpp import Llama
@@ -259,7 +295,7 @@ def cmd_map(args) -> dict:
                 values[key] = {"value": pred.value, "source": "llm", "confidence": 0.0, "review": True}
         stats["llm"] = sum(1 for v in values.values() if v["source"] == "llm")
         stats["llm_usage"] = usage
-    if request.get("ocr"):
+    if ocr:
         for key, item in values.items():
             # A scan can go wrong in ways confidence does not show (a learned
             # rule landing on another cell), so nothing from OCR is auto-accepted.

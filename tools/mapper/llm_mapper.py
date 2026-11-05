@@ -18,6 +18,7 @@ Three safeguards against the errors seen in evaluation:
 
 import math
 import re
+import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 
@@ -87,15 +88,38 @@ def _number_set(text: str) -> set[str]:
     return {re.sub(r"\D", "", n) for n in NUMBER.findall(text)}
 
 
-def grounded(value: str, shown: list[str]) -> bool:
+# "toạ" and "tọa" are one word written with the tone mark in either place.
+TONE_PLACES = {
+    "oà": "òa", "oá": "óa", "oả": "ỏa", "oã": "õa", "oạ": "ọa",
+    "oè": "òe", "oé": "óe", "oẻ": "ỏe", "oẽ": "õe", "oẹ": "ọe",
+    "uỳ": "ùy", "uý": "úy", "uỷ": "ủy", "uỹ": "ũy", "uỵ": "ụy",
+}
+
+
+def _text_tokens(text: str, accents: bool) -> list[str]:
+    text = unicodedata.normalize("NFC", text.lower())
+    for old, new in TONE_PLACES.items():
+        text = text.replace(old, new)
+    words = re.findall(r"\w+", text)
+    return words if accents else [norm(w) for w in words]
+
+
+def grounded(value: str, shown: list[str], accents: bool = True) -> bool:
     """Every number of the answer is a number of a shown cell (numbers must be
-    exact), and its text occurs in the shown cells."""
+    exact), and its words occur in a row in one shown cell: "đất trống" is not
+    in "đất trồng", nor "Đông" in "Đồng Nai". OCR can lose accents, so `accents`
+    is off for scanned sources."""
     nums = _number_set(value)
     if not nums <= set().union(*map(_number_set, shown)):
         return False
-    if re.search(r"[^\W\d_]", value):
-        return norm(value) in norm(" ".join(shown))
-    return bool(nums)
+    if not re.search(r"[^\W\d_]", value):
+        return bool(nums)
+    want = _text_tokens(value, accents)
+    return any(
+        tokens[i : i + len(want)] == want
+        for tokens in (_text_tokens(cell, accents) for cell in shown)
+        for i in range(len(tokens) - len(want) + 1)
+    )
 
 
 def parse_answer(text: str) -> dict[str, str]:
@@ -152,8 +176,9 @@ class LlmPrediction:
 
 
 class LlmMapper:
-    def __init__(self, llm):
+    def __init__(self, llm, ocr: bool = False):
         self.llm = llm
+        self.ocr = ocr
         self.profiles: dict[str, Counter] = {}
         self.examples: dict[str, list[str]] = {}
         self.confirmed: dict[str, list[str]] = {}
@@ -250,7 +275,7 @@ class LlmMapper:
             raw = clean(str(raw))
             if not key or not norm(raw):
                 continue
-            ok = grounded(raw, shown)
+            ok = grounded(raw, shown, accents=not self.ocr)
             value = conform(raw, self.confirmed.get(key, [])) if ok else raw
             result[key] = LlmPrediction(value, ok, raw)
         usage = {

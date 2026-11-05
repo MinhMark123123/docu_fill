@@ -29,7 +29,8 @@ class EngineCancelledException implements Exception {
 class EngineValue {
   final String value;
 
-  /// "rule" (learned from past exports) or "llm" (local model).
+  /// "form" (read from the structure of the appraisal form), "rule" (learned
+  /// from past exports) or "llm" (local model).
   final String source;
   final double confidence;
 
@@ -287,7 +288,12 @@ class OfflineEngineService {
           if (value != null && value.isNotEmpty) values[key] = value;
         });
       }
-      cases.add({'text': text, 'values': values});
+      // Lets the engine tell exports the user reviewed from those exported as
+      // proposed, which must not be learned from.
+      final predicted = <String, String>{
+        for (final source in history.sources) ...source.predictedValues,
+      };
+      cases.add({'text': text, 'values': values, 'predicted': predicted});
     }
     return cases;
   }

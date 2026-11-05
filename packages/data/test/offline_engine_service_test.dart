@@ -16,7 +16,7 @@ class _FakeHistories implements ExportHistoryRepository {
           sourceType: 'xlsx',
           text: 'Số | 4310',
           method: 'gemini_text',
-          predictedValues: {},
+          predictedValues: {'%%So%%': '4311'},
         ),
       ],
     ),
@@ -130,6 +130,7 @@ void main() {
       {
         'text': 'Số | 4310',
         'values': {'%%So%%': '4310'},
+        'predicted': {'%%So%%': '4311'},
       },
     ]);
     expect(request['ocr'], false);
