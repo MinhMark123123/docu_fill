@@ -91,6 +91,15 @@ abstract class AppLang {
   static const String engineProgressLoadLlm = "engine.progress.load_llm";
   static const String engineProgressLoadOcr = "engine.progress.load_ocr";
   static const String engineProgressOcrPage = "engine.progress.ocr_page";
+  static const String engineLearningTitle = "engine.learning_title";
+  static const String engineLearningAuto = "engine.learning_auto";
+  static const String engineLearningInclude = "engine.learning_include";
+  static const String engineLearningExclude = "engine.learning_exclude";
+  static const String engineLearningAutoUsedNote = "engine.learning_auto_used";
+  static const String engineLearningAutoSkippedNote = "engine.learning_auto_skipped";
+  static const String engineLearningIncludedNote = "engine.learning_included";
+  static const String engineLearningExcludedNote = "engine.learning_excluded";
+  static const String engineLearningNotUsedTooltip = "engine.learning_not_used";
   static const String engineReviewAccent = "engine.review_accent";
   static const String engineReviewCertificate = "engine.review_certificate";
   static const String engineReviewIdentity = "engine.review_identity";

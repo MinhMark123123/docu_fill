@@ -77,6 +77,16 @@ class ExportHistoryViewModel extends BaseViewModel {
     _filterHistories();
   }
 
+  /// Whether the offline engine learns from [history]: an export made without
+  /// checking teaches it its own mistakes.
+  Future<void> setLearning(ExportHistory history, CaseStudyStatus value) async {
+    final updated = history.withCaseStudyStatus(value);
+    await _exportHistoryRepository.saveHistory(updated);
+    if (_selectedHistory.data.value?.id == history.id) {
+      _selectedHistory.postValue(Optional.of(updated));
+    }
+  }
+
   void selectHistory(ExportHistory history) {
     _selectedHistory.postValue(Optional.of(history));
   }

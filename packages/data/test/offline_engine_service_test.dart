@@ -145,6 +145,7 @@ void main() {
         'text': 'Số | 4310',
         'values': {'%%So%%': '4310'},
         'predicted': {'%%So%%': '4311'},
+        'learning': 'none',
       },
     ]);
     expect(request['ocr'], false);

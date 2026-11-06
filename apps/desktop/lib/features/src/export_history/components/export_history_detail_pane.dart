@@ -11,12 +11,14 @@ class ExportHistoryDetailPane extends StatelessWidget {
   final ExportHistory history;
   final VoidCallback onReExport;
   final VoidCallback onRestore;
+  final ValueChanged<CaseStudyStatus> onLearningChanged;
 
   const ExportHistoryDetailPane({
     super.key,
     required this.history,
     required this.onReExport,
     required this.onRestore,
+    required this.onLearningChanged,
   });
 
   @override
@@ -39,6 +41,8 @@ class ExportHistoryDetailPane extends StatelessWidget {
               child: ListView(
                 children: [
                   _buildMetadata(context),
+                  Dimens.spacing.vertical(Dimens.size16),
+                  _buildLearning(context),
                   Dimens.spacing.vertical(Dimens.size16),
                   _buildOutputFiles(context),
                   Dimens.spacing.vertical(Dimens.size16),
@@ -111,6 +115,68 @@ class ExportHistoryDetailPane extends StatelessWidget {
           context,
           AppLang.labelsDocumentCount.tr(),
           "${history.documentCount}",
+        ),
+      ],
+    );
+  }
+
+  /// The "use for learning" choice: lets the user keep a wrongly exported case out of what
+  /// the offline engine learns from, or force a checked one in.
+  Widget _buildLearning(BuildContext context) {
+    final choice = switch (history.caseStudyStatus) {
+      CaseStudyStatus.good => CaseStudyStatus.good,
+      CaseStudyStatus.failed => CaseStudyStatus.failed,
+      _ => CaseStudyStatus.none,
+    };
+    final note = switch (choice) {
+      CaseStudyStatus.good => AppLang.engineLearningIncludedNote.tr(),
+      CaseStudyStatus.failed => AppLang.engineLearningExcludedNote.tr(),
+      _ =>
+        history.looksUnreviewed
+            ? AppLang.engineLearningAutoSkippedNote.tr()
+            : AppLang.engineLearningAutoUsedNote.tr(),
+    };
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          AppLang.engineLearningTitle.tr(),
+          style: context.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Dimens.spacing.vertical(Dimens.size8),
+        SegmentedButton<CaseStudyStatus>(
+          showSelectedIcon: false,
+          segments: [
+            ButtonSegment(
+              value: CaseStudyStatus.none,
+              label: Text(AppLang.engineLearningAuto.tr()),
+              icon: const Icon(Icons.auto_mode_outlined),
+            ),
+            ButtonSegment(
+              value: CaseStudyStatus.good,
+              label: Text(AppLang.engineLearningInclude.tr()),
+              icon: const Icon(Icons.check_circle_outline),
+            ),
+            ButtonSegment(
+              value: CaseStudyStatus.failed,
+              label: Text(AppLang.engineLearningExclude.tr()),
+              icon: const Icon(Icons.block_outlined),
+            ),
+          ],
+          selected: {choice},
+          onSelectionChanged: (selected) => onLearningChanged(selected.first),
+        ),
+        Dimens.spacing.vertical(Dimens.size4),
+        Text(
+          note,
+          style: context.textTheme.bodySmall?.copyWith(
+            color:
+                history.usedForLearning
+                    ? context.colorScheme.onSurfaceVariant
+                    : context.colorScheme.error,
+          ),
         ),
       ],
     );

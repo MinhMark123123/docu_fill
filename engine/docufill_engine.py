@@ -14,8 +14,10 @@ map request:
   {"text": "<source text, rows of ' | ' cells>",
    "fields": {"%%Key%%": "description", ...},
    "cases": [{"text": "...", "values": {"%%Key%%": "exported value"},
-              "predicted": {"%%Key%%": "value proposed at import"}}],
-     (exports where the user changed almost nothing are not learned from)
+              "predicted": {"%%Key%%": "value proposed at import"},
+              "learning": "good" | "failed" | "none"}],
+     (the user's choice; with "none", exports where the user changed almost
+      nothing are not learned from)
    "ocr": true when the text comes from OCR (repairs accents of its values),
    "known_values": {"%%Key%%": ["confirmed value of a past export without source text"]},
    "case_files": ["<dataset.jsonl of tools/data_export or export_histories.json of the in-app export>", ...]}
@@ -153,7 +155,7 @@ def _load_cases(request: dict) -> tuple[list[tuple[str, dict[str, str]]], int]:
     for c in request.get("cases", []):
         if not c.get("text"):
             continue
-        if was_reviewed(c.get("predicted") or {}, c["values"]):
+        if was_reviewed(c.get("predicted") or {}, c["values"], c.get("learning") or "none"):
             cases.append((c["text"], c["values"]))
         else:
             unreviewed += 1

@@ -44,7 +44,7 @@ III. KẾT QUẢ THẨM ĐỊNH: |  |  |  |  |  |
  | 2. Giá trị quyền sử dụng đất trồng cây lâu năm thuộc lộ giới |  | 0 | 0 |  |
  | Tổng diện tích (m2) |  | 0 | 0 |  |
 TT | Nội dung | Tài sản thẩm định | Tài sản so sánh 1 | Tài sản so sánh 2 | Tài sản so sánh 3 |
- | Mô tả chi tiết tài sản | x | DT: 2100m2 Đất trồng cây, tọa lạc tại đường rộng khoảng 3m. Địa chỉ: Thôn 2, tỉnh B.(Xã H, Tỉnh L). Toạ độ: (1, 2) | Đất ở, giáp đường, 2 mặt tiền. Thửa đất số 52, tờ bản đồ số 140 | Nhà cấp 4 (DTXD: 80m2), giáp đường |
+ | Mô tả chi tiết tài sản | x | DT: 2100m2 Đất trồng cây, tọa lạc tại đường rộng khoảng 3m. Địa chỉ: Thôn 2, tỉnh B.(Xã H, Tỉnh L). Toạ độ: (1, 2) Liên hệ: Chị Tư 1990 - 0912345678 | Đất ở, giáp đường, 2 mặt tiền. Thửa đất số 52, tờ bản đồ số 140. Liên hệ: 0901.234.567 - Anh Ba | DT: 109m2, Nhà cấp 4 (DTXD: khoảng 80m2, CLCL: 85%), giáp đường. Liên hệ: Anh Năm - 0911.111.111 - 0922.222.222 |
 A | Giá tham khảo (đồng) |  | 1000000000 | 450000000 | 2500000000 |
 2 | Giá trị ts trên đất (đồng) |  |  |  | 500000000 |
 1 | Diện tích đất (m2) | 1234.5 | 2100 | 1000 | 5800 |
@@ -176,7 +176,26 @@ def test_comparable_table():
     assert v["%%DoRongDuongTaiSan2%%"] == "1,5m"
     assert v["%%LoaiCongTrinhXayDungTaiSan1%%"] == "Đất trống"
     assert v["%%DienTichCongTrinhXayDungTaiSan1%%"] == "0"
-    assert "%%LoaiCongTrinhXayDungTaiSan3%%" not in v  # has a building value
+    assert v["%%LoaiCongTrinhXayDungTaiSan3%%"] == "Nhà cấp 4"  # not vacant: a house
+
+
+def test_comparable_with_a_house():
+    out = _values()
+    v = out.values
+    assert v["%%LoaiCongTrinhXayDungTaiSan3%%"] == "Nhà cấp 4"
+    assert v["%%DienTichCongTrinhXayDungTaiSan3%%"] == "80"
+    assert v["%%ChatLuongConLaiCongTrinhXayDungTaiSan3%%"] == "85%"
+    assert v["%%GiaTriCongTrinhXayDungTaiSan3%%"] == "500.000.000"
+    assert v["%%SoTangTaiSan3%%"] == "1" and "%%SoTangTaiSan3%%" in out.check
+
+
+def test_sellers():
+    out = _values()
+    v = out.values
+    assert (v["%%NguoiBan1%%"], v["%%SoDienThoaiNguoiBan1%%"]) == ("Chị Tư", "0912345678")
+    assert (v["%%NguoiBan2%%"], v["%%SoDienThoaiNguoiBan2%%"]) == ("Anh Ba", "0901.234.567")
+    assert v["%%SoDienThoaiNguoiBan3%%"] == "0911.111.111 - 0922.222.222"
+    assert "%%NguoiBan1%%" not in out.check
 
 
 def test_ocr_skips_table_columns_and_blanks_nothing_on_comparables():
@@ -197,6 +216,7 @@ def test_formats():
     assert percent("-0.05") == "-5%"
     assert percent("0") == "0%"
     assert percent("0.015") == "1.5%"
+    assert vn_number("524999999.99999994") == "525.000.000"
     assert vn_number("1.234") == ""  # 1234 or 1.234: not guessed
     assert vn_number("1234.125") == "1.234,125"
     assert percent("") is None
@@ -236,6 +256,14 @@ def test_unreviewed_export_is_recognized():
     assert was_reviewed(predicted, edited)
     assert was_reviewed({"a": "1"}, {"a": "1"})  # too few proposals to tell
     assert was_reviewed({}, {"a": "1"})
+
+
+def test_the_users_choice_wins():
+    predicted = {f"k{i}": str(i) for i in range(100)}
+    assert was_reviewed(predicted, dict(predicted), "good")
+    edited = {**predicted, **{f"k{i}": "x" for i in range(50)}}
+    assert not was_reviewed(predicted, edited, "failed")
+    assert was_reviewed(predicted, edited, "needsReview")
 
 
 if __name__ == "__main__":

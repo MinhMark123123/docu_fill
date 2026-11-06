@@ -263,6 +263,7 @@ class OfflineEngineService {
     final known = <String, Set<String>>{};
     for (final history in histories) {
       if (history.sources.any((s) => s.text.isNotEmpty)) continue;
+      if (history.caseStudyStatus == CaseStudyStatus.failed) continue;
       for (final entries in [history.fieldValues, history.singleLineValues]) {
         entries.forEach((key, entry) {
           final value = entry.value;
@@ -295,11 +296,13 @@ class OfflineEngineService {
         });
       }
       // Lets the engine tell exports the user reviewed from those exported as
-      // proposed, which must not be learned from.
-      final predicted = <String, String>{
-        for (final source in history.sources) ...source.predictedValues,
-      };
-      cases.add({'text': text, 'values': values, 'predicted': predicted});
+      // proposed, which must not be learned from, and honour the user's choice.
+      cases.add({
+        'text': text,
+        'values': values,
+        'predicted': history.predictedValues,
+        'learning': history.caseStudyStatus.name,
+      });
     }
     return cases;
   }

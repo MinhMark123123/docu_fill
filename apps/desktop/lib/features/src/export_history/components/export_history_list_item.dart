@@ -43,6 +43,18 @@ class ExportHistoryListItem extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
+                  if (!history.usedForLearning)
+                    Padding(
+                      padding: EdgeInsets.only(right: Dimens.size8),
+                      child: Tooltip(
+                        message: AppLang.engineLearningNotUsedTooltip.tr(),
+                        child: Icon(
+                          Icons.block_outlined,
+                          size: Dimens.size16,
+                          color: context.colorScheme.error,
+                        ),
+                      ),
+                    ),
                   Expanded(
                     child: Text(
                       history.baseFileName,

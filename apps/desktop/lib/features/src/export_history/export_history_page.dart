@@ -67,6 +67,8 @@ class ExportHistoryPage extends BaseView<ExportHistoryViewModel> {
                                 history: selectedHistory,
                                 onReExport: () =>
                                     viewModel.reExport(selectedHistory),
+                                onLearningChanged: (value) => viewModel
+                                    .setLearning(selectedHistory, value),
                                 onRestore: () => viewModel.restoreToForm(
                                   context,
                                   selectedHistory,

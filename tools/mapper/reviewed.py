@@ -22,7 +22,17 @@ def touched_share(predicted: dict[str, str], values: dict[str, str]) -> float:
     return changed / len(predicted)
 
 
-def was_reviewed(predicted: dict[str, str], values: dict[str, str]) -> bool:
+# The user's "use for learning" choice in the app's export history, stored in
+# caseStudyStatus: "good" always learns, "failed" never, anything else is decided
+# from the share of values touched.
+INCLUDE, EXCLUDE = "good", "failed"
+
+
+def was_reviewed(predicted: dict[str, str], values: dict[str, str], choice: str = "none") -> bool:
+    if choice == INCLUDE:
+        return True
+    if choice == EXCLUDE:
+        return False
     return len(predicted) < MIN_PREDICTED or touched_share(predicted, values) >= MIN_TOUCHED
 
 
@@ -36,4 +46,4 @@ def is_reviewed(history: dict) -> bool:
         for group in ("fieldValues", "singleLineValues")
         for k, e in history.get(group, {}).items()
     }
-    return was_reviewed(predicted, values)
+    return was_reviewed(predicted, values, history.get("caseStudyStatus") or "none")

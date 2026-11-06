@@ -118,4 +118,52 @@ class ExportHistory {
       _$ExportHistoryFromJson(json);
 
   Map<String, dynamic> toJson() => _$ExportHistoryToJson(this);
+
+  /// The same export with the user's choice of whether the offline engine
+  /// learns from it.
+  ExportHistory withCaseStudyStatus(CaseStudyStatus value) => ExportHistory(
+    id: id,
+    createdAt: createdAt,
+    baseFileName: baseFileName,
+    exportDirectory: exportDirectory,
+    status: status,
+    templateIds: templateIds,
+    templateSnapshots: templateSnapshots,
+    fieldValues: fieldValues,
+    singleLineValues: singleLineValues,
+    outputFiles: outputFiles,
+    errorMessage: errorMessage,
+    documentCount: documentCount,
+    caseStudyStatus: value,
+    sources: sources,
+  );
+
+  /// Values the mapper proposed when the source files were imported.
+  Map<String, String> get predictedValues => {
+    for (final source in sources) ...source.predictedValues,
+  };
+
+  /// Exported almost as proposed, so probably not checked. Mirrors
+  /// tools/mapper/reviewed.py, which makes the actual decision in the engine.
+  bool get looksUnreviewed {
+    final predicted = predictedValues;
+    if (predicted.length < 20) return false;
+    String words(String? v) => (v ?? '').trim().split(RegExp(r'\s+')).join(' ');
+    final exported = {
+      for (final e in [...fieldValues.entries, ...singleLineValues.entries])
+        e.key: e.value.value,
+    };
+    final changed =
+        predicted.entries
+            .where((e) => words(exported[e.key]) != words(e.value))
+            .length;
+    return changed / predicted.length < 0.03;
+  }
+
+  /// Whether the offline engine learns from this export.
+  bool get usedForLearning => switch (caseStudyStatus) {
+    CaseStudyStatus.good => true,
+    CaseStudyStatus.failed => false,
+    _ => !looksUnreviewed,
+  };
 }

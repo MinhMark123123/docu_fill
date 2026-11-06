@@ -38,6 +38,13 @@ SITED = r"t[oọ][aạ]\s*lạc|giáp\b"  # where a description moves from what 
 FRONTAGES = re.compile(r"(?<![\d.,])\b(0?[1-4]|một|hai|ba)\s*mặt\s*tiền\b", re.I)
 WORD_COUNT = {"một": "1", "hai": "2", "ba": "3"}
 ROAD_START = re.compile(r"(?:đường|hẻm|ngõ)\b", re.I)
+# "Nhà cấp 4 (DTXD: khoảng 80m2, CLCL: 85%)" in a comparable's description.
+HOUSE = re.compile(r"((?:căn\s*)?nhà\s*cấp\s*\d)\s*\(([^)]*)\)", re.I)
+HOUSE_AREA = re.compile(r"DT(?:XD|SD)\s*:?\s*(?:~|khoảng)?\s*(\d+(?:[.,]\d+)?)\s*m", re.I)
+HOUSE_QUALITY = re.compile(r"CLCL\s*:?\s*~?\s*(\d+(?:[.,]\d+)?)\s*%", re.I)
+STOREYS = re.compile(r"\b(?:tầng|lầu|trệt)\b", re.I)
+CONTACT = re.compile(r"Liên\s*hệ\s*:\s*(.+)$", re.I | re.S)
+PHONE = re.compile(r"(?<![\d.])0\d[\d. ]{7,13}\d(?![\d.])")
 BUILDING = re.compile(r"\b(?:nhà|CTXD|DTXD|xưởng|cấp\s*4)\b", re.I)
 # Comparison-table rows that carry an adjustment rate, by template key part.
 RATE_ROWS = {
@@ -89,7 +96,12 @@ def plain_number(text: str) -> str:
         t = t.replace(".", "")
     elif re.search(r"^-?\d{1,3}\.\d{3}$", t):
         return ""
-    return t if NUMBER.match(t) else ""
+    if not NUMBER.match(t):
+        return ""
+    # Excel float noise: 524999999.99999994 is 525000000.
+    if len(t.partition(".")[2]) >= 8:
+        t = f"{float(t):.6f}".rstrip("0").rstrip(".")
+    return t
 
 
 def vn_number(text: str) -> str:
@@ -385,6 +397,46 @@ def _description_block(desc: str) -> dict[str, str]:
     return parts
 
 
+def contact(text: str) -> tuple[str, str, bool] | None:
+    """(name, phones, needs a check) from "Liên hệ: Anh Tuấn - 0797 986 682" or
+    "Liên hệ: 0919.21.7474 - Anh Nhân". Phones are kept as written; several are
+    joined with " - ". None without a phone number."""
+    m = CONTACT.search(text.replace("\n", " "))
+    if not m:
+        return None
+    rest = re.split(r"\s*(?:To[aạ]\s*độ|Diện\s*tích|Địa\s*chỉ)\s*:", m.group(1), flags=re.I)[0]
+    phones = [p.strip() for p in PHONE.findall(rest) if len(re.sub(r"\D", "", p)) in (10, 11)]
+    if not phones:
+        return None
+    name = rest
+    for phone in phones:
+        name = name.replace(phone, " ")
+    several = bool(re.search(r"\bhoặc\b|,", name, re.I))
+    name = re.sub(r"\b\d+\b", " ", name)  # a year of birth: "Lan 1990 - 09..."
+    name = clean(re.sub(r"\s*[-–/]\s*", " ", name)).strip(" .,;:")
+    return name, " - ".join(phones), several or not name
+
+
+def _house(desc: str, value: str, out: Extraction, n: str) -> None:
+    """A comparable with a house on it: type, floor area and remaining quality
+    from its description, value from "Giá trị ts trên đất". The storeys are rarely
+    written; one is proposed and flagged."""
+    m = HOUSE.search(desc)
+    if not m:
+        return
+    out.put(f"LoaiCongTrinhXayDungTaiSan{n}", _sentence(m.group(1)))
+    area = HOUSE_AREA.search(m.group(2))
+    if area:
+        out.put(f"DienTichCongTrinhXayDungTaiSan{n}", area.group(1).replace(".", ","))
+    quality = HOUSE_QUALITY.search(m.group(2))
+    if quality:
+        out.put(f"ChatLuongConLaiCongTrinhXayDungTaiSan{n}", f"{quality.group(1).replace('.', ',')}%")
+    if plain_number(value) not in ("", "0"):
+        out.put(f"GiaTriCongTrinhXayDungTaiSan{n}", vn_number(value))
+    if not STOREYS.search(desc):
+        out.put(f"SoTangTaiSan{n}", "1", check=True)
+
+
 def _comparables(doc: RawDocument, out: Extraction) -> None:
     desc_row = _table_row(doc, "motachitiet")
     build_row = _table_row(doc, "giatritstrendat")
@@ -405,6 +457,11 @@ def _comparables(doc: RawDocument, out: Extraction) -> None:
                     out.put(f"{key}{n}", m.group(1).rstrip(".,"))
                 else:
                     out.blank(f"{key}{n}")
+            seller = contact(cell.text)
+            if seller:
+                name, phones, unsure = seller
+                out.put(f"NguoiBan{n}", name, check=unsure)
+                out.put(f"SoDienThoaiNguoiBan{n}", phones, check=unsure)
         if price_row is not None and (cell := _column(doc, price_row, n)):
             if plain_number(cell.text):
                 # The offered price, not the estimated deal price on the next row.
@@ -422,7 +479,9 @@ def _comparables(doc: RawDocument, out: Extraction) -> None:
             cell = _column(doc, build_row, n)
             desc = _column(doc, desc_row, n) if desc_row is not None else None
             built = desc is not None and BUILDING.search(desc.text)
-            if not built and (cell is None or plain_number(cell.text) in ("", "0")):
+            if built:
+                _house(desc.text, cell.text if cell else "", out, n)
+            elif cell is None or plain_number(cell.text) in ("", "0"):
                 out.put(f"LoaiCongTrinhXayDungTaiSan{n}", "Đất trống")
                 for key in (
                     "SoTangTaiSan", "DienTichCongTrinhXayDungTaiSan", "DonGiaXayDungCongTrinhTaiSan",
