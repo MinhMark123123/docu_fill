@@ -21,7 +21,7 @@ from datetime import date, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from domain import branch_values, extract, percent  # noqa: E402
+from domain import branch_values, extract, percent, tidy  # noqa: E402
 from learner import Mapper, same_value  # noqa: E402
 from rawdoc import RawDocument  # noqa: E402
 from reviewed import is_reviewed  # noqa: E402
@@ -125,6 +125,7 @@ def main() -> None:
             for key, pred in preds.items():
                 if pred.grounded and plausible(pred.value, asker.confirmed.get(key, [])):
                     new[key] = pred.value
+        new = {k: tidy(k, v) for k, v in new.items()}
         old = {}
         for source in target["sources"]:
             old.update(source.get("predictedValues") or {})

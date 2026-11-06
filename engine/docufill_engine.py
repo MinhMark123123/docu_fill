@@ -224,7 +224,7 @@ def _fit_rules(cases, docs):
 def cmd_map(args) -> dict:
     from accents import fix_accents
     from certificate import compare, papers_from_report, read_certificates
-    from domain import branch_values, extract
+    from domain import branch_values, extract, tidy
     from llm_mapper import LlmMapper
     from rawdoc import RawDocument
     from shapes import plausible
@@ -312,6 +312,8 @@ def cmd_map(args) -> dict:
                 values[key] = {"value": pred.value, "source": "llm", "confidence": 0.0, "review": True}
         stats["llm"] = sum(1 for v in values.values() if v["source"] == "llm")
         stats["llm_usage"] = usage
+    for key, item in values.items():
+        item["value"] = tidy(key, item["value"])
     if ocr:
         _, differs = compare({k: v["value"] for k, v in values.items()}, certificates)
         stats["certificate_differs"] = len(differs)

@@ -48,3 +48,7 @@ app.*.map.json
 # Local sample documents and research data
 example_docs/
 research_samples/
+
+# Customer dossiers and app data exports used to improve the engine (see case_data/README.md)
+/case_data/*
+!/case_data/README.md

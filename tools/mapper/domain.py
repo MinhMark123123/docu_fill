@@ -34,6 +34,11 @@ HUONG = re.compile(
 PARCEL = re.compile(r"thửa(?:\s*đất)?(?:\s*số)?\s*:?\s*(\d[\d.,]*)", re.I)
 SHEET_NO = re.compile(r"tờ(?:\s*bản\s*đồ)?(?:\s*số)?\s*:?\s*(\d[\d.,]*)", re.I)
 ROAD_WIDTH = re.compile(r"rộng\s*(?:khoảng\s*)?(\d+(?:[.,]\d+)?)\s*m", re.I)
+BARE_WIDTH = re.compile(r"^\s*(\d+(?:[.,]\d+)?)\s*m\s*$", re.I)  # a cell holding only "13m"
+SPAN = r"\d+(?:[.,]\d+)?\s*m?(?:\s*[-–]\s*\d+(?:[.,]\d+)?\s*m?)?"
+SIZE = re.compile(rf"ngang\s*({SPAN})\s*[x×]\s*dài\s*({SPAN})", re.I)
+# Land items of the valuation table that the form calls "trong lộ giới".
+RIGHT_OF_WAY = re.compile(r"logioi|quyhoach|giaothong")
 SITED = r"t[oọ][aạ]\s*lạc|giáp\b"  # where a description moves from what to where
 FRONTAGES = re.compile(r"(?<![\d.,])\b(0?[1-4]|một|hai|ba)\s*mặt\s*tiền\b", re.I)
 WORD_COUNT = {"một": "1", "hai": "2", "ba": "3"}
@@ -121,6 +126,30 @@ def decimal_comma(text: str) -> str:
     return re.sub(r"(?<=\d)\.(?=\d{1,2}(?!\d))", ",", text)
 
 
+def trim_zeros(text: str) -> str:
+    """"7,10m" -> "7,1m", "6,0m" -> "6m": decimals as the user writes them."""
+    text = re.sub(r"(\d),0+(?![\d])", r"\1", text)
+    return re.sub(r"(\d,\d*?[1-9])0+(?![\d])", r"\1", text)
+
+
+def measure(text: str) -> str:
+    """A length or range from a description, as the fields hold it:
+    "3.8m" -> "3,8", "20,5m - 20,7m" -> "20,5-20,7", "74.90" -> "74,9"."""
+    text = re.sub(r"\s*m\b", "", text.replace("–", "-"))
+    text = re.sub(r"\s*-\s*", "-", text.strip())
+    return trim_zeros(re.sub(r"(?<=\d)\.(?=\d{1,2}(?!\d))", ",", text))
+
+
+AWAY_FROM_APPRAISED = re.compile(r"\s*\(\s*cách\s*TS\s*T[ĐD][^)]*\)", re.I)
+
+
+def tidy(key: str, value: str) -> str:
+    """Remarks the user always deletes, whichever mapper produced the value."""
+    if re.fullmatch(r"%%KhoangCachTuTaiSan\d?DenDuongPhoChinh%%", key):
+        return AWAY_FROM_APPRAISED.sub("", value).strip()
+    return value
+
+
 def percent(text: str) -> str | None:
     """Rate cell as a percentage: -0.05 -> -5%, 0 -> 0%. The value goes into the
     document as text, where "-0.05" would be printed as it is."""
@@ -204,6 +233,7 @@ def _dates(out: Extraction, today: date) -> None:
     out.put("ngaythangnam", f"ngày {today.day:02d} tháng {today.month:02d} năm {today.year}", check=True)
     out.put("ThangNamTuVanGia", f"{today.month:02d}/{today.year}")
     out.blank("NgayThangNamNhanHoSo")
+    out.blank("sothongbao")  # the case number the user gives the export
 
 
 def _customer(doc: RawDocument, out: Extraction) -> None:
@@ -274,9 +304,9 @@ def _land(doc: RawDocument, out: Extraction) -> None:
             if m and depth is None:
                 depth = clean(m.group(1))
     if front and back:
-        out.put("MatTienMatHau", decimal_comma(f"{front}/ {back}"))
+        out.put("MatTienMatHau", trim_zeros(decimal_comma(f"{front}/ {back}")))
     if depth:
-        out.put("ChieuSauTrungBinh", decimal_comma(depth))
+        out.put("ChieuSauTrungBinh", trim_zeros(decimal_comma(depth)))
 
     # Written "Thửa đất số: 116"; the request form buries it inside a sentence.
     for label, key in (("thuadatso", "SoThuaDat"), ("tobandoso", "SoToBanDo")):
@@ -349,10 +379,67 @@ def _building(doc: RawDocument, out: Extraction) -> None:
                         break
 
 
+def _building_figures(doc: RawDocument, out: Extraction) -> None:
+    """Year and footprint from the first building described under "b. Về tài sản
+    gắn liền với đất", and the valuation table "Hạng mục CTXD | Diện tích |
+    Đơn giá | Chất lượng còn lại | Giá trị" when it values a single building."""
+    start = _row_index(doc, "bvetaisan")
+    if start is not None:
+        stop = _row_index(doc, "iiiketqua", start)
+        text = "\n".join(c.text for row in doc.rows[start:stop] for c in row if c.text)
+        year = re.search(r"Năm xây dựng\D{0,20}?(\d{4})", text, re.I)
+        if year:
+            out.put("NamXayDung", year.group(1))
+        area = re.search(r"Diện tích xây dựng\s*:?\s*(\d+(?:[.,]\d+)?)\s*m", text, re.I)
+        if area:
+            out.put("DienTichXayDungCTXD", measure(area.group(1)))
+
+    head = _row_index(doc, "sttxhangmucctxd".replace("x", ""))
+    if head is None:
+        head = next((i for i, row in enumerate(doc.rows) if any(c.key == "hangmucctxd" for c in row)), None)
+    if head is None:
+        return
+    cols = {}
+    for c in doc.rows[head]:
+        for name, label in (("area", "dientich"), ("price", "dongia"), ("quality", "chatluongconlai"), ("value", "giatri")):
+            if c.key.startswith(label) and name not in cols:
+                cols[name] = c.col
+    if len(cols) < 4:
+        return
+    items = []
+    for row in doc.rows[head + 1 : head + 8]:
+        first = next((c for c in row if c.text), None)
+        if first is None or not re.fullmatch(r"\d+", first.text.strip()):
+            if first is not None and items:
+                break
+            continue
+        items.append(row)
+    if len(items) != 1:
+        return  # several buildings: how they add up is the user's call
+
+    def cell(name: str) -> str:
+        col = cols[name]
+        return items[0][col].text if col < len(items[0]) else ""
+
+    if plain_number(cell("area")) in ("", "0"):
+        return
+    area = measure(plain_number(cell("area")))
+    # The table values the floor area the user also writes as used and recognised.
+    out.put("DienTichSuDungThucTeCTXD", area, check=True)
+    out.put("DienTichSuDungCongNhanCTXD", area, check=True)
+    out.put("DonGiaCTXD", vn_number(cell("price")))
+    out.put("ChatLuongConLai", percent(cell("quality")))
+    rounded = _labeled(doc, "giatritaisantrendatlamtron")
+    value = rounded[0] if rounded and plain_number(rounded[0]) else cell("value")
+    if plain_number(value):
+        out.put("GiaTriCTXD", vn_number(f"{float(plain_number(value)):.0f}"))
+
+
 def _valuation(doc: RawDocument, out: Extraction) -> None:
     """"Khoản mục | Theo đơn giá nhà nước | Theo đơn giá thẩm định" and the rows
-    under it. The form's "ngoài lộ giới" is its first land item. With more items
-    than that plus the right-of-way one, how they add up is the user's call."""
+    under it. The form's "ngoài lộ giới" is its first land item; "trong lộ giới"
+    is land in a right of way or planned for a road. Other land items (several
+    parcels or land types) are how the user adds them up, so nothing is read."""
     head = _row_index(doc, "khoanmuc")
     if head is None:
         return
@@ -365,20 +452,24 @@ def _valuation(doc: RawDocument, out: Extraction) -> None:
         label = next((c.key for c in doc.rows[i] if c.text), "")
         if re.match(r"\d", label) and "giatriquyensudungdat" in label:
             items.append(i)
-    if len(items) != 2 or "logioi" not in " ".join(c.key for c in doc.rows[items[1]]):
+    if len(items) < 2 or not all(
+        RIGHT_OF_WAY.search(" ".join(c.key for c in doc.rows[i])) for i in items[1:]
+    ):
         return
 
     def cell(i: int, col: int) -> str:
         return doc.rows[i][col].text if col < len(doc.rows[i]) else ""
 
-    first, second = items
+    first, others = items[0], items[1:]
     out.put("GiaTriDatONgoaiLoGioi", vn_number(cell(first, appraised)))
     out.put("DienTichDatNgoaiLoGioi", vn_number(cell(first + 1, appraised)))
     out.put("DonGiaDatNhaNuoc", vn_number(cell(first + 2, state)))
-    if plain_number(cell(second, appraised)) in ("", "0"):
+    used = [i for i in others if plain_number(cell(i, appraised)) not in ("", "0")]
+    if not used:
         out.blank("DienTichDatTrongLoGioi")
         out.blank("GiaTriDatOTrongLoGioi")
-    else:
+    elif len(used) == 1:
+        (second,) = used
         out.put("GiaTriDatOTrongLoGioi", vn_number(cell(second, appraised)))
         out.put("DienTichDatTrongLoGioi", vn_number(cell(second + 1, appraised)))
 
@@ -443,13 +534,27 @@ def _comparables(doc: RawDocument, out: Extraction) -> None:
     price_row = _table_row(doc, "giathamkhao")
     time_row = _table_row(doc, "thoidiemgiaodich")
     road_row = _table_row(doc, "dorongmatcatngo")
+    width_row = _table_row(doc, "dorongmattien")
     for n in PROPERTIES:
         if desc_row is not None and (cell := _column(doc, desc_row, n)):
             parts = _description_block(cell.text)
             if "address" in parts:
                 old, new = split_new_address(parts["address"])
                 out.put(f"DiaChiTaiSan{n}", f"{old} (nay là {new})" if new else old)
-            out.put(f"LoaiDatVaDienTichTaiSan{n}", parts.get("land"), check=True)
+            land = parts.get("land")
+            if land is None and HOUSE.search(cell.text):
+                # A house's description names the building, not the land: offers
+                # in the same street usually share the appraised land's use.
+                land = out.values.get("%%MucDichSuDungDat%%")
+            out.put(f"LoaiDatVaDienTichTaiSan{n}", land, check=True)
+            size = SIZE.search(cell.text.replace("\n", " "))
+            if size:
+                width, length = measure(size.group(1)), measure(size.group(2))
+                # The width row of the table can disagree (e.g. 10,21 for "ngang 10m").
+                listed = _column(doc, width_row, n) if width_row is not None else None
+                differs = listed is not None and plain_number(listed.text) not in ("", plain_number(width.split("-")[0]))
+                out.put(f"ChieuNgangTaiSan{n}", width, check=differs)
+                out.put(f"ChieuDaiTaiSan{n}", length)
             # Offers rarely state these; other numbers in the text are not them.
             for regex, key in ((PARCEL, "ThuaDatTaiSan"), (SHEET_NO, "ToBanDoTaiSan")):
                 m = regex.search(cell.text)
@@ -471,7 +576,7 @@ def _comparables(doc: RawDocument, out: Extraction) -> None:
             if m:
                 out.put(f"ThoiDiemGiaoDichTaiSan{n}", m.group())
         if road_row is not None and (cell := _column(doc, road_row, n)):
-            m = ROAD_WIDTH.search(cell.text)
+            m = ROAD_WIDTH.search(cell.text) or BARE_WIDTH.match(cell.text)
             if m:
                 out.put(f"DoRongDuongTaiSan{n}", f"{m.group(1).replace('.', ',')}m")
         # Vacant land: "Giá trị ts trên đất" empty or zero, so nothing to value.
@@ -596,6 +701,7 @@ def extract(doc: RawDocument, today: date, ocr: bool = False) -> Extraction:
     _property_address(doc, out)
     _land(doc, out)
     _building(doc, out)
+    _building_figures(doc, out)
     _frontages(doc, out, ocr)
     if not ocr:
         _legal(doc, out)

@@ -7,7 +7,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from domain import branch_values, extract, percent, split_new_address, vn_number  # noqa: E402
+from domain import (  # noqa: E402
+    branch_values, extract, measure, percent, split_new_address, tidy, trim_zeros, vn_number,
+)
 from learner import _word_end  # noqa: E402
 from llm_mapper import grounded  # noqa: E402
 from rawdoc import RawDocument  # noqa: E402
@@ -265,6 +267,90 @@ def test_the_users_choice_wins():
     assert not was_reviewed(predicted, edited, "failed")
     assert was_reviewed(predicted, edited, "needsReview")
 
+
+
+VALUATION = """--- Sheet: BC ---
+- BĐSTĐ tọa lạc tại đường A |  |  |  | 
+ | Khoản mục | Theo đơn giá nhà nước | Theo đơn giá thẩm định | 
+ | 1. Giá trị quyền sử dụng đất ở tại đô thị | 1000000000 | 2000000000 | 
+ | Tổng diện tích (m2) | 80 | 80 | 
+ | Đơn giá (đồng/m2) | 12500000 | 25000000 | 
+ | 2. Giá trị quyền sử dụng đất trồng cây lâu năm thuộc lộ giới | 0 | 0 | 
+ | Tổng diện tích (m2) | 0 | 0 | 
+ | 2. Giá trị quyền sử dụng đất thuộc quy hoạch đất giao thông | 150000000 | 150000000 | 
+ | Tổng diện tích (m2) | 10.5 | 10.5 | 
+ | 3.Giá trị tài sản nhà ở | 900000000 | 900000000 | 
+b. Về tài sản gắn liền với đất: |  |  |  | 
++Diện tích sàn: 200 m2 |  |  |  | 
++Diện tích xây dựng: 70.5 m2 |  |  |  | 
++Năm xây dựng: 2019 |  |  |  | 
+- Loại tài sản: nhà cấp 3 |  |  |  | 
++Năm xây dựng: năm 2024 |  |  |  | 
+III. KẾT QUẢ THẨM ĐỊNH |  |  |  | 
+STT | Hạng mục CTXD | Diện tích (m2) | Đơn giá (VNĐ) | Chất lượng còn lại (%) | Giá trị thẩm định (VNĐ)
+ |  | (1) | (2) | (3) | (4 = 1x2x3)
+1 | Nhà cấp 2A | 200 | 6000000 | 0.75 | 899999999.996
+Giá trị tài sản trên đất (làm tròn) | 900000000 | đồng |  |  | 
+"""
+
+
+def test_planned_road_land_is_inside_the_right_of_way():
+    v = extract(RawDocument(_sheet_rows(VALUATION)), date(2026, 11, 4)).values
+    assert v["%%GiaTriDatONgoaiLoGioi%%"] == "2.000.000.000"
+    assert v["%%DienTichDatNgoaiLoGioi%%"] == "80"
+    assert v["%%DonGiaDatNhaNuoc%%"] == "12.500.000"
+    assert v["%%GiaTriDatOTrongLoGioi%%"] == "150.000.000"
+    assert v["%%DienTichDatTrongLoGioi%%"] == "10,5"
+
+
+def test_several_land_types_are_left_to_the_user():
+    text = VALUATION.replace("thuộc quy hoạch đất giao thông", "trồng lúa")
+    v = extract(RawDocument(_sheet_rows(text)), date(2026, 11, 4)).values
+    assert "%%GiaTriDatONgoaiLoGioi%%" not in v
+
+
+def test_building_of_the_appraised_property():
+    out = extract(RawDocument(_sheet_rows(VALUATION)), date(2026, 11, 4))
+    v = out.values
+    assert v["%%NamXayDung%%"] == "2019"  # the first building described
+    assert v["%%DienTichXayDungCTXD%%"] == "70,5"
+    assert v["%%DienTichSuDungThucTeCTXD%%"] == "200"
+    assert "%%DienTichSuDungCongNhanCTXD%%" in out.check
+    assert v["%%DonGiaCTXD%%"] == "6.000.000"
+    assert v["%%ChatLuongConLai%%"] == "75%"
+    assert v["%%GiaTriCTXD%%"] == "900.000.000"  # the rounded total
+
+
+def test_two_buildings_are_left_to_the_user():
+    text = VALUATION.replace(
+        "1 | Nhà cấp 2A | 200 | 6000000 | 0.75 | 899999999.996\n",
+        "1 | Nhà cấp 2A | 200 | 6000000 | 0.75 | 899999999.996\n2 | Kho | 50 | 2000000 | 0.5 | 50000000\n",
+    )
+    assert "%%DonGiaCTXD%%" not in extract(RawDocument(_sheet_rows(text)), date(2026, 11, 4)).values
+
+
+def test_comparable_size_and_bare_road_width():
+    form = FORM.replace("Toạ độ: (1, 2) Liên hệ", "Diện tích: 2100m2 (ngang 3.8m x dài 20,5m - 20,7m). Toạ độ: (1, 2) Liên hệ")
+    form = form.replace("| rộng khoảng 3m | rộng 1.5m |", "| 13m | rộng 1.5m |")
+    v = extract(RawDocument(_sheet_rows(form)), date(2026, 11, 4)).values
+    assert (v["%%ChieuNgangTaiSan1%%"], v["%%ChieuDaiTaiSan1%%"]) == ("3,8", "20,5-20,7")
+    assert v["%%DoRongDuongTaiSan1%%"] == "13m"
+
+
+def test_house_comparable_takes_the_appraised_land_use():
+    form = FORM.replace("a. Về đất: |", "a. Về đất: |\n- Mục đích sử dụng đất: Đất ở tại đô thị. |", 1)
+    out = extract(RawDocument(_sheet_rows(form)), date(2026, 11, 4))
+    assert out.values["%%LoaiDatVaDienTichTaiSan3%%"] == "Đất ở tại đô thị"
+    assert "%%LoaiDatVaDienTichTaiSan3%%" in out.check
+
+
+def test_small_conventions():
+    assert trim_zeros("7,10m/ 4,45m") == "7,1m/ 4,45m"
+    assert trim_zeros("6,0m") == "6m"
+    assert measure("74.90 m") == "74,9"
+    assert tidy("%%KhoangCachTuTaiSan2DenDuongPhoChinh%%", "Mặt tiền đường A (cách TSTĐ 100m)") == "Mặt tiền đường A"
+    assert tidy("%%DiaChiTaiSan%%", "A (cách TSTĐ 1m)") == "A (cách TSTĐ 1m)"
+    assert "%%sothongbao%%" in _values().empty
 
 if __name__ == "__main__":
     failed = 0
